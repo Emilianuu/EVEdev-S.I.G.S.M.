@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hospital de Clínicas – Ambulancias y Traslados</title>
+
+    <!-- Bootstrap 5.3 -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Estilos propios -->
+    <link
+      rel="stylesheet"
+      href="../../css/modulo-gestion-ambulancias/panel-de-gestion.css"
+    />
+  </head>
+  <body>
+    <!-- Mobile toggle -->
+    <button class="mobile-toggle" id="mobileToggle">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+      <div class="sidebar-brand">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <img src="../../../assets/img/logo.png">
+            <rect width="44" height="44" rx="6" fill="#E3F2FD" />
+            <!-- simplified building bars -->
+            <rect x="8" y="10" width="4" height="24" rx="1" fill="#1565C0" />
+            <rect x="14" y="6" width="4" height="28" rx="1" fill="#1976D2" />
+            <rect x="20" y="10" width="4" height="24" rx="1" fill="#1565C0" />
+            <rect x="26" y="14" width="4" height="20" rx="1" fill="#42A5F5" />
+            <rect x="32" y="18" width="4" height="16" rx="1" fill="#90CAF9" />
+          </svg>
+          <div>
+            <div
+              style="
+                font-size: 11px;
+                font-weight: 700;
+                color: #1565c0;
+                line-height: 1.2;
+              "
+            >
+              HOSPITAL DE CLÍNICAS
+            </div>
+            <div style="font-size: 9.5px; color: #555; line-height: 1.2">
+              Dr. Manuel Quintela
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section-label">Sistema de Gestión</div>
+      <div class="sidebar-label-bold">Ambulancias y Traslados</div>
+
+      <ul class="list-unstyled mb-0">
+        <li class="nav-item-custom">
+          <a
+            class="nav-link-custom active"
+            data-view="dashboard"
+            onclick="navigate(this)"
+          >
+            <i class="bi bi-grid-fill"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item-custom">
+          <a
+            class="nav-link-custom"
+            data-view="traslados"
+            onclick="navigate(this)"
+          >
+            <i class="bi bi-truck"></i> Traslados
+          </a>
+        </li>
+        <li class="nav-item-custom">
+          <a
+            class="nav-link-custom"
+            data-view="nuevo-traslado"
+            onclick="navigate(this)"
+          >
+            <i class="bi bi-plus-circle"></i> Nuevo Traslado
+          </a>
+        </li>
+        <li class="nav-item-custom">
+          <a
+            class="nav-link-custom"
+            data-view="seguimiento"
+            onclick="navigate(this)"
+          >
+            <i class="bi bi-geo-alt-fill"></i> Seguimiento
+          </a>
+        </li>
+        <li class="nav-item-custom">
+          <a
+            class="nav-link-custom"
+            data-view="recursos"
+            onclick="navigate(this)"
+          >
+            <i class="bi bi-gear-fill"></i> Recursos
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="avatar-circle">A</div>
+        <div>
+          <div class="avatar-name">Admin Usuario</div>
+          <div class="avatar-role">Administrativo</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─── MAIN CONTENT ─────────────────────────────── -->
+    <main id="main">
+      <!-- DASHBOARD -->
+      <section class="view active" id="view-dashboard">
+        <div class="page-title">Dashboard – Hospital de Clínicas</div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="dash-card dc-blue">
+              <div>
+                <div class="dc-val">8</div>
+                <div class="dc-label">Traslados Activos</div>
+              </div>
+              <i class="bi bi-plus-circle"></i>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="dash-card dc-green">
+              <div>
+                <div class="dc-val">12/18</div>
+                <div class="dc-label">Vehículos Disponibles</div>
+              </div>
+              <i class="bi bi-truck"></i>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="dash-card dc-orange">
+              <div>
+                <div class="dc-val">24</div>
+                <div class="dc-label">Personal en Servicio</div>
+              </div>
+              <i class="bi bi-person"></i>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="dash-card dc-purple">
+              <div>
+                <div class="dc-val">47</div>
+                <div class="dc-label">Traslados del Día</div>
+              </div>
+              <i class="bi bi-calendar3"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h5>Traslados Activos en Tiempo Real</h5>
+
+          <div class="traslado-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h6>AMB-001 – Juan Pérez</h6>
+                <small>Destino: Hospital Maciel</small>
+              </div>
+              <span class="badge-estado b-transito">En tránsito</span>
+            </div>
+            <div class="progress" style="height: 8px; border-radius: 6px">
+              <div
+                class="progress-bar"
+                style="
+                  width: 65%;
+                  background: var(--primary);
+                  border-radius: 6px;
+                "
+              ></div>
+            </div>
+            <small class="text-muted" style="font-size: 11.5px"
+              >Progreso: 65%</small
+            >
+          </div>
+
+          <div class="traslado-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h6>AMB-003 – María Rodríguez</h6>
+                <small>Destino: Sanatorio CASMU</small>
+              </div>
+              <span class="badge-estado b-transito">En tránsito</span>
+            </div>
+            <div class="progress" style="height: 8px; border-radius: 6px">
+              <div
+                class="progress-bar"
+                style="
+                  width: 30%;
+                  background: var(--primary);
+                  border-radius: 6px;
+                "
+              ></div>
+            </div>
+            <small class="text-muted" style="font-size: 11.5px"
+              >Progreso: 30%</small
+            >
+          </div>
+
+          <div class="traslado-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h6>AUTO-012 – Equipamiento médico</h6>
+                <small>Destino: Centro de Salud Cerro</small>
+              </div>
+              <span class="badge-estado b-salida">Salida</span>
+            </div>
+            <div class="progress" style="height: 8px; border-radius: 6px">
+              <div
+                class="progress-bar"
+                style="width: 10%; background: var(--amber); border-radius: 6px"
+              ></div>
+            </div>
+            <small class="text-muted" style="font-size: 11.5px"
+              >Progreso: 10%</small
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- TRASLADOS -->
+      <section class="view" id="view-traslados">
+        <div class="page-title">Gestión de Traslados</div>
+
+        <div class="filter-bar">
+          <i
+            class="bi bi-funnel"
+            style="color: var(--text-muted); font-size: 16px"
+          ></i>
+          <select>
+            <option>Todos</option>
+            <option>En tránsito</option>
+            <option>Completado</option>
+            <option>Programado</option>
+            <option>En preparación</option>
+          </select>
+          <input type="text" placeholder="Buscar por ID o paciente" />
+        </div>
+
+        <div class="section-card p-0 overflow-hidden">
+          <div class="table-responsive">
+            <table class="table table-custom mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fecha/Hora</th>
+                  <th>Conductor</th>
+                  <th>Enfermero</th>
+                  <th>Paciente/Elemento</th>
+                  <th>Tipo</th>
+                  <th>Vehículo</th>
+                  <th>Destino</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>AMB-001</td>
+                  <td>27/05/2026 08:30</td>
+                  <td>Carlos Méndez</td>
+                  <td>Ana García</td>
+                  <td>Juan Pérez (CI: 1.234.567-8)</td>
+                  <td><span class="badge-tipo-traslado">Paciente</span></td>
+                  <td>Ambulancia 01</td>
+                  <td>Hospital Maciel</td>
+                  <td>
+                    <span class="badge-estado b-transito">En tránsito</span>
+                  </td>
+                  <td>
+                    <button class="btn-eye">
+                      <i class="bi bi-eye-fill"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AMB-002</td>
+                  <td>27/05/2026 07:45</td>
+                  <td>Roberto Silva</td>
+                  <td>Lucía Fernández</td>
+                  <td>María González (CI: 2.345.678-9)</td>
+                  <td><span class="badge-tipo-traslado">Paciente</span></td>
+                  <td>Ambulancia 03</td>
+                  <td>Sanatorio CASMU</td>
+                  <td>
+                    <span class="badge-estado b-completado">Completado</span>
+                  </td>
+                  <td>
+                    <button class="btn-eye">
+                      <i class="bi bi-eye-fill"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AUTO-012</td>
+                  <td>27/05/2026 09:00</td>
+                  <td>Diego Martínez</td>
+                  <td>N/A</td>
+                  <td>Equipamiento médico – Ecógrafo portátil</td>
+                  <td><span class="badge-tipo-traslado">Equipamiento</span></td>
+                  <td>Auto 12</td>
+                  <td>Centro de Salud Cerro</td>
+                  <td>
+                    <span class="badge-estado b-prep">En preparación</span>
+                  </td>
+                  <td>
+                    <button class="btn-eye">
+                      <i class="bi bi-eye-fill"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AMB-005</td>
+                  <td>27/05/2026 06:15</td>
+                  <td>Fernando López</td>
+                  <td>Patricia Suárez</td>
+                  <td>Muestras biológicas – Lab Central</td>
+                  <td>
+                    <span class="badge-tipo-traslado">Material biológico</span>
+                  </td>
+                  <td>Ambulancia 05</td>
+                  <td>Laboratorio Central</td>
+                  <td>
+                    <span class="badge-estado b-completado">Completado</span>
+                  </td>
+                  <td>
+                    <button class="btn-eye">
+                      <i class="bi bi-eye-fill"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AMB-007</td>
+                  <td>27/05/2026 10:30</td>
+                  <td>Gabriel Torres</td>
+                  <td>Mónica Benítez</td>
+                  <td>Pedro Sánchez (CI: 3.456.789-0)</td>
+                  <td><span class="badge-tipo-traslado">Paciente</span></td>
+                  <td>Ambulancia 07</td>
+                  <td>Hospital Saint Bois</td>
+                  <td>
+                    <span class="badge-estado b-programado">Programado</span>
+                  </td>
+                  <td>
+                    <button class="btn-eye">
+                      <i class="bi bi-eye-fill"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- NUEVO TRASLADO -->
+      <section class="view" id="view-nuevo-traslado">
+        <div class="page-title">Nueva Solicitud de Traslado</div>
+
+        <div class="section-card">
+          <!-- Wizard -->
+          <div class="wizard-steps mb-4">
+            <div class="wizard-step active">
+              <div class="step-num">1</div>
+              <span>Tipo de Traslado</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="wizard-step">
+              <div class="step-num">2</div>
+              <span>Datos del Traslado</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="wizard-step">
+              <div class="step-num">3</div>
+              <span>Asignación de Recursos</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="wizard-step">
+              <div class="step-num">4</div>
+              <span>Ruta y Horarios</span>
+            </div>
+          </div>
+
+          <p style="font-size: 14.5px; font-weight: 600; margin-bottom: 14px">
+            Seleccione el tipo de traslado
+          </p>
+
+          <div class="d-flex flex-column gap-3" style="max-width: 420px">
+            <label
+              class="d-flex align-items-center gap-10"
+              style="cursor: pointer; gap: 10px"
+            >
+              <input
+                type="radio"
+                name="tipo"
+                checked
+                style="accent-color: var(--primary); width: 18px; height: 18px"
+              />
+              <span style="font-size: 14px">Paciente (persona)</span>
+            </label>
+            <label
+              class="d-flex align-items-center gap-10"
+              style="cursor: pointer; gap: 10px"
+            >
+              <input
+                type="radio"
+                name="tipo"
+                style="accent-color: var(--primary); width: 18px; height: 18px"
+              />
+              <span style="font-size: 14px"
+                >Material biológico (muestras, órganos)</span
+              >
+            </label>
+            <label
+              class="d-flex align-items-center gap-10"
+              style="cursor: pointer; gap: 10px"
+            >
+              <input
+                type="radio"
+                name="tipo"
+                style="accent-color: var(--primary); width: 18px; height: 18px"
+              />
+              <span style="font-size: 14px">Equipamiento médico o insumos</span>
+            </label>
+          </div>
+
+          <div class="info-box">
+            <i class="bi bi-info-circle-fill"></i>
+            El tipo de traslado determinará si se asigna una ambulancia u otro
+            vehículo.
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-4">
+            <button
+              class="btn btn-outline-secondary"
+              disabled
+              style="font-size: 13.5px; padding: 9px 20px"
+            >
+              <i class="bi bi-chevron-left"></i> ANTERIOR
+            </button>
+            <button
+              class="btn btn-primary"
+              style="
+                background: var(--primary);
+                border-color: var(--primary);
+                font-size: 13.5px;
+                padding: 9px 24px;
+                font-weight: 600;
+              "
+            >
+              SIGUIENTE <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEGUIMIENTO -->
+      <section class="view" id="view-seguimiento">
+        <div class="page-title">Seguimiento en Tiempo Real</div>
+
+        <div class="row g-4">
+          <div class="col-12 col-xl-8">
+            <div class="section-card">
+              <!-- Header -->
+              <div
+                class="d-flex justify-content-between align-items-center mb-4"
+              >
+                <h5 class="mb-0" style="font-size: 19px">AMB-001</h5>
+                <span class="badge-estado b-transito"
+                  ><i class="bi bi-geo-alt-fill me-1"></i>En tránsito</span
+                >
+              </div>
+
+              <!-- Info grid -->
+              <div class="row g-3 mb-4">
+                <div class="col-6">
+                  <div
+                    style="
+                      font-size: 11.5px;
+                      color: var(--text-muted);
+                      font-weight: 600;
+                      margin-bottom: 3px;
+                    "
+                  >
+                    Paciente
+                  </div>
+                  <div style="font-size: 14px; font-weight: 700">
+                    Juan Pérez (CI: 1.234.567-8)
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div
+                    style="
+                      font-size: 11.5px;
+                      color: var(--text-muted);
+                      font-weight: 600;
+                      margin-bottom: 3px;
+                    "
+                  >
+                    Vehículo
+                  </div>
+                  <div style="font-size: 14px; font-weight: 700">
+                    Ambulancia 01 – Patente ABC 1234
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div
+                    style="
+                      font-size: 11.5px;
+                      color: var(--text-muted);
+                      font-weight: 600;
+                      margin-bottom: 3px;
+                    "
+                  >
+                    Conductor
+                  </div>
+                  <div style="font-size: 14px">Carlos Méndez</div>
+                </div>
+                <div class="col-6">
+                  <div
+                    style="
+                      font-size: 11.5px;
+                      color: var(--text-muted);
+                      font-weight: 600;
+                      margin-bottom: 3px;
+                    "
+                  >
+                    Enfermero Responsable
+                  </div>
+                  <div style="font-size: 14px">Ana García</div>
+                </div>
+              </div>
+
+              <!-- Progress bar ruta -->
+              <div
+                class="d-flex justify-content-between mb-1"
+                style="font-size: 13px"
+              >
+                <span>Hospital de Clínicas</span>
+                <strong>Hospital Maciel</strong>
+              </div>
+              <div
+                class="progress mb-1"
+                style="height: 10px; border-radius: 6px"
+              >
+                <div
+                  class="progress-bar"
+                  style="
+                    width: 65%;
+                    background: var(--primary);
+                    border-radius: 6px;
+                  "
+                ></div>
+              </div>
+              <div
+                class="d-flex justify-content-between"
+                style="font-size: 12px; color: var(--text-muted)"
+              >
+                <span>Salida: 08:30</span>
+                <span>Llegada estimada: 09:15</span>
+              </div>
+
+              <!-- Map placeholder -->
+              <div class="map-placeholder mt-4">
+                <i class="bi bi-geo-alt-fill" style="font-size: 36px"></i>
+                <span style="font-size: 14px">Mapa en Tiempo Real</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="col-12 col-xl-4">
+            <div class="section-card">
+              <h5>Línea de Tiempo</h5>
+
+              <div class="timeline-item">
+                <div class="tl-dot done">
+                  <i class="bi bi-check-lg" style="font-size: 15px"></i>
+                </div>
+                <div>
+                  <div class="tl-time">08:15</div>
+                  <div class="tl-title">Solicitud creada</div>
+                  <div class="tl-sub">
+                    Solicitud generada por Dra. María Fernández
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="tl-dot done">
+                  <i class="bi bi-check-lg" style="font-size: 15px"></i>
+                </div>
+                <div>
+                  <div class="tl-time">08:20</div>
+                  <div class="tl-title">Personal asignado</div>
+                  <div class="tl-sub">Conductor y enfermero confirmados</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="tl-dot done">
+                  <i class="bi bi-check-lg" style="font-size: 15px"></i>
+                </div>
+                <div>
+                  <div class="tl-time">08:25</div>
+                  <div class="tl-title">Vehículo preparado</div>
+                  <div class="tl-sub">Ambulancia 01 lista para salida</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="tl-dot done">
+                  <i class="bi bi-check-lg" style="font-size: 15px"></i>
+                </div>
+                <div>
+                  <div class="tl-time">08:30</div>
+                  <div class="tl-title">Salida del Hospital de Clínicas</div>
+                  <div class="tl-sub">Traslado iniciado</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="tl-dot current">
+                  <i class="bi bi-geo-alt-fill" style="font-size: 13px"></i>
+                </div>
+                <div>
+                  <div class="tl-time">08:52</div>
+                  <div class="tl-title active-step">
+                    En tránsito – Av. 18 de Julio
+                  </div>
+                  <div class="tl-sub">Ubicación actual del vehículo</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="tl-dot pending">
+                  <i class="bi bi-clock" style="font-size: 13px"></i>
+                </div>
+                <div>
+                  <div class="tl-time">09:15</div>
+                  <div class="tl-title" style="color: var(--text-muted)">
+                    Llegada estimada al Hospital Maciel
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RECURSOS -->
+      <section class="view" id="view-recursos">
+        <div class="page-title">Gestión de Recursos</div>
+
+        <!-- Stat cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-sm-4">
+            <div class="stat-card">
+              <div>
+                <div class="stat-value">2/6</div>
+                <div class="stat-label">Vehículos Totales</div>
+                <div class="stat-sub">Disponibles</div>
+              </div>
+              <div class="stat-icon-circle">
+                <i class="bi bi-truck-front-fill"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-4">
+            <div class="stat-card">
+              <div>
+                <div class="stat-value">2/5</div>
+                <div class="stat-label">Conductores</div>
+                <div class="stat-sub">Disponibles</div>
+              </div>
+              <div class="stat-icon-circle">
+                <i class="bi bi-person-fill"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-4">
+            <div class="stat-card">
+              <div>
+                <div class="stat-value">3/5</div>
+                <div class="stat-label">Enfermeros</div>
+                <div class="stat-sub">Disponibles</div>
+              </div>
+              <div class="stat-icon-circle">
+                <i class="bi bi-plus-circle-fill"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="section-card p-0 overflow-hidden">
+          <div class="px-3 pt-3">
+            <div class="tab-pill-bar">
+              <div
+                class="tab-pill active"
+                onclick="switchTab(this, 'tab-vehiculos')"
+              >
+                VEHÍCULOS
+              </div>
+              <div
+                class="tab-pill"
+                onclick="switchTab(this, 'tab-conductores')"
+              >
+                CONDUCTORES
+              </div>
+              <div class="tab-pill" onclick="switchTab(this, 'tab-enfermeros')">
+                ENFERMEROS
+              </div>
+            </div>
+          </div>
+
+          <!-- Vehículos tab -->
+          <div id="tab-vehiculos" class="tab-content-panel">
+            <div class="table-responsive">
+              <table class="table table-custom mb-0">
+                <thead>
+                  <tr>
+                    <th>ID Vehículo</th>
+                    <th>Tipo</th>
+                    <th>Patente</th>
+                    <th>Estado</th>
+                    <th>Conductor Asignado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Ambulancia 01</td>
+                    <td>
+                      <span class="badge-tipo bt-ambulancia">Ambulancia</span>
+                    </td>
+                    <td>ABC 1234</td>
+                    <td>
+                      <span class="badge-estado b-servicio">En servicio</span>
+                    </td>
+                    <td>Carlos Méndez</td>
+                  </tr>
+                  <tr>
+                    <td>Ambulancia 03</td>
+                    <td>
+                      <span class="badge-tipo bt-ambulancia">Ambulancia</span>
+                    </td>
+                    <td>DEF 5678</td>
+                    <td>
+                      <span class="badge-estado b-disponible"
+                        ><i class="bi bi-check-circle-fill"></i>
+                        Disponible</span
+                      >
+                    </td>
+                    <td>–</td>
+                  </tr>
+                  <tr>
+                    <td>Ambulancia 05</td>
+                    <td>
+                      <span class="badge-tipo bt-ambulancia">Ambulancia</span>
+                    </td>
+                    <td>GHI 9012</td>
+                    <td>
+                      <span class="badge-estado b-servicio">En servicio</span>
+                    </td>
+                    <td>Fernando López</td>
+                  </tr>
+                  <tr>
+                    <td>Ambulancia 07</td>
+                    <td>
+                      <span class="badge-tipo bt-ambulancia">Ambulancia</span>
+                    </td>
+                    <td>JKL 3456</td>
+                    <td>
+                      <span class="badge-estado b-mant">En mantenimiento</span>
+                    </td>
+                    <td>–</td>
+                  </tr>
+                  <tr>
+                    <td>Auto 10</td>
+                    <td><span class="badge-tipo bt-auto">Auto</span></td>
+                    <td>MNO 7890</td>
+                    <td>
+                      <span class="badge-estado b-disponible"
+                        ><i class="bi bi-check-circle-fill"></i>
+                        Disponible</span
+                      >
+                    </td>
+                    <td>–</td>
+                  </tr>
+                  <tr>
+                    <td>Auto 12</td>
+                    <td><span class="badge-tipo bt-auto">Auto</span></td>
+                    <td>PQR 1234</td>
+                    <td>
+                      <span class="badge-estado b-servicio">En servicio</span>
+                    </td>
+                    <td>Diego Martínez</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Conductores tab -->
+          <div
+            id="tab-conductores"
+            class="tab-content-panel"
+            style="display: none"
+          >
+            <div class="table-responsive">
+              <table class="table table-custom mb-0">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>CI</th>
+                    <th>Estado</th>
+                    <th>Vehículo Asignado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Carlos Méndez</td>
+                    <td>1.111.111-1</td>
+                    <td>
+                      <span class="badge-estado b-servicio">En servicio</span>
+                    </td>
+                    <td>Ambulancia 01</td>
+                  </tr>
+                  <tr>
+                    <td>Roberto Silva</td>
+                    <td>2.222.222-2</td>
+                    <td>
+                      <span class="badge-estado b-disponible"
+                        ><i class="bi bi-check-circle-fill"></i>
+                        Disponible</span
+                      >
+                    </td>
+                    <td>–</td>
+                  </tr>
+                  <tr>
+                    <td>Diego Martínez</td>
+                    <td>3.333.333-3</td>
+                    <td>
+                      <span class="badge-estado b-servicio">En servicio</span>
+                    </td>
+                    <td>Auto 12</td>
+                  </tr>
+                  <tr>
+                    <td>Fernando López</td>
+                    <td>4.444.444-4</td>
+                    <td>
+                      <span class="badge-estado b-servicio">En servicio</span>
+                    </td>
+                    <td>Ambulancia 05</td>
+                  </tr>
+                  <tr>
+                    <td>Gabriel Torres</td>
+                    <td>5.555.555-5</td>
+                    <td>
+                      <span class="badge-estado b-disponible"
+                        ><i class="bi bi-check-circle-fill"></i>
+                        Disponible</span
+                      >
+                    </td>
+                    <td>–</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Enfermeros tab -->
+          <div
+            id="tab-enfermeros"
+            class="tab-content-panel"
+            style="display: none"
+          >
+            <div class="table-responsive">
+              <table class="table table-custom mb-0">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>CI</th>
+                    <th>Estado</th>
+                    <th>Traslado Asignado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Ana García</td>
+                    <td>6.666.666-6</td>
+                    <td>
+                      <span class="badge-estado b-servicio">En servicio</span>
+                    </td>
+                    <td>AMB-001</td>
+                  </tr>
+                  <tr>
+                    <td>Lucía Fernández</td>
+                    <td>7.777.777-7</td>
+                    <td>
+                      <span class="badge-estado b-disponible"
+                        ><i class="bi bi-check-circle-fill"></i>
+                        Disponible</span
+                      >
+                    </td>
+                    <td>–</td>
+                  </tr>
+                  <tr>
+                    <td>Patricia Suárez</td>
+                    <td>8.888.888-8</td>
+                    <td>
+                      <span class="badge-estado b-servicio">En servicio</span>
+                    </td>
+                    <td>AMB-005</td>
+                  </tr>
+                  <tr>
+                    <td>Mónica Benítez</td>
+                    <td>9.999.999-9</td>
+                    <td>
+                      <span class="badge-estado b-disponible"
+                        ><i class="bi bi-check-circle-fill"></i>
+                        Disponible</span
+                      >
+                    </td>
+                    <td>–</td>
+                  </tr>
+                  <tr>
+                    <td>María Sosa</td>
+                    <td>1.234.567-8</td>
+                    <td>
+                      <span class="badge-estado b-servicio">En servicio</span>
+                    </td>
+                    <td>AMB-007</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript propio -->
+    <script src="../../javascript/modulo-gestion-ambulancias/panel-de-gestion.js"></script>
+  </body>
+</html>
