@@ -3,858 +3,216 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hospital de Clínicas – Sistema de Gestión de Documentos</title>
+    <title>Hospital de Clínicas – Gestión de Documentación</title>
 
-    <!-- Bootstrap 5.3 -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Bootstrap Icons -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
-      rel="stylesheet"
-    />
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&display=swap" rel="stylesheet" />
 
-    <!-- Estilos propios -->
-    <link
-      rel="stylesheet"
-      href="../../css/modulo-gestion-documentacion/panel-de-administracion.css"
-    />
+    <link rel="stylesheet" href="./assets/css/panel-de-administracion.css" />
   </head>
 
   <body>
+
     <!-- ════════════════════════════════════════
-         ROLE PICKER (fullscreen, before app shell)
+         ROLE PICKER
     ════════════════════════════════════════ -->
-    <div
-      id="view-home"
-      style="
+    <div id="view-home" style="
         display: flex;
         align-items: center;
         justify-content: center;
         min-height: 100vh;
         padding: 24px;
         background: linear-gradient(150deg, #eff6ff 0%, #f8fafc 60%, #fff 100%);
-      "
-    >
+      ">
       <div style="text-align: center; max-width: 460px; width: 100%">
-        <div
-          style="
-            width: 88px;
-            height: 88px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-          "
-        >
-          <img
-            src="../../../assets/img/logo.png"
-            alt="Logo Hospital de Clínicas"
-            style="height: 140px; object-fit: contain"
-          />
+        <div style="width: 88px; height: 88px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+          <img src="../../servicios_comunes/vista_general/logo.png" alt="Logo Hospital de Clínicas" style="height: 140px; object-fit: contain" />
         </div>
-        <h1
-          style="
-            font-family: &quot;DM Serif Display&quot;, serif;
-            font-size: 2rem;
-            font-weight: 400;
-            color: var(--hc-gray-900);
-            margin: 0 0 6px;
-          "
-        >
+        <h1 style="font-family: 'DM Serif Display', serif; font-size: 2rem; font-weight: 400; color: var(--hc-gray-900); margin: 0 0 6px;">
           Hospital de Clínicas
         </h1>
-        <p
-          style="color: var(--hc-gray-500); font-size: 0.9rem; margin: 0 0 40px"
-        >
-          Sistema de Gestión de Documentos
+        <p style="color: var(--hc-gray-500); font-size: 0.9rem; margin: 0 0 40px">
+          Módulo de Gestión de Documentación
         </p>
 
-        <p
-          style="
-            font-size: 0.77rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--hc-gray-400);
-            margin-bottom: 14px;
-          "
-        >
+        <p style="font-size: 0.77rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hc-gray-400); margin-bottom: 14px;">
           Seleccione su tipo de acceso
         </p>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
-          <div
-            onclick="showView('patient-area')"
-            style="
-              background: #fff;
-              border: 1.5px solid var(--hc-gray-200);
-              border-radius: 14px;
-              padding: 28px 20px;
-              cursor: pointer;
-              transition:
-                box-shadow 0.2s,
-                transform 0.2s,
-                border-color 0.2s;
-              text-align: center;
-            "
-            onmouseover="
-              this.style.boxShadow = '0 8px 24px rgba(0,0,0,.1)';
-              this.style.transform = 'translateY(-2px)';
-              this.style.borderColor = 'var(--hc-blue-light)';
-            "
-            onmouseout="
-              this.style.boxShadow = '';
-              this.style.transform = '';
-              this.style.borderColor = 'var(--hc-gray-200)';
-            "
-          >
-            <div
-              style="
-                width: 48px;
-                height: 48px;
-                background: var(--hc-blue-light);
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 auto 14px;
-                font-size: 1.3rem;
-                color: var(--hc-blue);
-              "
-            >
+          <div onclick="showView('patient-area')" style="background: #fff; border: 1.5px solid var(--hc-gray-200); border-radius: 14px; padding: 28px 20px; cursor: pointer; transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s; text-align: center;"
+            onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.1)';this.style.transform='translateY(-2px)';this.style.borderColor='var(--hc-blue-light)'"
+            onmouseout="this.style.boxShadow='';this.style.transform='';this.style.borderColor='var(--hc-gray-200)'">
+            <div style="width: 48px; height: 48px; background: var(--hc-blue-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 1.3rem; color: var(--hc-blue);">
               <i class="bi bi-person"></i>
             </div>
-            <div
-              style="font-weight: 700; font-size: 0.92rem; margin-bottom: 4px"
-            >
-              Soy Paciente
-            </div>
-            <div style="font-size: 0.78rem; color: var(--hc-gray-500)">
-              Acceder a documentación médica y encuestas
-            </div>
+            <div style="font-weight: 700; font-size: 0.92rem; margin-bottom: 4px">Soy Paciente</div>
+            <div style="font-size: 0.78rem; color: var(--hc-gray-500)">Acceder a documentación médica</div>
           </div>
-          <div
-            onclick="showView('view-login')"
-            style="
-              background: #fff;
-              border: 1.5px solid var(--hc-gray-200);
-              border-radius: 14px;
-              padding: 28px 20px;
-              cursor: pointer;
-              transition:
-                box-shadow 0.2s,
-                transform 0.2s,
-                border-color 0.2s;
-              text-align: center;
-            "
-            onmouseover="
-              this.style.boxShadow = '0 8px 24px rgba(0,0,0,.1)';
-              this.style.transform = 'translateY(-2px)';
-              this.style.borderColor = 'var(--hc-blue-light)';
-            "
-            onmouseout="
-              this.style.boxShadow = '';
-              this.style.transform = '';
-              this.style.borderColor = 'var(--hc-gray-200)';
-            "
-          >
-            <div
-              style="
-                width: 48px;
-                height: 48px;
-                background: var(--hc-blue-light);
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 auto 14px;
-                font-size: 1.3rem;
-                color: var(--hc-blue);
-              "
-            >
+          <div onclick="showView('view-login')" style="background: #fff; border: 1.5px solid var(--hc-gray-200); border-radius: 14px; padding: 28px 20px; cursor: pointer; transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s; text-align: center;"
+            onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,.1)';this.style.transform='translateY(-2px)';this.style.borderColor='var(--hc-blue-light)'"
+            onmouseout="this.style.boxShadow='';this.style.transform='';this.style.borderColor='var(--hc-gray-200)'">
+            <div style="width: 48px; height: 48px; background: var(--hc-blue-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 1.3rem; color: var(--hc-blue);">
               <i class="bi bi-person-gear"></i>
             </div>
-            <div
-              style="font-weight: 700; font-size: 0.92rem; margin-bottom: 4px"
-            >
-              Soy Funcionario
-            </div>
-            <div style="font-size: 0.78rem; color: var(--hc-gray-500)">
-              Administrar documentos, QR y encuestas
-            </div>
+            <div style="font-weight: 700; font-size: 0.92rem; margin-bottom: 4px">Soy Funcionario</div>
+            <div style="font-size: 0.78rem; color: var(--hc-gray-500)">Administrar documentos y QR</div>
           </div>
         </div>
 
-        <p
-          style="
-            margin-top: 32px;
-            font-size: 0.75rem;
-            color: var(--hc-gray-400);
-          "
-        >
+        <p style="margin-top: 32px; font-size: 0.75rem; color: var(--hc-gray-400);">
           Dr. Manuel Quintela &nbsp;·&nbsp; Sistema v2.0
         </p>
       </div>
     </div>
 
     <!-- ════════════════════════════════════════
-         PATIENT AREA (simple stacked screens, no sidebar)
+         PATIENT AREA – DOCUMENTACIÓN
     ════════════════════════════════════════ -->
-    <div
-      id="patient-area"
-      style="display: none; min-height: 100vh; background: var(--hc-gray-50)"
-    >
+    <div id="patient-area" style="display: none; min-height: 100vh; background: var(--hc-gray-50)">
       <!-- Patient topbar -->
-      <div
-        style="
-          background: var(--hc-navy);
-          color: #fff;
-          height: 56px;
-          display: flex;
-          align-items: center;
-          padding: 0 20px;
-          gap: 12px;
-          position: sticky;
-          top: 0;
-          z-index: 50;
-        "
-      >
-        <button
-          onclick="showView('view-home')"
-          style="
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 0;
-            font-family: inherit;
-            transition: color 0.15s;
-          "
-          onmouseover="this.style.color = '#fff'"
-          onmouseout="this.style.color = 'rgba(255,255,255,.6)'"
-        >
+      <div style="background: var(--hc-navy); color: #fff; height: 56px; display: flex; align-items: center; padding: 0 20px; gap: 12px; position: sticky; top: 0; z-index: 50;">
+        <button onclick="showView('view-home')" style="background: transparent; border: none; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 6px; padding: 0; font-family: inherit; transition: color 0.15s;"
+          onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.6)'">
           <i class="bi bi-arrow-left"></i>
         </button>
         <div style="display: flex; align-items: center; gap: 8px; flex: 1">
-          <div
-            style="
-              width: 32px;
-              height: 32px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              flex-shrink: 0;
-            "
-          >
-            <img
-              src="../../../assets/img/logo.png"
-              alt="Logo"
-              style="height: 25px; object-fit: contain"
-            />
+          <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <img src="../../servicios_comunes/vista_general/logo.png" alt="Logo" style="height: 25px; object-fit: contain" />
           </div>
           <div>
-            <div style="font-size: 0.8rem; font-weight: 700; line-height: 1.1">
-              Hospital de Clínicas
-            </div>
-            <div style="font-size: 0.66rem; color: rgba(255, 255, 255, 0.45)">
-              Portal de Pacientes
-            </div>
+            <div style="font-size: 0.8rem; font-weight: 700; line-height: 1.1">Hospital de Clínicas</div>
+            <div style="font-size: 0.66rem; color: rgba(255,255,255,0.45)">Portal de Pacientes</div>
           </div>
         </div>
-        <span
-          id="patient-screen-label"
-          style="font-size: 0.78rem; color: rgba(255, 255, 255, 0.55)"
-          >Inicio</span
-        >
+        <span id="patient-screen-label" style="font-size: 0.78rem; color: rgba(255,255,255,0.55)">Inicio</span>
       </div>
 
       <div style="max-width: 780px; margin: 0 auto; padding: 24px 20px 40px">
-        <!-- PS-1: HOME -->
+
+        <!-- PS-HOME -->
         <div id="ps-home" class="patient-screen active">
-          <h2
-            style="
-              font-family: &quot;DM Serif Display&quot;, serif;
-              font-size: 1.4rem;
-              font-weight: 400;
-              margin: 0 0 4px;
-            "
-          >
-            Bienvenido/a
-          </h2>
-          <p
-            style="
-              color: var(--hc-gray-500);
-              font-size: 0.84rem;
-              margin: 0 0 24px;
-            "
-          >
-            Acceda a su documentación médica o complete una encuesta
-          </p>
+          <h2 style="font-family: 'DM Serif Display', serif; font-size: 1.4rem; font-weight: 400; margin: 0 0 4px;">Bienvenido/a</h2>
+          <p style="color: var(--hc-gray-500); font-size: 0.84rem; margin: 0 0 24px;">Acceda a su documentación médica</p>
           <div style="display: grid; gap: 12px">
-            <div
-              class="action-tile"
-              onclick="
-                showPatientScreen('ps-doc-categories');
-                updatePatientLabel('Documentación');
-              "
-            >
+            <div class="action-tile" onclick="showPatientScreen('ps-doc-categories');updatePatientLabel('Documentación');">
               <div style="display: flex; align-items: center; gap: 14px">
-                <div class="tile-icon ic-blue">
-                  <i class="bi bi-file-earmark-text"></i>
-                </div>
+                <div class="tile-icon ic-blue"><i class="bi bi-file-earmark-text"></i></div>
                 <div>
                   <div class="tile-title">Documentación</div>
-                  <div class="tile-sub">
-                    Indicaciones, preparaciones para estudios y más
-                  </div>
+                  <div class="tile-sub">Indicaciones, preparaciones para estudios y más</div>
                 </div>
-                <i
-                  class="bi bi-chevron-right"
-                  style="margin-left: auto; color: var(--hc-gray-300)"
-                ></i>
+                <i class="bi bi-chevron-right" style="margin-left: auto; color: var(--hc-gray-300)"></i>
               </div>
             </div>
-            <div
-              class="action-tile"
-              onclick="
-                showPatientScreen('ps-surveys');
-                updatePatientLabel('Encuestas');
-              "
-            >
+            <div class="action-tile" style="border-style: dashed"
+              onclick="alert('Escanee el código QR con su cámara o ingrese el código provisto por el personal.')">
               <div style="display: flex; align-items: center; gap: 14px">
-                <div class="tile-icon ic-blue">
-                  <i class="bi bi-clipboard-check"></i>
-                </div>
-                <div>
-                  <div class="tile-title">Encuestas de Satisfacción</div>
-                  <div class="tile-sub">
-                    Ayúdenos a mejorar nuestros servicios
-                  </div>
-                </div>
-                <i
-                  class="bi bi-chevron-right"
-                  style="margin-left: auto; color: var(--hc-gray-300)"
-                ></i>
-              </div>
-            </div>
-            <div
-              class="action-tile"
-              style="border-style: dashed"
-              onclick="
-                alert(
-                  'Escanee el código QR con su cámara o ingrese el código provisto por el personal.',
-                )
-              "
-            >
-              <div style="display: flex; align-items: center; gap: 14px">
-                <div class="tile-icon ic-teal">
-                  <i class="bi bi-qr-code"></i>
-                </div>
+                <div class="tile-icon ic-teal"><i class="bi bi-qr-code"></i></div>
                 <div>
                   <div class="tile-title">Acceso por código QR</div>
-                  <div class="tile-sub">
-                    Escanee el QR proporcionado por el personal
-                  </div>
+                  <div class="tile-sub">Escanee el QR proporcionado por el personal</div>
                 </div>
-                <i
-                  class="bi bi-chevron-right"
-                  style="margin-left: auto; color: var(--hc-gray-300)"
-                ></i>
+                <i class="bi bi-chevron-right" style="margin-left: auto; color: var(--hc-gray-300)"></i>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- PS-2: DOC CATEGORIES -->
+        <!-- PS-DOC-CATEGORIES -->
         <div id="ps-doc-categories" class="patient-screen">
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              margin-bottom: 20px;
-            "
-          >
-            <button
-              class="btn-hc btn-hc-secondary btn-sm"
-              onclick="
-                showPatientScreen('ps-home');
-                updatePatientLabel('Inicio');
-              "
-            >
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            <button class="btn-hc btn-hc-secondary btn-sm" onclick="showPatientScreen('ps-home');updatePatientLabel('Inicio');">
               <i class="bi bi-arrow-left"></i> Volver
             </button>
-            <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700">
-              Categorías de Documentos
-            </h2>
+            <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700">Categorías de Documentos</h2>
           </div>
           <div class="panel">
             <div class="panel-body" style="padding: 8px 8px">
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-doc-list');
-                  setDocListTitle('IVE');
-                  updatePatientLabel('IVE');
-                "
-              >
+              <div class="doc-row" onclick="showPatientScreen('ps-doc-list');setDocListTitle('IVE');updatePatientLabel('IVE');">
                 <div class="doc-icon ic-pink"><i class="bi bi-heart"></i></div>
-                <div class="doc-body">
-                  <p class="doc-title">Interrupción Voluntaria del Embarazo</p>
-                </div>
+                <div class="doc-body"><p class="doc-title">Interrupción Voluntaria del Embarazo</p></div>
                 <i class="bi bi-chevron-right doc-arrow"></i>
               </div>
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-doc-list');
-                  setDocListTitle('Procedimientos Quirúrgicos');
-                  updatePatientLabel('Cirugía');
-                "
-              >
-                <div class="doc-icon ic-pink">
-                  <i class="bi bi-activity"></i>
-                </div>
-                <div class="doc-body">
-                  <p class="doc-title">Procedimientos Quirúrgicos</p>
-                </div>
+              <div class="doc-row" onclick="showPatientScreen('ps-doc-list');setDocListTitle('Procedimientos Quirúrgicos');updatePatientLabel('Cirugía');">
+                <div class="doc-icon ic-pink"><i class="bi bi-activity"></i></div>
+                <div class="doc-body"><p class="doc-title">Procedimientos Quirúrgicos</p></div>
                 <i class="bi bi-chevron-right doc-arrow"></i>
               </div>
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-doc-list');
-                  setDocListTitle('Estudios Imagenológicos');
-                  updatePatientLabel('Imagenología');
-                "
-              >
-                <div class="doc-icon ic-blue">
-                  <i class="bi bi-aspect-ratio"></i>
-                </div>
-                <div class="doc-body">
-                  <p class="doc-title">Estudios Imagenológicos</p>
-                </div>
+              <div class="doc-row" onclick="showPatientScreen('ps-doc-list');setDocListTitle('Estudios Imagenológicos');updatePatientLabel('Imagenología');">
+                <div class="doc-icon ic-blue"><i class="bi bi-aspect-ratio"></i></div>
+                <div class="doc-body"><p class="doc-title">Estudios Imagenológicos</p></div>
                 <i class="bi bi-chevron-right doc-arrow"></i>
               </div>
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-doc-list');
-                  setDocListTitle('Cardiología');
-                  updatePatientLabel('Cardiología');
-                "
-              >
-                <div class="doc-icon ic-pink">
-                  <i class="bi bi-heart-pulse"></i>
-                </div>
+              <div class="doc-row" onclick="showPatientScreen('ps-doc-list');setDocListTitle('Cardiología');updatePatientLabel('Cardiología');">
+                <div class="doc-icon ic-pink"><i class="bi bi-heart-pulse"></i></div>
                 <div class="doc-body"><p class="doc-title">Cardiología</p></div>
                 <i class="bi bi-chevron-right doc-arrow"></i>
               </div>
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-doc-list');
-                  setDocListTitle('Nefrología y Trasplante');
-                  updatePatientLabel('Nefrología');
-                "
-              >
-                <div class="doc-icon ic-teal">
-                  <i class="bi bi-droplet"></i>
-                </div>
-                <div class="doc-body">
-                  <p class="doc-title">Nefrología y Trasplante</p>
-                </div>
+              <div class="doc-row" onclick="showPatientScreen('ps-doc-list');setDocListTitle('Nefrología y Trasplante');updatePatientLabel('Nefrología');">
+                <div class="doc-icon ic-teal"><i class="bi bi-droplet"></i></div>
+                <div class="doc-body"><p class="doc-title">Nefrología y Trasplante</p></div>
                 <i class="bi bi-chevron-right doc-arrow"></i>
               </div>
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-doc-list');
-                  setDocListTitle('Información General');
-                  updatePatientLabel('General');
-                "
-              >
-                <div class="doc-icon ic-blue">
-                  <i class="bi bi-file-earmark-text"></i>
-                </div>
-                <div class="doc-body">
-                  <p class="doc-title">Información General</p>
-                </div>
+              <div class="doc-row" onclick="showPatientScreen('ps-doc-list');setDocListTitle('Información General');updatePatientLabel('General');">
+                <div class="doc-icon ic-blue"><i class="bi bi-file-earmark-text"></i></div>
+                <div class="doc-body"><p class="doc-title">Información General</p></div>
                 <i class="bi bi-chevron-right doc-arrow"></i>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- PS-3: DOC LIST -->
+        <!-- PS-DOC-LIST -->
         <div id="ps-doc-list" class="patient-screen">
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              margin-bottom: 16px;
-            "
-          >
-            <button
-              class="btn-hc btn-hc-secondary btn-sm"
-              onclick="
-                showPatientScreen('ps-doc-categories');
-                updatePatientLabel('Documentación');
-              "
-            >
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+            <button class="btn-hc btn-hc-secondary btn-sm" onclick="showPatientScreen('ps-doc-categories');updatePatientLabel('Documentación');">
               <i class="bi bi-arrow-left"></i> Volver
             </button>
-            <h2
-              id="ps-doc-list-title"
-              style="margin: 0; font-size: 1.1rem; font-weight: 700"
-            >
-              IVE
-            </h2>
+            <h2 id="ps-doc-list-title" style="margin: 0; font-size: 1.1rem; font-weight: 700">IVE</h2>
           </div>
           <div class="info-banner">
-            <i class="bi bi-qr-code"></i> Cada documento tiene un QR único para
-            compartir o acceder rápidamente
+            <i class="bi bi-qr-code"></i> Cada documento tiene un QR único para compartir o acceder rápidamente
           </div>
           <div id="ps-doc-list-items"></div>
         </div>
 
-        <!-- PS-4: SURVEYS -->
-        <div id="ps-surveys" class="patient-screen">
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              margin-bottom: 16px;
-            "
-          >
-            <button
-              class="btn-hc btn-hc-secondary btn-sm"
-              onclick="
-                showPatientScreen('ps-home');
-                updatePatientLabel('Inicio');
-              "
-            >
-              <i class="bi bi-arrow-left"></i> Volver
-            </button>
-            <h2 style="margin: 0; font-size: 1.1rem; font-weight: 700">
-              Encuestas
-            </h2>
-          </div>
-          <div class="info-banner">
-            <i class="bi bi-shield-check"></i> Todas las encuestas son
-            <strong>anónimas</strong> y nos ayudan a mejorar la calidad de
-            atención.
-          </div>
-          <div class="panel">
-            <div class="panel-body" style="padding: 8px">
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-survey-form');
-                  setSurveyTitle('Encuesta de Satisfacción General');
-                "
-              >
-                <div class="doc-icon ic-amber"><i class="bi bi-star"></i></div>
-                <div class="doc-body">
-                  <p class="doc-title">Encuesta de Satisfacción General</p>
-                  <p class="doc-sub">
-                    Ayúdenos a mejorar &nbsp;·&nbsp; 3–5 min
-                  </p>
-                </div>
-                <i class="bi bi-chevron-right doc-arrow"></i>
-              </div>
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-survey-form');
-                  setSurveyTitle('Satisfacción – Usuarios Trasplantados');
-                "
-              >
-                <div class="doc-icon ic-pink"><i class="bi bi-heart"></i></div>
-                <div class="doc-body">
-                  <p class="doc-title">Satisfacción – Usuarios Trasplantados</p>
-                  <p class="doc-sub">
-                    Encuesta para pacientes trasplantados &nbsp;·&nbsp; 5–7 min
-                  </p>
-                </div>
-                <i class="bi bi-chevron-right doc-arrow"></i>
-              </div>
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-survey-form');
-                  setSurveyTitle('Evolución de Programas FNR');
-                "
-              >
-                <div class="doc-icon ic-purple">
-                  <i class="bi bi-award"></i>
-                </div>
-                <div class="doc-body">
-                  <p class="doc-title">Evolución de Programas FNR</p>
-                  <p class="doc-sub">
-                    Fondo Nacional de Recursos &nbsp;·&nbsp; 4–6 min
-                  </p>
-                </div>
-                <i class="bi bi-chevron-right doc-arrow"></i>
-              </div>
-              <div
-                class="doc-row"
-                onclick="
-                  showPatientScreen('ps-survey-form');
-                  setSurveyTitle('Calidad de Atención');
-                "
-              >
-                <div class="doc-icon ic-teal">
-                  <i class="bi bi-clipboard-check"></i>
-                </div>
-                <div class="doc-body">
-                  <p class="doc-title">Calidad de Atención</p>
-                  <p class="doc-sub">
-                    Evalúe la atención recibida &nbsp;·&nbsp; 2–4 min
-                  </p>
-                </div>
-                <i class="bi bi-chevron-right doc-arrow"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PS-5: SURVEY FORM -->
-        <div id="ps-survey-form" class="patient-screen">
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              margin-bottom: 20px;
-            "
-          >
-            <button
-              class="btn-hc btn-hc-secondary btn-sm"
-              onclick="showPatientScreen('ps-surveys')"
-            >
-              <i class="bi bi-arrow-left"></i> Volver
-            </button>
-            <h2
-              id="ps-survey-form-title"
-              style="margin: 0; font-size: 1.1rem; font-weight: 700"
-            >
-              Encuesta
-            </h2>
-          </div>
-          <div class="panel">
-            <div class="panel-body">
-              <p
-                style="
-                  font-size: 0.82rem;
-                  color: var(--hc-gray-500);
-                  margin-bottom: 20px;
-                "
-              >
-                Sus respuestas son anónimas y nos ayudan a mejorar.
-              </p>
-              <div class="mb-4">
-                <label class="hc-label"
-                  >1. ¿Cómo calificaría la atención recibida?</label
-                >
-                <div class="star-rating" id="ps-stars-1">
-                  <span onclick="setStars('ps-stars-1', 1)">★</span
-                  ><span onclick="setStars('ps-stars-1', 2)">★</span
-                  ><span onclick="setStars('ps-stars-1', 3)">★</span
-                  ><span onclick="setStars('ps-stars-1', 4)">★</span
-                  ><span onclick="setStars('ps-stars-1', 5)">★</span>
-                </div>
-              </div>
-              <div class="mb-4">
-                <label class="hc-label"
-                  >2. ¿El personal fue amable y respetuoso?</label
-                >
-                <div class="star-rating" id="ps-stars-2">
-                  <span onclick="setStars('ps-stars-2', 1)">★</span
-                  ><span onclick="setStars('ps-stars-2', 2)">★</span
-                  ><span onclick="setStars('ps-stars-2', 3)">★</span
-                  ><span onclick="setStars('ps-stars-2', 4)">★</span
-                  ><span onclick="setStars('ps-stars-2', 5)">★</span>
-                </div>
-              </div>
-              <div class="mb-4">
-                <label class="hc-label"
-                  >3. ¿Le brindaron información clara sobre su situación de
-                  salud?</label
-                >
-                <div class="star-rating" id="ps-stars-3">
-                  <span onclick="setStars('ps-stars-3', 1)">★</span
-                  ><span onclick="setStars('ps-stars-3', 2)">★</span
-                  ><span onclick="setStars('ps-stars-3', 3)">★</span
-                  ><span onclick="setStars('ps-stars-3', 4)">★</span
-                  ><span onclick="setStars('ps-stars-3', 5)">★</span>
-                </div>
-              </div>
-              <div class="mb-4">
-                <label class="hc-label"
-                  >4. ¿Recomendaría este servicio a familiares o amigos?</label
-                >
-                <select class="hc-input">
-                  <option value="">Seleccione una opción</option>
-                  <option>Definitivamente sí</option>
-                  <option>Probablemente sí</option>
-                  <option>No estoy seguro/a</option>
-                  <option>Probablemente no</option>
-                  <option>Definitivamente no</option>
-                </select>
-              </div>
-              <div class="mb-4">
-                <label class="hc-label"
-                  >5. Comentarios adicionales (opcional)</label
-                >
-                <textarea
-                  class="hc-input hc-textarea"
-                  placeholder="Comparta su experiencia..."
-                ></textarea>
-              </div>
-              <button
-                class="btn-hc btn-hc-primary"
-                onclick="showPatientScreen('ps-survey-done')"
-              >
-                Enviar Encuesta
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- PS-6: SURVEY DONE -->
-        <div id="ps-survey-done" class="patient-screen">
-          <div class="panel">
-            <div class="panel-body text-center" style="padding: 48px 24px">
-              <div class="success-icon"><i class="bi bi-check-lg"></i></div>
-              <h3 style="font-weight: 700; margin-bottom: 8px">
-                ¡Gracias por su respuesta!
-              </h3>
-              <p
-                style="
-                  color: var(--hc-gray-500);
-                  font-size: 0.875rem;
-                  margin-bottom: 28px;
-                "
-              >
-                Su opinión es muy valiosa para mejorar la calidad de atención
-                del Hospital de Clínicas.
-              </p>
-              <button
-                class="btn-hc btn-hc-primary"
-                onclick="
-                  showPatientScreen('ps-home');
-                  updatePatientLabel('Inicio');
-                "
-              >
-                Volver al inicio
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- ════════════════════════════════════════
-         STAFF LOGIN (fullscreen)
+         STAFF LOGIN
     ════════════════════════════════════════ -->
     <div id="view-login" style="display: none">
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          padding: 24px;
-          background: var(--hc-gray-100);
-        "
-      >
+      <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: var(--hc-gray-100);">
         <div class="login-card">
           <div class="login-logo-circle"><i class="bi bi-lock"></i></div>
-          <h2
-            style="
-              text-align: center;
-              font-weight: 700;
-              font-size: 1.25rem;
-              margin: 0 0 4px;
-            "
-          >
-            Acceso para Funcionarios
-          </h2>
-          <p
-            style="
-              text-align: center;
-              color: var(--hc-gray-500);
-              font-size: 0.84rem;
-              margin: 0 0 28px;
-            "
-          >
-            Ingrese sus credenciales institucionales
-          </p>
+          <h2 style="text-align: center; font-weight: 700; font-size: 1.25rem; margin: 0 0 4px;">Acceso para Funcionarios</h2>
+          <p style="text-align: center; color: var(--hc-gray-500); font-size: 0.84rem; margin: 0 0 28px;">Ingrese sus credenciales institucionales</p>
 
           <div class="mb-3">
             <label class="hc-label">Usuario</label>
             <div class="search-wrap">
               <i class="bi bi-person"></i>
-              <input
-                type="text"
-                class="hc-input"
-                placeholder="Ingrese su usuario"
-                id="login-user"
-                value="admin"
-              />
+              <input type="text" class="hc-input" placeholder="Ingrese su usuario" id="login-user" value="admin" />
             </div>
           </div>
           <div class="mb-4">
             <label class="hc-label">Contraseña</label>
             <div class="search-wrap">
               <i class="bi bi-lock"></i>
-              <input
-                type="password"
-                class="hc-input"
-                placeholder="Ingrese su contraseña"
-                id="login-pass"
-                value="1234"
-              />
+              <input type="password" class="hc-input" placeholder="Ingrese su contraseña" id="login-pass" value="1234" />
             </div>
           </div>
-          <button
-            class="btn-hc btn-hc-primary w-100"
-            onclick="doLogin()"
-            style="justify-content: center"
-          >
+          <button class="btn-hc btn-hc-primary w-100" onclick="doLogin()" style="justify-content: center">
             <i class="bi bi-box-arrow-in-right"></i> Ingresar
           </button>
-          <p
-            style="
-              text-align: center;
-              font-size: 0.78rem;
-              color: var(--hc-gray-400);
-              margin-top: 16px;
-            "
-          >
+          <p style="text-align: center; font-size: 0.78rem; color: var(--hc-gray-400); margin-top: 16px;">
             ¿Olvidó su contraseña? Contacte al administrador del sistema
           </p>
           <div class="hc-divider"></div>
-          <button
-            class="btn-hc btn-hc-ghost w-100"
-            onclick="showView('view-home')"
-            style="justify-content: center; font-size: 0.82rem"
-          >
+          <button class="btn-hc btn-hc-ghost w-100" onclick="showView('view-home')" style="justify-content: center; font-size: 0.82rem">
             <i class="bi bi-arrow-left"></i> Volver al inicio
           </button>
         </div>
@@ -862,74 +220,40 @@
     </div>
 
     <!-- ════════════════════════════════════════
-         ADMIN APP SHELL (sidebar + main)
+         ADMIN APP SHELL
     ════════════════════════════════════════ -->
-
-    <!-- Overlay para cerrar sidebar en móvil al tocar fuera -->
     <div id="sidebar-overlay"></div>
 
     <div id="app-shell" style="display: none">
       <!-- SIDEBAR -->
       <nav id="sidebar">
         <div class="sidebar-logo">
-          <div
-            class="logo-icon"
-            style="background: transparent; overflow: hidden"
-          >
-            <img
-              src="../../../assets/img/logo.png"
-              alt="Logo Hospital de Clínicas"
-              style="height: 40px; object-fit: contain"
-            />
+          <div class="logo-icon" style="background: transparent; overflow: hidden">
+            <img src="../../servicios_comunes/vista_general/logo.png" alt="Logo Hospital de Clínicas" style="height: 40px; object-fit: contain" />
           </div>
           <div class="logo-text">
             <strong>Hospital de Clínicas</strong>
-            <span>Sistema de Gestión</span>
+            <span>Gestión de Documentos</span>
           </div>
-          <!-- Botón ocultar/mostrar sidebar (visible en pantallas pequeñas) -->
-          <button
-            class="sidebar-toggle-btn"
-            onclick="toggleSidebar()"
-            title="Ocultar menú"
-          >
+          <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Ocultar menú">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
 
         <div class="sidebar-nav">
           <div class="nav-section-label">Principal</div>
-          <a
-            class="nav-item active"
-            onclick="setAdminView('view-dashboard')"
-            id="nav-dashboard"
-          >
+          <a class="nav-item active" onclick="setAdminView('view-dashboard')" id="nav-dashboard">
             <i class="bi bi-grid-1x2"></i>
             <span class="nav-label">Dashboard</span>
           </a>
-          <a
-            class="nav-item"
-            onclick="setAdminView('view-manage-docs')"
-            id="nav-docs"
-          >
+          <a class="nav-item" onclick="setAdminView('view-manage-docs')" id="nav-docs">
             <i class="bi bi-file-earmark-text"></i>
             <span class="nav-label">Documentos</span>
             <span class="nav-badge">47</span>
           </a>
-          <a
-            class="nav-item"
-            onclick="setAdminView('view-survey-results')"
-            id="nav-surveys"
-          >
-            <i class="bi bi-bar-chart"></i>
-            <span class="nav-label">Encuestas</span>
-          </a>
 
           <div class="nav-section-label">Herramientas</div>
-          <a
-            class="nav-item"
-            onclick="setAdminView('view-new-doc')"
-            id="nav-new-doc"
-          >
+          <a class="nav-item" onclick="setAdminView('view-new-doc')" id="nav-new-doc">
             <i class="bi bi-plus-circle"></i>
             <span class="nav-label">Nuevo Documento</span>
           </a>
@@ -967,11 +291,7 @@
               <i class="bi bi-bell"></i>
               <span class="topbar-badge"></span>
             </button>
-            <button
-              class="topbar-icon-btn"
-              title="Salir"
-              onclick="showView('view-home')"
-            >
+            <button class="topbar-icon-btn" title="Salir" onclick="showView('view-home')">
               <i class="bi bi-box-arrow-right"></i>
             </button>
           </div>
@@ -979,19 +299,15 @@
 
         <!-- PAGE BODY -->
         <div class="page-body">
+
           <!-- ── DASHBOARD ─────────────────────── -->
           <div id="view-dashboard" class="view active">
             <div class="page-header">
               <div>
                 <h1>Dashboard</h1>
-                <p class="subtitle">
-                  Resumen del Sistema de Gestión de Documentos
-                </p>
+                <p class="subtitle">Resumen del módulo de Gestión de Documentos</p>
               </div>
-              <button
-                class="btn-hc btn-hc-primary"
-                onclick="setAdminView('view-new-doc')"
-              >
+              <button class="btn-hc btn-hc-primary" onclick="setAdminView('view-new-doc')">
                 <i class="bi bi-plus-lg"></i> Nuevo Documento
               </button>
             </div>
@@ -1000,129 +316,81 @@
             <div class="row g-3 mb-4">
               <div class="col-xl-3 col-md-6">
                 <div class="stat-card d-flex align-items-center gap-3">
-                  <div class="stat-icon ic-blue">
-                    <i class="bi bi-file-earmark-text"></i>
-                  </div>
+                  <div class="stat-icon ic-blue"><i class="bi bi-file-earmark-text"></i></div>
                   <div>
-                    <p class="stat-label">
-                      <i class="bi bi-file-earmark-text"></i> Documentos
-                    </p>
+                    <p class="stat-label"><i class="bi bi-file-earmark-text"></i> Documentos</p>
                     <p class="stat-value">47</p>
-                    <p class="stat-delta">
-                      <i class="bi bi-arrow-up-right"></i> +3 este mes
-                    </p>
+                    <p class="stat-delta"><i class="bi bi-arrow-up-right"></i> +3 este mes</p>
                   </div>
                 </div>
               </div>
               <div class="col-xl-3 col-md-6">
                 <div class="stat-card d-flex align-items-center gap-3">
-                  <div class="stat-icon ic-purple">
-                    <i class="bi bi-clipboard-check"></i>
-                  </div>
+                  <div class="stat-icon ic-teal"><i class="bi bi-qr-code"></i></div>
                   <div>
-                    <p class="stat-label">
-                      <i class="bi bi-clipboard"></i> Encuestas
-                    </p>
-                    <p class="stat-value">234</p>
-                    <p class="stat-delta">
-                      <i class="bi bi-arrow-up-right"></i> +12% vs mes anterior
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-md-6">
-                <div class="stat-card d-flex align-items-center gap-3">
-                  <div class="stat-icon ic-amber">
-                    <i class="bi bi-star"></i>
-                  </div>
-                  <div>
-                    <p class="stat-label">
-                      <i class="bi bi-star"></i> Promedio
-                    </p>
-                    <p class="stat-value">4.4</p>
-                    <p class="stat-delta" style="color: var(--hc-gray-500)">
-                      de 5.0 estrellas
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-md-6">
-                <div class="stat-card d-flex align-items-center gap-3">
-                  <div class="stat-icon ic-teal">
-                    <i class="bi bi-qr-code"></i>
-                  </div>
-                  <div>
-                    <p class="stat-label">
-                      <i class="bi bi-qr-code"></i> Escaneos QR
-                    </p>
+                    <p class="stat-label"><i class="bi bi-qr-code"></i> Escaneos QR</p>
                     <p class="stat-value">1.2k</p>
-                    <p class="stat-delta">
-                      <i class="bi bi-arrow-up-right"></i> +8% esta semana
-                    </p>
+                    <p class="stat-delta"><i class="bi bi-arrow-up-right"></i> +8% esta semana</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6">
+                <div class="stat-card d-flex align-items-center gap-3">
+                  <div class="stat-icon ic-green"><i class="bi bi-check-circle"></i></div>
+                  <div>
+                    <p class="stat-label"><i class="bi bi-check-circle"></i> Publicados</p>
+                    <p class="stat-value">42</p>
+                    <p class="stat-delta" style="color:var(--hc-gray-500)">de 47 documentos</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6">
+                <div class="stat-card d-flex align-items-center gap-3">
+                  <div class="stat-icon ic-amber"><i class="bi bi-pencil-square"></i></div>
+                  <div>
+                    <p class="stat-label"><i class="bi bi-pencil-square"></i> Borradores</p>
+                    <p class="stat-value">5</p>
+                    <p class="stat-delta" style="color:var(--hc-gray-500)">pendientes de revisión</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Quick actions -->
+            <!-- Quick actions + actividad reciente -->
             <div class="row g-3 mb-4">
               <div class="col-lg-8">
                 <div class="panel h-100">
                   <div class="panel-header">
-                    <p class="panel-title">
-                      <i class="bi bi-lightning-charge text-warning"></i>
-                      Acciones Rápidas
-                    </p>
+                    <p class="panel-title"><i class="bi bi-lightning-charge text-warning"></i> Acciones Rápidas</p>
                   </div>
                   <div class="panel-body">
                     <div class="row g-3">
                       <div class="col-sm-6">
-                        <div
-                          class="action-tile featured"
-                          onclick="setAdminView('view-new-doc')"
-                        >
-                          <div class="tile-icon ic-white">
-                            <i class="bi bi-plus-lg"></i>
-                          </div>
+                        <div class="action-tile featured" onclick="setAdminView('view-new-doc')">
+                          <div class="tile-icon ic-white"><i class="bi bi-plus-lg"></i></div>
                           <p class="tile-title">Nuevo Documento</p>
-                          <p class="tile-sub">
-                            Cargar documentación para pacientes
-                          </p>
+                          <p class="tile-sub">Cargar documentación para pacientes</p>
                         </div>
                       </div>
                       <div class="col-sm-6">
-                        <div
-                          class="action-tile"
-                          onclick="setAdminView('view-manage-docs')"
-                        >
-                          <div class="tile-icon ic-blue">
-                            <i class="bi bi-folder2-open"></i>
-                          </div>
+                        <div class="action-tile" onclick="setAdminView('view-manage-docs')">
+                          <div class="tile-icon ic-blue"><i class="bi bi-folder2-open"></i></div>
                           <p class="tile-title">Gestión de Documentos</p>
-                          <p class="tile-sub">
-                            Ver, editar y administrar documentación
-                          </p>
-                        </div>
-                      </div>
-                      <div class="col-sm-6">
-                        <div
-                          class="action-tile"
-                          onclick="setAdminView('view-survey-results')"
-                        >
-                          <div class="tile-icon ic-purple">
-                            <i class="bi bi-bar-chart-line"></i>
-                          </div>
-                          <p class="tile-title">Resultados de Encuestas</p>
-                          <p class="tile-sub">Ver análisis y estadísticas</p>
+                          <p class="tile-sub">Ver, editar y administrar documentación</p>
                         </div>
                       </div>
                       <div class="col-sm-6">
                         <div class="action-tile">
-                          <div class="tile-icon ic-teal">
-                            <i class="bi bi-qr-code-scan"></i>
-                          </div>
+                          <div class="tile-icon ic-teal"><i class="bi bi-qr-code-scan"></i></div>
                           <p class="tile-title">Generador QR</p>
                           <p class="tile-sub">Crear y gestionar códigos QR</p>
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="action-tile" onclick="showView('patient-area');showPatientScreen('ps-doc-categories');updatePatientLabel('Documentación');">
+                          <div class="tile-icon ic-purple"><i class="bi bi-person-lines-fill"></i></div>
+                          <p class="tile-title">Vista Paciente</p>
+                          <p class="tile-sub">Ver como lo ve el paciente</p>
                         </div>
                       </div>
                     </div>
@@ -1132,134 +400,29 @@
               <div class="col-lg-4">
                 <div class="panel h-100">
                   <div class="panel-header">
-                    <p class="panel-title">
-                      <i class="bi bi-clock-history text-secondary"></i>
-                      Actividad Reciente
-                    </p>
+                    <p class="panel-title"><i class="bi bi-clock-history text-secondary"></i> Actividad Reciente</p>
                   </div>
                   <div class="panel-body" style="padding: 12px 16px">
-                    <div
-                      style="display: flex; flex-direction: column; gap: 2px"
-                    >
-                      <div
-                        style="
-                          display: flex;
-                          gap: 10px;
-                          padding: 8px 0;
-                          border-bottom: 1px solid var(--hc-gray-100);
-                        "
-                      >
-                        <div
-                          style="
-                            width: 7px;
-                            height: 7px;
-                            border-radius: 50%;
-                            background: var(--hc-green);
-                            margin-top: 5px;
-                            flex-shrink: 0;
-                          "
-                        ></div>
+                    <div style="display: flex; flex-direction: column; gap: 2px">
+                      <div style="display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--hc-gray-100);">
+                        <div style="width: 7px; height: 7px; border-radius: 50%; background: var(--hc-green); margin-top: 5px; flex-shrink: 0;"></div>
                         <div>
-                          <div style="font-size: 0.82rem; font-weight: 600">
-                            Doc. IVE actualizado
-                          </div>
-                          <div
-                            style="
-                              font-size: 0.74rem;
-                              color: var(--hc-gray-400);
-                            "
-                          >
-                            Hace 2 horas
-                          </div>
+                          <div style="font-size: 0.82rem; font-weight: 600">Doc. IVE actualizado</div>
+                          <div style="font-size: 0.74rem; color: var(--hc-gray-400)">Hace 2 horas</div>
                         </div>
                       </div>
-                      <div
-                        style="
-                          display: flex;
-                          gap: 10px;
-                          padding: 8px 0;
-                          border-bottom: 1px solid var(--hc-gray-100);
-                        "
-                      >
-                        <div
-                          style="
-                            width: 7px;
-                            height: 7px;
-                            border-radius: 50%;
-                            background: var(--hc-blue);
-                            margin-top: 5px;
-                            flex-shrink: 0;
-                          "
-                        ></div>
+                      <div style="display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--hc-gray-100);">
+                        <div style="width: 7px; height: 7px; border-radius: 50%; background: var(--hc-accent); margin-top: 5px; flex-shrink: 0;"></div>
                         <div>
-                          <div style="font-size: 0.82rem; font-weight: 600">
-                            Nueva encuesta recibida
-                          </div>
-                          <div
-                            style="
-                              font-size: 0.74rem;
-                              color: var(--hc-gray-400);
-                            "
-                          >
-                            Hace 4 horas
-                          </div>
+                          <div style="font-size: 0.82rem; font-weight: 600">QR cardiología generado</div>
+                          <div style="font-size: 0.74rem; color: var(--hc-gray-400)">Ayer, 15:32</div>
                         </div>
                       </div>
-                      <div
-                        style="
-                          display: flex;
-                          gap: 10px;
-                          padding: 8px 0;
-                          border-bottom: 1px solid var(--hc-gray-100);
-                        "
-                      >
-                        <div
-                          style="
-                            width: 7px;
-                            height: 7px;
-                            border-radius: 50%;
-                            background: var(--hc-accent);
-                            margin-top: 5px;
-                            flex-shrink: 0;
-                          "
-                        ></div>
+                      <div style="display: flex; gap: 10px; padding: 8px 0;">
+                        <div style="width: 7px; height: 7px; border-radius: 50%; background: var(--hc-purple); margin-top: 5px; flex-shrink: 0;"></div>
                         <div>
-                          <div style="font-size: 0.82rem; font-weight: 600">
-                            QR cardiología generado
-                          </div>
-                          <div
-                            style="
-                              font-size: 0.74rem;
-                              color: var(--hc-gray-400);
-                            "
-                          >
-                            Ayer, 15:32
-                          </div>
-                        </div>
-                      </div>
-                      <div style="display: flex; gap: 10px; padding: 8px 0">
-                        <div
-                          style="
-                            width: 7px;
-                            height: 7px;
-                            border-radius: 50%;
-                            background: var(--hc-purple);
-                            margin-top: 5px;
-                            flex-shrink: 0;
-                          "
-                        ></div>
-                        <div>
-                          <div style="font-size: 0.82rem; font-weight: 600">
-                            Nuevo doc. Nefrología
-                          </div>
-                          <div
-                            style="
-                              font-size: 0.74rem;
-                              color: var(--hc-gray-400);
-                            "
-                          >
-                            Ayer, 10:15
-                          </div>
+                          <div style="font-size: 0.82rem; font-weight: 600">Nuevo doc. Nefrología</div>
+                          <div style="font-size: 0.74rem; color: var(--hc-gray-400)">Ayer, 10:15</div>
                         </div>
                       </div>
                     </div>
@@ -1274,37 +437,22 @@
             <div class="page-header">
               <div>
                 <h1>Gestión de Documentos</h1>
-                <p class="subtitle">
-                  47 documentos en total &nbsp;·&nbsp; 6 categorías
-                </p>
+                <p class="subtitle">47 documentos en total &nbsp;·&nbsp; 6 categorías</p>
               </div>
-              <button
-                class="btn-hc btn-hc-primary"
-                onclick="setAdminView('view-new-doc')"
-              >
+              <button class="btn-hc btn-hc-primary" onclick="setAdminView('view-new-doc')">
                 <i class="bi bi-plus-lg"></i> Nuevo Documento
               </button>
             </div>
 
             <div class="panel">
               <div class="panel-header">
-                <p class="panel-title">
-                  <i class="bi bi-file-earmark-text"></i> Listado de Documentos
-                </p>
+                <p class="panel-title"><i class="bi bi-file-earmark-text"></i> Listado de Documentos</p>
                 <div style="display: flex; gap: 8px; align-items: center">
                   <div class="search-wrap" style="width: 220px">
                     <i class="bi bi-search"></i>
-                    <input
-                      type="text"
-                      class="hc-input"
-                      style="font-size: 0.82rem; padding: 7px 10px 7px 32px"
-                      placeholder="Buscar documentos..."
-                    />
+                    <input type="text" class="hc-input" style="font-size:0.82rem;padding:7px 10px 7px 32px" placeholder="Buscar documentos..." />
                   </div>
-                  <select
-                    class="hc-input"
-                    style="width: auto; font-size: 0.82rem; padding: 7px 10px"
-                  >
+                  <select class="hc-input" style="width:auto;font-size:0.82rem;padding:7px 10px">
                     <option>Todas las categorías</option>
                     <option>IVE</option>
                     <option>Procedimientos Quirúrgicos</option>
@@ -1319,30 +467,24 @@
                 <table class="hc-table">
                   <thead>
                     <tr>
-                      <th style="width: 40%">Documento</th>
+                      <th style="width:40%">Documento</th>
                       <th>Categoría</th>
                       <th>Última actualización</th>
                       <th>Estado</th>
-                      <th style="text-align: right">Acciones</th>
+                      <th style="text-align:right">Acciones</th>
                     </tr>
                   </thead>
                   <tbody id="admin-doc-list-table"></tbody>
                 </table>
               </div>
               <div class="panel-footer">
-                <span style="font-size: 0.78rem; color: var(--hc-gray-500)"
-                  >Mostrando 5 de 47 documentos</span
-                >
-                <div style="display: flex; gap: 6px">
-                  <button class="btn-hc btn-hc-secondary btn-xs">
-                    <i class="bi bi-chevron-left"></i>
-                  </button>
+                <span style="font-size:0.78rem;color:var(--hc-gray-500)">Mostrando 5 de 47 documentos</span>
+                <div style="display:flex;gap:6px">
+                  <button class="btn-hc btn-hc-secondary btn-xs"><i class="bi bi-chevron-left"></i></button>
                   <button class="btn-hc btn-hc-primary btn-xs">1</button>
                   <button class="btn-hc btn-hc-secondary btn-xs">2</button>
                   <button class="btn-hc btn-hc-secondary btn-xs">3</button>
-                  <button class="btn-hc btn-hc-secondary btn-xs">
-                    <i class="bi bi-chevron-right"></i>
-                  </button>
+                  <button class="btn-hc btn-hc-secondary btn-xs"><i class="bi bi-chevron-right"></i></button>
                 </div>
               </div>
             </div>
@@ -1353,14 +495,9 @@
             <div class="page-header">
               <div>
                 <h1>Nuevo Documento</h1>
-                <p class="subtitle">
-                  Complete los datos para cargar un nuevo documento al sistema
-                </p>
+                <p class="subtitle">Complete los datos para cargar un nuevo documento al sistema</p>
               </div>
-              <button
-                class="btn-hc btn-hc-secondary"
-                onclick="setAdminView('view-manage-docs')"
-              >
+              <button class="btn-hc btn-hc-secondary" onclick="setAdminView('view-manage-docs')">
                 <i class="bi bi-arrow-left"></i> Volver
               </button>
             </div>
@@ -1369,29 +506,16 @@
               <div class="col-lg-8">
                 <div class="panel">
                   <div class="panel-header">
-                    <p class="panel-title">
-                      <i class="bi bi-pencil-square"></i> Información del
-                      Documento
-                    </p>
+                    <p class="panel-title"><i class="bi bi-pencil-square"></i> Información del Documento</p>
                   </div>
                   <div class="panel-body">
                     <div class="row g-3">
                       <div class="col-12">
-                        <label class="hc-label"
-                          >Título del Documento
-                          <span style="color: var(--hc-red)">*</span></label
-                        >
-                        <input
-                          type="text"
-                          class="hc-input"
-                          placeholder="Ej: Indicaciones para ecocardiograma"
-                        />
+                        <label class="hc-label">Título del Documento <span style="color:var(--hc-red)">*</span></label>
+                        <input type="text" class="hc-input" placeholder="Ej: Indicaciones para ecocardiograma" />
                       </div>
                       <div class="col-md-6">
-                        <label class="hc-label"
-                          >Categoría
-                          <span style="color: var(--hc-red)">*</span></label
-                        >
+                        <label class="hc-label">Categoría <span style="color:var(--hc-red)">*</span></label>
                         <select class="hc-input">
                           <option value="">Seleccione una categoría</option>
                           <option>Interrupción Voluntaria del Embarazo</option>
@@ -1412,19 +536,11 @@
                       </div>
                       <div class="col-12">
                         <label class="hc-label">Descripción breve</label>
-                        <input
-                          type="text"
-                          class="hc-input"
-                          placeholder="Breve descripción del documento"
-                        />
+                        <input type="text" class="hc-input" placeholder="Breve descripción del documento" />
                       </div>
                       <div class="col-12">
                         <label class="hc-label">Contenido del Documento</label>
-                        <textarea
-                          class="hc-input hc-textarea"
-                          placeholder="Ingrese el contenido del documento en formato texto o HTML..."
-                          style="min-height: 160px"
-                        ></textarea>
+                        <textarea class="hc-input hc-textarea" placeholder="Ingrese el contenido del documento en formato texto o HTML..." style="min-height:160px"></textarea>
                       </div>
                     </div>
                   </div>
@@ -1433,380 +549,43 @@
               <div class="col-lg-4">
                 <div class="panel mb-3">
                   <div class="panel-header">
-                    <p class="panel-title">
-                      <i class="bi bi-paperclip"></i> Adjuntar Archivo
-                    </p>
+                    <p class="panel-title"><i class="bi bi-paperclip"></i> Adjuntar Archivo</p>
                   </div>
                   <div class="panel-body">
-                    <div
-                      class="upload-zone"
-                      onclick="this.querySelector('input').click()"
-                    >
-                      <i
-                        class="bi bi-cloud-upload"
-                        style="
-                          font-size: 2rem;
-                          color: var(--hc-gray-400);
-                          display: block;
-                          margin-bottom: 10px;
-                        "
-                      ></i>
-                      <div
-                        style="
-                          font-size: 0.84rem;
-                          font-weight: 600;
-                          color: var(--hc-gray-600);
-                          margin-bottom: 4px;
-                        "
-                      >
-                        Haga clic para seleccionar
-                      </div>
-                      <div
-                        style="font-size: 0.76rem; color: var(--hc-gray-400)"
-                      >
-                        PDF hasta 10 MB
-                      </div>
-                      <input type="file" accept=".pdf" style="display: none" />
+                    <div class="upload-zone" onclick="this.querySelector('input').click()">
+                      <i class="bi bi-cloud-upload" style="font-size:2rem;color:var(--hc-gray-400);display:block;margin-bottom:10px;"></i>
+                      <div style="font-size:0.84rem;font-weight:600;color:var(--hc-gray-600);margin-bottom:4px;">Haga clic para seleccionar</div>
+                      <div style="font-size:0.76rem;color:var(--hc-gray-400)">PDF hasta 10 MB</div>
+                      <input type="file" accept=".pdf" style="display:none" />
                     </div>
                   </div>
                 </div>
                 <div class="panel">
                   <div class="panel-header">
-                    <p class="panel-title">
-                      <i class="bi bi-qr-code"></i> Código QR
-                    </p>
+                    <p class="panel-title"><i class="bi bi-qr-code"></i> Código QR</p>
                   </div>
                   <div class="panel-body text-center">
-                    <p
-                      style="
-                        font-size: 0.8rem;
-                        color: var(--hc-gray-500);
-                        margin-bottom: 12px;
-                      "
-                    >
+                    <p style="font-size:0.8rem;color:var(--hc-gray-500);margin-bottom:12px;">
                       El QR se generará automáticamente al guardar el documento.
                     </p>
-                    <div
-                      style="
-                        border: 1.5px dashed var(--hc-gray-200);
-                        border-radius: 8px;
-                        padding: 20px;
-                        background: var(--hc-gray-50);
-                      "
-                    >
-                      <i
-                        class="bi bi-qr-code"
-                        style="font-size: 2.5rem; color: var(--hc-gray-300)"
-                      ></i>
+                    <div style="border:1.5px dashed var(--hc-gray-200);border-radius:8px;padding:20px;background:var(--hc-gray-50);">
+                      <i class="bi bi-qr-code" style="font-size:2.5rem;color:var(--hc-gray-300)"></i>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="col-12">
-                <div
-                  style="display: flex; gap: 10px; justify-content: flex-end"
-                >
-                  <button
-                    class="btn-hc btn-hc-secondary"
-                    onclick="setAdminView('view-manage-docs')"
-                  >
-                    Cancelar
-                  </button>
-                  <button class="btn-hc btn-hc-primary" onclick="saveDoc()">
-                    <i class="bi bi-floppy"></i> Guardar Documento
-                  </button>
+                <div style="display:flex;gap:10px;justify-content:flex-end">
+                  <button class="btn-hc btn-hc-secondary" onclick="setAdminView('view-manage-docs')">Cancelar</button>
+                  <button class="btn-hc btn-hc-primary" onclick="saveDoc()"><i class="bi bi-floppy"></i> Guardar Documento</button>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- ── RESULTADOS DE ENCUESTAS ────────── -->
-          <div id="view-survey-results" class="view">
-            <div class="page-header">
-              <div>
-                <h1>Resultados de Encuestas</h1>
-                <p class="subtitle">
-                  Análisis y estadísticas de satisfacción de pacientes
-                </p>
-              </div>
-              <button class="btn-hc btn-hc-secondary">
-                <i class="bi bi-download"></i> Exportar
-              </button>
-            </div>
-
-            <!-- Summary stats -->
-            <div class="row g-3 mb-4">
-              <div class="col-md-3 col-sm-6">
-                <div class="stat-card">
-                  <p class="stat-label">
-                    <i class="bi bi-people"></i> Total Respuestas
-                  </p>
-                  <p class="stat-value">315</p>
-                  <p class="stat-delta">
-                    <i class="bi bi-arrow-up-right"></i> +12% vs mes anterior
-                  </p>
-                </div>
-              </div>
-              <div class="col-md-3 col-sm-6">
-                <div class="stat-card">
-                  <p class="stat-label">
-                    <i class="bi bi-star"></i> Promedio General
-                  </p>
-                  <p class="stat-value" style="color: var(--hc-accent)">4.4</p>
-                  <p class="stat-delta" style="color: var(--hc-gray-500)">
-                    de 5.0 estrellas
-                  </p>
-                </div>
-              </div>
-              <div class="col-md-3 col-sm-6">
-                <div class="stat-card">
-                  <p class="stat-label">
-                    <i class="bi bi-clipboard-check"></i> Encuestas Activas
-                  </p>
-                  <p class="stat-value">4</p>
-                  <p class="stat-delta" style="color: var(--hc-gray-500)">
-                    en curso actualmente
-                  </p>
-                </div>
-              </div>
-              <div class="col-md-3 col-sm-6">
-                <div class="stat-card">
-                  <p class="stat-label">
-                    <i class="bi bi-emoji-smile"></i> Satisfacción
-                  </p>
-                  <p class="stat-value" style="color: var(--hc-green)">88%</p>
-                  <p class="stat-delta">
-                    <i class="bi bi-arrow-up-right"></i> +4pp este mes
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Survey cards grid -->
-            <p class="section-heading">Encuestas Activas</p>
-            <div class="row g-3">
-              <div class="col-xl-6">
-                <div class="survey-result-card">
-                  <div
-                    style="
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: flex-start;
-                      gap: 8px;
-                      margin-bottom: 4px;
-                    "
-                  >
-                    <h4>Encuesta de Satisfacción General</h4>
-                    <span class="badge-hc badge-green">Activa</span>
-                  </div>
-                  <p class="meta">
-                    <i class="bi bi-calendar3 me-1"></i>Última respuesta:
-                    29/5/2026
-                  </p>
-                  <div class="row g-2 mb-3">
-                    <div class="col-6">
-                      <div class="survey-stat-mini">
-                        <p class="label">Respuestas</p>
-                        <p class="val">156</p>
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div class="survey-stat-mini">
-                        <p class="label">Promedio</p>
-                        <p class="val"><span class="star">★</span> 4.3</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="hc-progress mb-1">
-                    <div class="hc-progress-bar" style="width: 86%"></div>
-                  </div>
-                  <p
-                    style="
-                      font-size: 0.73rem;
-                      color: var(--hc-gray-400);
-                      margin: 0 0 12px;
-                    "
-                  >
-                    86% de satisfacción
-                  </p>
-                  <button
-                    class="btn-hc btn-hc-secondary btn-sm w-100"
-                    style="justify-content: center"
-                  >
-                    Ver detalles
-                  </button>
-                </div>
-              </div>
-              <div class="col-xl-6">
-                <div class="survey-result-card">
-                  <div
-                    style="
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: flex-start;
-                      gap: 8px;
-                      margin-bottom: 4px;
-                    "
-                  >
-                    <h4>Satisfacción – Usuarios Trasplantados</h4>
-                    <span class="badge-hc badge-green">Activa</span>
-                  </div>
-                  <p class="meta">
-                    <i class="bi bi-calendar3 me-1"></i>Última respuesta:
-                    28/5/2026
-                  </p>
-                  <div class="row g-2 mb-3">
-                    <div class="col-6">
-                      <div class="survey-stat-mini">
-                        <p class="label">Respuestas</p>
-                        <p class="val">42</p>
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div class="survey-stat-mini">
-                        <p class="label">Promedio</p>
-                        <p class="val"><span class="star">★</span> 4.7</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="hc-progress mb-1">
-                    <div
-                      class="hc-progress-bar"
-                      style="width: 94%; background: var(--hc-green)"
-                    ></div>
-                  </div>
-                  <p
-                    style="
-                      font-size: 0.73rem;
-                      color: var(--hc-gray-400);
-                      margin: 0 0 12px;
-                    "
-                  >
-                    94% de satisfacción
-                  </p>
-                  <button
-                    class="btn-hc btn-hc-secondary btn-sm w-100"
-                    style="justify-content: center"
-                  >
-                    Ver detalles
-                  </button>
-                </div>
-              </div>
-              <div class="col-xl-6">
-                <div class="survey-result-card">
-                  <div
-                    style="
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: flex-start;
-                      gap: 8px;
-                      margin-bottom: 4px;
-                    "
-                  >
-                    <h4>Evolución de Programas FNR</h4>
-                    <span class="badge-hc badge-green">Activa</span>
-                  </div>
-                  <p class="meta">
-                    <i class="bi bi-calendar3 me-1"></i>Última respuesta:
-                    27/5/2026
-                  </p>
-                  <div class="row g-2 mb-3">
-                    <div class="col-6">
-                      <div class="survey-stat-mini">
-                        <p class="label">Respuestas</p>
-                        <p class="val">78</p>
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div class="survey-stat-mini">
-                        <p class="label">Promedio</p>
-                        <p class="val"><span class="star">★</span> 4.2</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="hc-progress mb-1">
-                    <div class="hc-progress-bar" style="width: 84%"></div>
-                  </div>
-                  <p
-                    style="
-                      font-size: 0.73rem;
-                      color: var(--hc-gray-400);
-                      margin: 0 0 12px;
-                    "
-                  >
-                    84% de satisfacción
-                  </p>
-                  <button
-                    class="btn-hc btn-hc-secondary btn-sm w-100"
-                    style="justify-content: center"
-                  >
-                    Ver detalles
-                  </button>
-                </div>
-              </div>
-              <div class="col-xl-6">
-                <div class="survey-result-card">
-                  <div
-                    style="
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: flex-start;
-                      gap: 8px;
-                      margin-bottom: 4px;
-                    "
-                  >
-                    <h4>Calidad de Atención</h4>
-                    <span class="badge-hc badge-green">Activa</span>
-                  </div>
-                  <p class="meta">
-                    <i class="bi bi-calendar3 me-1"></i>Última respuesta:
-                    26/5/2026
-                  </p>
-                  <div class="row g-2 mb-3">
-                    <div class="col-6">
-                      <div class="survey-stat-mini">
-                        <p class="label">Respuestas</p>
-                        <p class="val">39</p>
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div class="survey-stat-mini">
-                        <p class="label">Promedio</p>
-                        <p class="val"><span class="star">★</span> 4.5</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="hc-progress mb-1">
-                    <div
-                      class="hc-progress-bar"
-                      style="width: 90%; background: var(--hc-teal)"
-                    ></div>
-                  </div>
-                  <p
-                    style="
-                      font-size: 0.73rem;
-                      color: var(--hc-gray-400);
-                      margin: 0 0 12px;
-                    "
-                  >
-                    90% de satisfacción
-                  </p>
-                  <button
-                    class="btn-hc btn-hc-secondary btn-sm w-100"
-                    style="justify-content: center"
-                  >
-                    Ver detalles
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- /page-body -->
-      </div>
-      <!-- /main-content -->
-    </div>
-    <!-- /app-shell -->
+        </div><!-- /page-body -->
+      </div><!-- /main-content -->
+    </div><!-- /app-shell -->
 
     <!-- ════════════════════════════════════════
          QR MODAL
@@ -1814,50 +593,15 @@
     <div class="qr-modal-overlay" id="qr-modal">
       <div class="qr-modal">
         <h3 id="qr-modal-title">Indicaciones IVE</h3>
-        <p id="qr-modal-desc">
-          Escanee este código para acceder al documento desde cualquier
-          dispositivo
-        </p>
+        <p id="qr-modal-desc">Escanee este código para acceder al documento desde cualquier dispositivo</p>
         <div class="qr-code-img" id="qr-code-container">
-          <svg
-            viewBox="0 0 100 100"
-            xmlns="http://www.w3.org/2000/svg"
-            width="164"
-            height="164"
-          >
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="164" height="164">
             <rect width="100" height="100" fill="white" />
-            <rect
-              x="5"
-              y="5"
-              width="35"
-              height="35"
-              rx="3"
-              fill="none"
-              stroke="#1a1c20"
-              stroke-width="3"
-            />
+            <rect x="5" y="5" width="35" height="35" rx="3" fill="none" stroke="#1a1c20" stroke-width="3" />
             <rect x="12" y="12" width="21" height="21" fill="#1a1c20" rx="1" />
-            <rect
-              x="60"
-              y="5"
-              width="35"
-              height="35"
-              rx="3"
-              fill="none"
-              stroke="#1a1c20"
-              stroke-width="3"
-            />
+            <rect x="60" y="5" width="35" height="35" rx="3" fill="none" stroke="#1a1c20" stroke-width="3" />
             <rect x="67" y="12" width="21" height="21" fill="#1a1c20" rx="1" />
-            <rect
-              x="5"
-              y="60"
-              width="35"
-              height="35"
-              rx="3"
-              fill="none"
-              stroke="#1a1c20"
-              stroke-width="3"
-            />
+            <rect x="5" y="60" width="35" height="35" rx="3" fill="none" stroke="#1a1c20" stroke-width="3" />
             <rect x="12" y="67" width="21" height="21" fill="#1a1c20" rx="1" />
             <rect x="45" y="5" width="7" height="7" fill="#1a1c20" />
             <rect x="45" y="15" width="7" height="7" fill="#1a1c20" />
@@ -1873,20 +617,14 @@
             <rect x="85" y="85" width="7" height="7" fill="#1a1c20" />
           </svg>
         </div>
-        <div style="display: flex; gap: 10px; justify-content: center">
-          <button class="btn-hc btn-hc-secondary" onclick="closeQr()">
-            Cerrar
-          </button>
-          <button class="btn-hc btn-hc-primary">
-            <i class="bi bi-download"></i> Descargar
-          </button>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button class="btn-hc btn-hc-secondary" onclick="closeQr()">Cerrar</button>
+          <button class="btn-hc btn-hc-primary"><i class="bi bi-download"></i> Descargar</button>
         </div>
       </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-    <!-- Lógica de la aplicación -->
-    <script src="../../javascript/modulo-gestion-documentacion/panel-de-administracion.js"></script>
+    <script src="./assets/js/panel-de-administracion.js"></script>
   </body>
 </html>
