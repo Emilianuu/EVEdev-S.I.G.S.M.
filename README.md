@@ -4,7 +4,7 @@ S.I.G.S.M. es un sistema de gestión desarrollado para optimizar la administraci
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 El núcleo del sistema se ha construido seleccionando tecnologías robustas que garantizan estabilidad y un rendimiento óptimo en un entorno web:
 
@@ -14,11 +14,11 @@ El núcleo del sistema se ha construido seleccionando tecnologías robustas que 
 
 ---
 
-## 📐 Justificación Tecnológica (Arquitectura)
+## ustificación Tecnológica (Arquitectura)
 
 La selección de la arquitectura de este proyecto se basa en la robustez y la seguridad en el manejo de la información:
 
-### 🖥️ Procesamiento del Lado del Servidor (Backend con PHP)
+### Procesamiento del Lado del Servidor (Backend con PHP)
 
 A diferencia de los scripts del lado del cliente, **el código de S.I.G.S.M. se ejecuta íntegramente en el servidor**. Esto aporta ventajas críticas para el sistema:
 
@@ -27,7 +27,7 @@ A diferencia de los scripts del lado del cliente, **el código de S.I.G.S.M. se 
 
 ---
 
-## 🚀 Instalación y Configuración Local
+## Instalación y Configuración Local
 
 Para ejecutar este proyecto en un entorno de desarrollo local, sigue estos pasos:
 
