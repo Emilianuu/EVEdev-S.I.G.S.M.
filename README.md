@@ -14,7 +14,7 @@ El núcleo del sistema se ha construido seleccionando tecnologías robustas que 
 
 ---
 
-## ustificación Tecnológica (Arquitectura)
+## Justificación Tecnológica (Arquitectura)
 
 La selección de la arquitectura de este proyecto se basa en la robustez y la seguridad en el manejo de la información:
 
