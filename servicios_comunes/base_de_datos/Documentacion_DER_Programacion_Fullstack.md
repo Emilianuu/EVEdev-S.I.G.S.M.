@@ -4,17 +4,16 @@
 
 **Equipo de Trabajo:**
 
-| ROL            | C.I.      | APELLIDO    | NOMBRE    | E-MAIL                       |
-| :------------- | :-------- | :---------- | :-------- | :--------------------------- |
-| Coordinador    | 5742262-3 | Chiessa     | Emiliano  | emiliano603099@gmail.com     |
-| Subcoordinador | 5745443-2 | Gomez       | Ezequiel  | ezequielg000mez23@gmail.com  |
-| Integrante 1   | 5771900-0 | Burgeño     | Valentino | valentinoburgeno16@gmail.com |
-| Integrante 2   | 5461972-6 | Izuibejeres | Juan      | juanmanuelizuibe@gmail.com   |
+| ROL            | C.I.      | APELLIDO | NOMBRE    | E-MAIL                       |
+| :------------- | :-------- | :------- | :-------- | :--------------------------- |
+| Coordinador    | 5742262-3 | Chiessa  | Emiliano  | emiliano603099@gmail.com     |
+| Subcoordinador | 5745443-2 | Gomez    | Ezequiel  | ezequielg0o0mez23@gmail.com  |
+| Integrante 1   | 5771900-0 | Burgeño  | Valentino | valentinoburgeno16@gmail.com |
 
 - **Docente:** Acosta, Fabián
 - **Institución:** I.S.B.O.
-- **Fecha de culminación:** 24/06/26
-- **Entrega:** PRIMERA ENTREGA
+- **Fecha de culminación:** 02/09/26
+- **Entrega:** SEGUNDA ENTREGA
 - **Curso:** 3°MJ
 
 [Descargar Documentación DER (PDF)](./Documentacion_DER_Programacion_Fullstack.pdf)
@@ -251,7 +250,7 @@ El bloque cumple con **3FN**:
 
 - **1FN:** No hay atributos multivaluados; las opciones múltiples se modelan en `OPCION_RESPUESTA`.
 - **2FN:** En `RESPUESTA_PREGUNTA`, `texto_libre` depende de la PK completa (`id_resp_pregunta`), no de una parte.
-- **3FN:** No existen dependencias transitivas.
+- **3FN:** No existen dependencias transitivas. El segmento de `ENCUESTA` es atributo directo, no derivado de otro.
 
 ---
 
@@ -379,7 +378,7 @@ Unifica en una sola entidad a todos los integrantes del equipo operativo (conduc
 
 ### Tabla: TRASLADO
 
-Registro de la ejecución del traslado aprobado. Vincula la solicitud con el vehículo, la ruta y el proveedor externo cuando aplica.
+Registro de la ejecución del traslado approved. Vincula la solicitud con el vehículo, la ruta y el proveedor externo cuando aplica.
 
 | Clave | Atributo          | Tipo     | Descripción                                                                         |
 | :---- | :---------------- | :------- | :---------------------------------------------------------------------------------- |
@@ -485,3 +484,100 @@ El bloque cumple con **3FN**:
 - **2FN:** En `PERSONAL_TRASLADO`, `rol_en_traslado` depende de la PK compuesta completa `(id_traslado, id_personal)`.
 - **3FN:** No hay dependencias transitivas. `distancia_km` en `RUTA` depende de `(id_origen, id_destino)`, que es su PK semántica.
 - La separación de `ESTADO_TRASLADO` evita la anomalía de modificación: cambiar el nombre de un estado actualiza un único registro.
+
+---
+
+## 5. Implementación de la base de datos
+
+Esta sección documenta cómo se llevó el DER de los tres bloques a una base de datos física en MySQL/MariaDB: el script DDL de las 24 tablas, los triggers que implementan las restricciones no estructurales, los datos de prueba, y la evidencia de funcionamiento.
+
+### 5.1. Scripts entregados
+
+| Archivo                        | Contenido                                                                                     |
+| :----------------------------- | :-------------------------------------------------------------------------------------------- |
+| `01_ddl_tablas.sql`            | Creación de las 24 tablas: claves primarias, foráneas, `UNIQUE` y `CHECK`.                    |
+| `02_triggers.sql`              | 10 triggers que implementan las restricciones no estructurales dependientes de otras tablas. |
+| `03_dml_datos_prueba.sql`      | Datos de prueba para las 24 tablas de los tres bloques.                                       |
+| `04_pruebas_restricciones.sql` | 8 sentencias que deben fallar a propósito, usadas como evidencia.                             |
+
+### 5.2. Convención general de reglas
+
+| Mecanismo                             | Se usa cuando…                                                                                        |
+| :------------------------------------ | :---------------------------------------------------------------------------------------------------- |
+| `PRIMARY KEY` / `FOREIGN KEY` / `UNIQUE` | La regla es estructural pura: integridad referencial, unicidad, claves compuestas.                   |
+| `CHECK`                               | La regla depende solo de columnas que NO participan de una FK en la misma fila.                       |
+| `TRIGGER` (`BEFORE`/`AFTER` INSERT/UPDATE) | La regla depende de otra tabla, de una consulta, o de una columna que sí es FK.                     |
+
+*Nota técnica:* Al ejecutar el DDL original con `CHECK` sobre columnas que son clave foránea (ej. `id_origen <> id_destino`), MariaDB devolvió el `Error 1901: Function or expression cannot be used in the CHECK clause`. Esas reglas se reimplementaron como triggers para garantizar compatibilidad total entre MariaDB y MySQL.
+
+---
+
+### 5.3. Restricciones implementadas - Bloque 1
+
+| Restricción (según DER)                       | Implementación                                                         | Objeto SQL                    |
+| :-------------------------------------------- | :--------------------------------------------------------------------- | :---------------------------- |
+| `nombre_usuario` único y no nulo              | `UNIQUE` + `NOT NULL`                                                  | Constraint (DDL)              |
+| `email` único y con formato válido             | `UNIQUE` + `CHECK` con `REGEXP`                                        | `chk_usuario_email_formato`   |
+| `contrasena_hash` nunca en texto plano        | Se genera en la aplicación antes del `INSERT`                          | Capa de Aplicación            |
+| Solo asignar roles con `activo = true`        | Trigger valida `ROL.activo` antes de insertar                           | `trg_usuariorol_rol_activo`   |
+| Invalidar sesiones al desactivar un usuario   | Manejado en la capa de sesión de la app                                | Capa de Aplicación            |
+| Usuario inactivo no puede iniciar sesión      | Validado durante el login                                              | Capa de Aplicación            |
+
+---
+
+### 5.4. Restricciones implementadas - Bloque 2
+
+| Restricción (según DER)                                | Implementación                                                                                 | Objeto SQL                        |
+| :----------------------------------------------------- | :--------------------------------------------------------------------------------------------- | :-------------------------------- |
+| Respuesta válida solo si `fecha_inicio <= hoy <= fecha_fin` | Trigger valida el rango de vigencia antes de insertar                                          | `trg_respencuesta_reglas`         |
+| Si `es_anonima = true`, `ci_paciente` es `NULL`        | Validado en trigger de sesión de respuesta                                                     | `trg_respencuesta_reglas`         |
+| Si `es_anonima = false`, `ci_paciente` `NOT NULL`      | Validado en trigger de sesión de respuesta                                                     | `trg_respencuesta_reglas`         |
+| `id_opcion` y `texto_libre` mutuamente exclusivos      | Trigger (reemplaza `CHECK` por involucrar FK)                                                  | `trg_resppregunta_exclusividad`   |
+| Pregunta `requerida = true` obliga a responderla       | La sesión se completa en varios INSERT; se valida al cerrar el envío                            | Capa de Aplicación                |
+| Orden único por encuesta / pregunta                    | `UNIQUE (id_encuesta, orden)` / `UNIQUE (id_pregunta, orden)`                                  | Constraint (DDL)                  |
+| Un paciente no responde la encuesta dos veces          | `UNIQUE (id_encuesta, ci_paciente)`                                                            | Constraint (DDL)                  |
+
+---
+
+### 5.5. Restricciones implementadas - Bloque 3
+
+| Restricción (según DER)                                            | Implementación                                                                        | Objeto SQL                                                        |
+| :----------------------------------------------------------------- | :------------------------------------------------------------------------------------ | :---------------------------------------------------------------- |
+| `id_origen <> id_destino` en `RUTA`                                | Trigger (reemplaza `CHECK` por columna FK)                                            | `trg_ruta_origen_destino`                                         |
+| `id_origen <> id_destino` en `SOLICITUD_TRASLADO`                  | Trigger (reemplaza `CHECK` por columna FK)                                            | `trg_solicitud_origen_destino`                                    |
+| Vehículo asignado debe estar `DISPONIBLE`                          | Trigger; además lo marca `EN_USO` al asignarlo                                        | `trg_traslado_validaciones`                                       |
+| Tipo de vehículo compatible con elemento (`COMPATIBILIDAD`)         | Trigger valida la tabla intermedia                                                    | `trg_traslado_validaciones`                                       |
+| Ruta del traslado coincide con origen/destino de la solicitud      | Trigger de validación integral de traslado                                            | `trg_traslado_validaciones`                                       |
+| Proveedor externo y personal propio son excluyentes                | Triggers en asignación de personal y proveedor                                         | `trg_personaltraslado_exclusion` / `trg_traslado_exclusion_proveedor` |
+| Horas en orden cronológico correcto                                | `CHECK (hora_llegada_real >= hora_salida_real AND hora_retorno >= hora_llegada_real)`| `chk_traslado_horas`                                              |
+| Flujo de `estado_solicitud` (`PENDIENTE` &rarr; `ASIGNADA` &rarr; `COMPLETADA`) | Trigger `BEFORE UPDATE`                                                               | `trg_solicitud_secuencia_estado`                                  |
+| Cambio en `HISTORIAL_ESTADO` se propaga a la solicitud             | Trigger `AFTER INSERT`; libera vehículo al finalizar o cancelar                        | `trg_historial_propaga_estado`                                    |
+| Personal no asignado a dos traslados activos a la vez              | No registra horario planificado previo, solo hora real ejecutada                      | Mejora Futura                                                     |
+
+---
+
+### 5.6. Evidencia de funcionamiento
+
+Se ejecutó `04_pruebas_restricciones.sql` sobre la base cargada. Las 8 pruebas fallaron devolviendo el **Error 1644 (SQLSTATE '45000')**, confirmando que los triggers bloquean las operaciones inválidas:
+
+| Pr. | Caso probado                                          | Mensaje de error obtenido (ERROR 1644)                                          |
+| :-- | :---------------------------------------------------- | :------------------------------------------------------------------------------ |
+| 1   | Asignar un rol inactivo                               | *No se puede asignar un rol inactivo a un usuario.*                             |
+| 2   | Ruta con mismo origen y destino                       | *Una ruta no puede tener el mismo origen y destino.*                            |
+| 3   | Respuesta sin `id_opcion` ni `texto_libre`            | *Debe indicarse exactamente uno: id_opcion o texto_libre.*                      |
+| 4   | Respuesta con `id_opcion` y `texto_libre` a la vez    | *Debe indicarse exactamente uno: id_opcion o texto_libre.*                      |
+| 5   | Vehículo en `MANTENIMIENTO` asignado a traslado       | *El vehículo asignado no está DISPONIBLE.*                                      |
+| 6   | Vehículo incompatible con el elemento solicitado      | *El tipo de vehículo no es compatible con el tipo de elemento solicitado.*      |
+| 7   | `ci_paciente` cargado en encuesta anónima             | *La encuesta es anónima: ci_paciente debe ser NULL.*                            |
+| 8   | Modificar el estado de una solicitud ya `COMPLETADA`  | *No se puede modificar el estado de una solicitud ya COMPLETADA.*               |
+
+#### Propagación automática de estados (Camino Correcto)
+
+Al registrar en `HISTORIAL_ESTADO` la secuencia completa de un traslado (`ASIGNADO` &rarr; `EN_CAMINO` &rarr; `COMPLETADO`):
+
+```sql
+SELECT estado_solicitud FROM SOLICITUD_TRASLADO WHERE id_solicitud = 1;
+-- Resultado: COMPLETADA
+
+SELECT estado_disponibilidad FROM VEHICULO WHERE id_vehiculo = 1;
+-- Resultado: DISPONIBLE
