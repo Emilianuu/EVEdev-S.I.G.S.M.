@@ -43,14 +43,6 @@ A continuación se detalla la organización de archivos y directorios de la raí
 │           ├── css/                  # Estilos específicos del módulo
 │           ├── img/                  # Imágenes del módulo
 │           └── js/                   # Scripts cliente del módulo
-├── modulo_encuestas/                 # Módulo de gestión de encuestas
-│   ├── controlador/                  # Lógica del módulo de encuestas
-│   ├── modelo/                       # Modelos y operaciones de datos
-│   └── vista/                        # Interfaz de usuario de encuestas
-│       └── assets/
-│           ├── css/
-│           ├── img/
-│           └── js/
 ├── modulo_traslados/                 # Módulo de gestión de traslados
 │   ├── controlador/                  # Lógica del módulo de traslados
 │   ├── modelo/                       # Persistencia de datos de traslados
