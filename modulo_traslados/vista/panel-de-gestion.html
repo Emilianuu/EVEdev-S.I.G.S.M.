@@ -28,7 +28,15 @@
       rel="stylesheet"
       href="./assets/css/panel-de-gestion.css"
     />
-  </head>
+  
+  <script>
+    const savedTheme = localStorage.getItem('theme') || localStorage.getItem('traslados_theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  </script>
+</head>
+
   <body>
     <!-- Mobile toggle -->
     <button class="mobile-toggle" id="mobileToggle">
@@ -39,37 +47,31 @@
     <aside id="sidebar">
       <div class="sidebar-brand">
         <div style="display: flex; align-items: center; gap: 10px">
-          <img src="../../servicios_comunes/vista_general/logo.png">
-            <rect width="44" height="44" rx="6" fill="#E3F2FD" />
-            <!-- simplified building bars -->
-            <rect x="8" y="10" width="4" height="24" rx="1" fill="#1565C0" />
-            <rect x="14" y="6" width="4" height="28" rx="1" fill="#1976D2" />
-            <rect x="20" y="10" width="4" height="24" rx="1" fill="#1565C0" />
-            <rect x="26" y="14" width="4" height="20" rx="1" fill="#42A5F5" />
-            <rect x="32" y="18" width="4" height="16" rx="1" fill="#90CAF9" />
-          </svg>
+          <div
+            class="logo-icon"
+            style="background: transparent; overflow: hidden; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;"
+          >
+            <img
+              src="../../servicios_comunes/vista_general/logo.png"
+              alt="Logo Hospital de Clínicas"
+              style="height: 34px; object-fit: contain"
+            />
+          </div>
           <div>
-            <div
-              style="
-                font-size: 11px;
-                font-weight: 700;
-                color: #1565c0;
-                line-height: 1.2;
-              "
-            >
-              HOSPITAL DE CLÍNICAS
-            </div>
-            <div style="font-size: 9.5px; color: #555; line-height: 1.2">
+            <strong style="display: block; font-size: 0.78rem; font-weight: 700; color: #fff; letter-spacing: 0.02em; white-space: nowrap; line-height: 1.2;">
+              Hospital de Clínicas
+            </strong>
+            <span style="font-size: 0.68rem; color: rgba(255, 255, 255, 0.45); white-space: nowrap;">
               Dr. Manuel Quintela
-            </div>
+            </span>
           </div>
         </div>
       </div>
 
       <div class="sidebar-section-label">Sistema de Gestión</div>
-      <div class="sidebar-label-bold">Ambulancias y Traslados</div>
+      <div class="sidebar-label-bold" style="color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 18px 12px;">Ambulancias y Traslados</div>
 
-      <ul class="list-unstyled mb-0">
+      <ul class="list-unstyled mb-0" style="flex: 1; overflow-y: auto; padding: 0 10px;">
         <li class="nav-item-custom">
           <a
             class="nav-link-custom active"
@@ -115,14 +117,31 @@
             <i class="bi bi-gear-fill"></i> Recursos
           </a>
         </li>
+        <li class="nav-item-custom">
+          <a
+            class="nav-link-custom"
+            data-view="configuracion"
+            onclick="navigate(this)"
+          >
+            <i class="bi bi-sliders"></i> Configuración
+          </a>
+        </li>
       </ul>
 
       <div class="sidebar-footer">
         <div class="avatar-circle">A</div>
-        <div>
-          <div class="avatar-name">Admin Usuario</div>
-          <div class="avatar-role">Administrativo</div>
+        <div style="overflow: hidden;">
+          <div class="avatar-name" style="font-size: 0.8rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">Admin Usuario</div>
+          <div class="avatar-role" style="font-size: 0.68rem; color: rgba(255, 255, 255, 0.4); white-space: nowrap;">Administrativo</div>
         </div>
+        <button
+          class="btn btn-sm btn-link ms-auto p-0"
+          title="Volver al portal principal"
+          onclick="location.href='../../index.html'"
+          style="font-size: 1rem; color: rgba(255, 255, 255, 0.5);"
+        >
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
       </div>
     </aside>
 
@@ -952,6 +971,92 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONFIGURACIÓN -->
+      <section class="view" id="view-configuracion">
+        <div class="page-title">Configuración</div>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="section-card mb-4">
+              <h5>Datos del Funcionario</h5>
+              <div class="mb-3">
+                <label class="form-label fw-bold" style="font-size: 0.85rem;">Nombre</label>
+                <input class="form-control" value="Admin Usuario" disabled />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold" style="font-size: 0.85rem;">Rol</label>
+                <input class="form-control" value="Administrativo" disabled />
+              </div>
+              <div class="mb-0">
+                <label class="form-label fw-bold" style="font-size: 0.85rem;">Sector</label>
+                <input class="form-control" value="Mesa Central / Traslados" disabled />
+              </div>
+            </div>
+
+            <div class="section-card">
+              <h5><i class="bi bi-palette"></i> Apariencia</h5>
+              <div class="form-check form-switch mb-0">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="cfg-darkmode"
+                  onchange="toggleDarkMode(this.checked)"
+                  style="cursor: pointer;"
+                />
+                <label
+                  class="form-check-label fw-bold"
+                  for="cfg-darkmode"
+                  style="font-size: 0.9rem; cursor: pointer;"
+                >
+                  Modo Oscuro (Estilo EVE)
+                </label>
+                <p class="text-muted mt-1" style="font-size: 0.78rem;">
+                  Cambia la interfaz a la paleta de colores oscuros con acentos neón ideal para guardias nocturnas.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="section-card">
+              <h5>Notificaciones y Alertas</h5>
+              <div class="form-check form-switch mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  checked
+                  id="cfg-t1"
+                />
+                <label class="form-check-label" for="cfg-t1" style="font-size: 0.88rem;">
+                  Notificar cuando un traslado cambie a "En tránsito"
+                </label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  checked
+                  id="cfg-t2"
+                />
+                <label class="form-check-label" for="cfg-t2" style="font-size: 0.88rem;">
+                  Avisar sobre ambulancias con mantenimiento vencido
+                </label>
+              </div>
+              <div class="form-check form-switch mb-0">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="cfg-t3"
+                />
+                <label class="form-check-label" for="cfg-t3" style="font-size: 0.88rem;">
+                  Resumen diario de flota por correo
+                </label>
+              </div>
             </div>
           </div>
         </div>

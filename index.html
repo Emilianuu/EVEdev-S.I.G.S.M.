@@ -61,6 +61,7 @@
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        transition: background 0.3s, color 0.3s;
       }
 
       /* ── Header ── */
@@ -75,6 +76,7 @@
         position: sticky;
         top: 0;
         z-index: 100;
+        transition: background 0.3s, border-color 0.3s;
       }
 
       .header-brand {
@@ -101,6 +103,7 @@
         font-size: 1.1rem;
         color: var(--blue-900);
         line-height: 1.2;
+        transition: color 0.3s;
       }
 
       .header-subtitle {
@@ -150,6 +153,7 @@
         color: var(--blue-900);
         line-height: 1.15;
         margin-bottom: 8px;
+        transition: color 0.3s;
       }
 
       .page-desc {
@@ -182,7 +186,8 @@
         transition:
           transform 0.18s ease,
           box-shadow 0.18s ease,
-          border-color 0.18s ease;
+          border-color 0.18s ease,
+          background 0.3s;
       }
 
       .module-card::before {
@@ -207,11 +212,6 @@
 
       .module-card:hover::before {
         opacity: 1;
-      }
-
-      .module-card:focus-visible {
-        outline: 2px solid var(--blue-500);
-        outline-offset: 3px;
       }
 
       .card-icon {
@@ -246,6 +246,7 @@
         color: var(--blue-900);
         line-height: 1.2;
         margin-bottom: 8px;
+        transition: color 0.3s;
       }
 
       .card-desc {
@@ -260,6 +261,7 @@
         justify-content: space-between;
         padding-top: 14px;
         border-top: 1px solid var(--slate-100);
+        transition: border-color 0.3s;
       }
 
       .card-chips {
@@ -276,6 +278,7 @@
         background: var(--slate-100);
         color: var(--slate-700);
         letter-spacing: 0.02em;
+        transition: background 0.3s, color 0.3s;
       }
 
       .card-arrow {
@@ -299,18 +302,47 @@
         color: var(--slate-500);
         border-top: 1px solid var(--slate-200);
         background: var(--white);
+        transition: background 0.3s, border-color 0.3s, color 0.3s;
       }
 
-      @media (max-width: 600px) {
-        header {
-          padding: 0 20px;
-        }
-        main {
-          padding: 32px 16px;
-        }
-        .modules-grid {
-          grid-template-columns: 1fr;
-        }
+      /* ── DARK MODE OVERRIDE (EVE STYLE) ───────────── */
+      [data-theme="dark"] {
+        --hc-bg-dark: #070913;
+        --hc-panel-dark: #101424;
+        --hc-border-dark: #1c233c;
+        --hc-text-main: #f1f5f9;
+        --hc-text-muted: #94a3b8;
+        --hc-eve-accent: #9f7aea;
+
+        --blue-900: #f1f5f9;
+        --blue-700: #9f7aea;
+        --slate-500: var(--hc-text-muted);
+        --slate-200: var(--hc-border-dark);
+        --slate-100: rgba(255, 255, 255, 0.04);
+        --white: var(--hc-panel-dark);
+      }
+
+      [data-theme="dark"] body {
+        background: linear-gradient(150deg, #101424 0%, #070913 55%, #05060d 100%);
+        color: var(--hc-text-main);
+      }
+
+      [data-theme="dark"] header,
+      [data-theme="dark"] footer {
+        background: var(--hc-panel-dark);
+        border-color: var(--hc-border-dark);
+        color: var(--hc-text-main);
+      }
+
+      [data-theme="dark"] .module-card {
+        background: var(--hc-panel-dark);
+        border-color: var(--hc-border-dark);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      }
+
+      [data-theme="dark"] .chip {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--hc-text-main);
       }
     </style>
   </head>
@@ -334,7 +366,7 @@
     <main>
       <div class="wrapper">
         <p class="page-eyebrow">Portal de módulos</p>
-        <h1 class="page-heading">Sistema de Gestión<br />de Traslados</h1>
+        <h1 class="page-heading">Sistema de Gestión<br />Institucional</h1>
         <p class="page-desc">
           Seleccioná el módulo al que querés acceder. Cada sección es
           independiente y cuenta con control de acceso por rol.
@@ -361,7 +393,7 @@
             <div class="card-footer-row">
               <div class="card-chips">
                 <span class="chip">Conductor</span>
-                z <span class="chip">Enfermero</span>
+                <span class="chip">Enfermero</span>
                 <span class="chip">Operador</span>
               </div>
               <i class="bi bi-arrow-right card-arrow"></i>
@@ -395,11 +427,18 @@
         </div>
       </div>
     </main>
-
     <!-- Footer -->
     <footer>
       Hospital de Clínicas Dr. Manuel Quintela &mdash; Sistema interno de
-      gestión de traslados
+      gestión institucional
     </footer>
+
+    <script>
+      // Load Dark Mode Preference across windows/tabs
+      const savedTheme = localStorage.getItem('theme') || localStorage.getItem('traslados_theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    </script>
   </body>
 </html>

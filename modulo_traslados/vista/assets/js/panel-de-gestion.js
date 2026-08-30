@@ -37,3 +37,24 @@ function switchTab(el, tabId) {
 document.getElementById("mobileToggle").addEventListener("click", () => {
   document.getElementById("sidebar").classList.toggle("open");
 });
+
+/* Dark Mode Logic (EVE Style) */
+function toggleDarkMode(isDark) {
+  if (isDark) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('traslados_theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('traslados_theme', 'light');
+  }
+}
+
+// Init theme preference
+document.addEventListener("DOMContentLoaded", function () {
+  const savedTheme = localStorage.getItem('traslados_theme');
+  if (savedTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    const chk = document.getElementById('cfg-darkmode');
+    if (chk) chk.checked = true;
+  }
+});
