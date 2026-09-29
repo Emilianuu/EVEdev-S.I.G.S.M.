@@ -55,6 +55,15 @@ CREATE TABLE USUARIO_ROL (
 -- BLOQUE 2 — CONTENIDOS Y ENCUESTAS
 -- =====================================================================
 
+CREATE TABLE PACIENTE (
+    ci VARCHAR(15) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    email VARCHAR(150) NULL,
+    telefono VARCHAR(20) NULL
+) ENGINE = InnoDB;
+
 CREATE TABLE CATEGORIA (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
