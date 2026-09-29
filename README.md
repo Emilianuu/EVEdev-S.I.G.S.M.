@@ -91,14 +91,17 @@ git clone https://github.com/tu-usuario/nombre-repositorio.git .
 
 1. Inicia los servicios de **Apache** y **MySQL** desde el panel de control de tu entorno local (XAMPP/Wamp/Laragon).
 2. Accede a **phpMyAdmin** (usualmente en `http://localhost/phpmyadmin`) o utiliza tu cliente SQL de preferencia (DBeaver, MySQL Workbench, HeidiSQL).
-3. Crea una nueva base de datos llamada `sigsm_db` con cotejamiento `utf8mb4_unicode_ci`.
-4. Importa los archivos SQL ubicados en la carpeta `servicios_comunes/base_de_datos/`.
+3. Crea una nueva base de datos llamada `sigsm` con cotejamiento `utf8mb4_unicode_ci`.
+4. Importa los archivos SQL ubicados en la carpeta `servicios_comunes/base_de_datos/` **respetando el siguiente orden estricto de ejecución**:
 
    _Vía línea de comandos:_
 
    ```bash
    mysql -u root -p -e "CREATE DATABASE sigsm_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-   mysql -u root -p sigsm_db < servicios_comunes/base_de_datos/schema.sql
+   mysql -u root -p sigsm < servicios_comunes/base_de_datos/01_ddl_tablas.sql
+   mysql -u root -p sigsm < servicios_comunes/base_de_datos/02_triggers.sql
+   mysql -u root -p sigsm < servicios_comunes/base_de_datos/03_dml_datos_prueba.sql
+   mysql -u root -p sigsm < servicios_comunes/base_de_datos/04_pruebas_restricciones.sql
    ```
 
 #### 3. Configurar la Conexión a la Base de Datos
@@ -111,7 +114,7 @@ git clone https://github.com/tu-usuario/nombre-repositorio.git .
 $host = "localhost";
 $usuario = "root";
 $password = ""; // Contraseña de tu MySQL local
-$database = "sigsm_db";
+$database = "sigsm";
 ?>
 ```
 
