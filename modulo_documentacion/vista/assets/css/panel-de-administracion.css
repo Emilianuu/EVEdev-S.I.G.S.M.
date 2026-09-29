@@ -67,7 +67,9 @@ body {
   left: 0;
   bottom: 0;
   z-index: 100;
-  transition: width 0.25s ease, background 0.3s;
+  transition:
+    width 0.25s ease,
+    background 0.3s;
   overflow: hidden;
 }
 
@@ -310,7 +312,9 @@ body {
   z-index: 50;
   flex-shrink: 0;
   box-shadow: var(--shadow-sm);
-  transition: background 0.3s, border-color 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
 }
 .topbar .toggle-btn {
   width: 34px;
@@ -438,7 +442,8 @@ body {
   transition:
     box-shadow 0.2s,
     transform 0.2s,
-    background 0.3s, border-color 0.3s;
+    background 0.3s,
+    border-color 0.3s;
 }
 .stat-card:hover {
   box-shadow: var(--shadow-md);
@@ -490,7 +495,9 @@ body {
   border-radius: var(--radius);
   border: 1px solid var(--hc-gray-200);
   box-shadow: var(--shadow-sm);
-  transition: background 0.3s, border-color 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
 }
 .panel-header {
   display: flex;
@@ -604,7 +611,9 @@ body {
   text-align: left;
   white-space: nowrap;
   background: var(--hc-gray-50);
-  transition: background 0.3s, border-color 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
 }
 .hc-table th:first-child {
   border-radius: var(--radius) 0 0 0;
@@ -952,7 +961,9 @@ body {
   padding: 44px 44px 36px;
   width: 100%;
   max-width: 440px;
-  transition: background 0.3s, border-color 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
 }
 .login-logo-circle {
   width: 52px;
@@ -1403,8 +1414,8 @@ body {
 /* ── DARK MODE OVERRIDE (EVE STYLE) ───────────── */
 [data-theme="dark"] {
   /* Eve dark colors */
-  --hc-bg-dark: #070913; 
-  --hc-panel-dark: #101424; 
+  --hc-bg-dark: #070913;
+  --hc-panel-dark: #101424;
   --hc-border-dark: #1c233c;
   --hc-text-main: #f1f5f9;
   --hc-text-muted: #94a3b8;
@@ -1419,8 +1430,8 @@ body {
   --hc-gray-900: #ffffff;
   --hc-gray-700: #e2e8f0;
   --hc-gray-500: var(--hc-text-muted);
-  
-  --hc-navy: #05060d; 
+
+  --hc-navy: #05060d;
   --hc-blue: var(--hc-eve-accent);
   --hc-blue-mid: #8b5cf6;
   --hc-blue-light: rgba(159, 122, 234, 0.2);
@@ -1491,4 +1502,238 @@ body {
 
 [data-theme="dark"] .module-card:hover {
   border-color: var(--hc-eve-accent);
+}
+
+/* Login & General */
+.login-view-wrapper {
+  display: flex;
+}
+.flex-center-content {
+  justify-content: center;
+}
+.login-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin: 0 0 4px;
+}
+.login-subtitle {
+  text-align: center;
+  color: var(--hc-gray-500);
+  font-size: 0.84rem;
+  margin: 0 0 28px;
+}
+.login-help-text {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--hc-gray-400);
+  margin-top: 16px;
+}
+.btn-text-sm {
+  font-size: 0.82rem;
+}
+.hidden-by-default {
+  display: none;
+}
+
+/* Sidebar & Navigation */
+.sidebar-logo-bg {
+  background: transparent;
+  overflow: hidden;
+}
+.logo-img-contain {
+  height: 40px;
+  object-fit: contain;
+}
+.sidebar-brand-title {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.sidebar-brand-subtitle {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+}
+.btn-logout-style {
+  margin-left: auto;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Dashboard & Cards */
+.stat-delta-accent {
+  color: var(--hc-accent);
+}
+.table-responsive-wrapper {
+  overflow-x: auto;
+}
+.chart-subtitle-text {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--hc-gray-500);
+  margin: 6px 0 18px;
+}
+.mb-custom-10 {
+  margin-bottom: 10px;
+}
+.clickable-doc-row {
+  cursor: pointer;
+}
+
+/* Documentos & Tables */
+.panel-header-wrap {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.search-wrap-flexible {
+  flex: 1;
+  min-width: 220px;
+}
+.select-sm {
+  width: auto;
+  font-size: 0.82rem;
+  padding: 8px 10px;
+}
+.text-right {
+  text-align: right;
+}
+.doc-count-text {
+  font-size: 0.78rem;
+  color: var(--hc-gray-500);
+}
+.pagination-controls {
+  display: flex;
+  gap: 6px;
+}
+.flex-end-actions {
+  justify-content: flex-end;
+}
+.table-cell-title {
+  font-weight: 600;
+}
+.table-cell-subtitle {
+  font-size: 0.76rem;
+  color: var(--hc-gray-400);
+}
+.table-cell-date {
+  color: var(--hc-gray-500);
+  font-size: 0.82rem;
+}
+.badge-circle-icon {
+  font-size: 0.45rem;
+}
+
+/* Forms & Upload Zone */
+.text-red-asterisk {
+  color: var(--hc-red);
+}
+.hc-textarea-large {
+  min-height: 160px;
+}
+.upload-icon-lg {
+  font-size: 2rem;
+  color: var(--hc-gray-400);
+  display: block;
+  margin-bottom: 10px;
+}
+.upload-text-bold {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--hc-gray-600);
+  margin-bottom: 4px;
+}
+.upload-text-sm {
+  font-size: 0.76rem;
+  color: var(--hc-gray-400);
+}
+.hidden-file-input {
+  display: none;
+}
+.flex-end-gap {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Viewer */
+.breadcrumb-link-wrapper {
+  font-size: 0.76rem;
+  color: var(--hc-gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 4px;
+}
+.breadcrumb-link {
+  color: var(--hc-gray-400);
+  text-decoration: none;
+}
+.header-actions-flex {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.btn-approve-custom {
+  background: #dcfce7;
+  color: var(--hc-green);
+}
+.page-info-text {
+  font-size: 0.78rem;
+  color: var(--hc-gray-400);
+}
+
+/* Generador QR */
+.empty-qr-box {
+  border: 1.5px dashed var(--hc-gray-200);
+  border-radius: 10px;
+  padding: 40px 20px;
+  color: var(--hc-gray-400);
+  font-size: 0.85rem;
+}
+.qr-icon-lg {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 10px;
+}
+.qr-result-img-wrapper {
+  margin: 0 auto 16px;
+  width: 164px;
+}
+.qr-result-patient {
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+.qr-result-desc {
+  font-size: 0.8rem;
+  color: var(--hc-gray-500);
+  margin: 0 0 18px;
+}
+.qr-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.qr-checkbox-label {
+  font-size: 0.85rem;
+}
+
+/* Configuracion */
+.check-cursor-pointer {
+  cursor: pointer;
+}
+.dark-mode-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dark-mode-desc {
+  font-size: 0.75rem;
+  color: var(--hc-gray-400);
+  margin-top: 4px;
+}
+.check-label-sm {
+  font-size: 0.85rem;
 }

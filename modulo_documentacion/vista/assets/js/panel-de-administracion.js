@@ -1,3 +1,12 @@
+// ── Init Temprano del Tema (previene parpadeo) ──────────────────────
+(function initTheme() {
+  const savedTheme =
+    localStorage.getItem("theme") || localStorage.getItem("traslados_theme");
+  if (savedTheme === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }
+})();
+
 // ── Datos fijos de demostración (sin backend) ──────────────────────
 let hcCounter = 4029;
 
@@ -20,9 +29,24 @@ const docs = [
       "Reposo relativo por 5 días en domicilio.",
     ],
     audit: [
-      { label: "Carga de Documento completada", who: "Dr. Daniel Muñoz", when: "24 Oct, 08:32", tone: "gray" },
-      { label: "Asignado para Validación de Firma", who: "Depto. Archivo Clínico", when: "24 Oct, 08:35", tone: "amber" },
-      { label: "Documento aprobado", who: "Dr. Daniel Muñoz", when: "24 Oct, 09:10", tone: "green" },
+      {
+        label: "Carga de Documento completada",
+        who: "Dr. Daniel Muñoz",
+        when: "24 Oct, 08:32",
+        tone: "gray",
+      },
+      {
+        label: "Asignado para Validación de Firma",
+        who: "Depto. Archivo Clínico",
+        when: "24 Oct, 08:35",
+        tone: "amber",
+      },
+      {
+        label: "Documento aprobado",
+        who: "Dr. Daniel Muñoz",
+        when: "24 Oct, 09:10",
+        tone: "green",
+      },
     ],
   },
   {
@@ -40,8 +64,18 @@ const docs = [
     listHeading: "Observaciones",
     listItems: ["Pendiente de firma del médico radiólogo de guardia."],
     audit: [
-      { label: "Carga de Documento completada", who: "Lic. Mesa Central", when: "23 Oct, 15:10", tone: "gray" },
-      { label: "Asignado para Validación de Firma", who: "Depto. Archivo Clínico", when: "23 Oct, 15:12", tone: "amber" },
+      {
+        label: "Carga de Documento completada",
+        who: "Lic. Mesa Central",
+        when: "23 Oct, 15:10",
+        tone: "gray",
+      },
+      {
+        label: "Asignado para Validación de Firma",
+        who: "Depto. Archivo Clínico",
+        when: "23 Oct, 15:12",
+        tone: "amber",
+      },
     ],
   },
   {
@@ -57,8 +91,18 @@ const docs = [
     resumenText:
       "Hemograma completo y perfil metabólico dentro de parámetros normales. Se adjuntan valores de referencia comparados con estudio previo del paciente.",
     audit: [
-      { label: "Carga de Documento completada", who: "Lic. Laboratorio Central", when: "23 Oct, 11:05", tone: "gray" },
-      { label: "En revisión por médico tratante", who: "Dra. Patricia Núñez", when: "23 Oct, 14:20", tone: "amber" },
+      {
+        label: "Carga de Documento completada",
+        who: "Lic. Laboratorio Central",
+        when: "23 Oct, 11:05",
+        tone: "gray",
+      },
+      {
+        label: "En revisión por médico tratante",
+        who: "Dra. Patricia Núñez",
+        when: "23 Oct, 14:20",
+        tone: "amber",
+      },
     ],
   },
   {
@@ -74,10 +118,22 @@ const docs = [
     resumenText:
       "Formulario de consentimiento para procedimiento quirúrgico programado. Rechazado por falta de firma del segundo testigo requerido por protocolo institucional.",
     listHeading: "Motivo de rechazo",
-    listItems: ["Falta firma de testigo. Debe reingresarse con el formulario completo."],
+    listItems: [
+      "Falta firma de testigo. Debe reingresarse con el formulario completo.",
+    ],
     audit: [
-      { label: "Carga de Documento completada", who: "Enf. Mesa Central", when: "22 Oct, 18:40", tone: "gray" },
-      { label: "Documento rechazado", who: "Dr. Daniel Muñoz", when: "22 Oct, 19:02", tone: "red" },
+      {
+        label: "Carga de Documento completada",
+        who: "Enf. Mesa Central",
+        when: "22 Oct, 18:40",
+        tone: "gray",
+      },
+      {
+        label: "Documento rechazado",
+        who: "Dr. Daniel Muñoz",
+        when: "22 Oct, 19:02",
+        tone: "red",
+      },
     ],
   },
   {
@@ -93,8 +149,18 @@ const docs = [
     resumenText:
       "Actualización de historia clínica con antecedentes personales, familiares y evolución de controles periódicos. Sin datos de alarma en la consulta actual.",
     audit: [
-      { label: "Carga de Documento completada", who: "Dr. Daniel Muñoz", when: "22 Oct, 09:15", tone: "gray" },
-      { label: "Documento aprobado", who: "Dr. Daniel Muñoz", when: "22 Oct, 09:40", tone: "green" },
+      {
+        label: "Carga de Documento completada",
+        who: "Dr. Daniel Muñoz",
+        when: "22 Oct, 09:15",
+        tone: "gray",
+      },
+      {
+        label: "Documento aprobado",
+        who: "Dr. Daniel Muñoz",
+        when: "22 Oct, 09:40",
+        tone: "green",
+      },
     ],
   },
   {
@@ -110,7 +176,12 @@ const docs = [
     resumenText:
       "Ingreso por guardia con cuadro de dolor abdominal. Se indican estudios complementarios y se deja en observación para reevaluación en las próximas horas.",
     audit: [
-      { label: "Carga de Documento completada", who: "Dr. de Guardia", when: "21 Oct, 20:03", tone: "gray" },
+      {
+        label: "Carga de Documento completada",
+        who: "Dr. de Guardia",
+        when: "21 Oct, 20:03",
+        tone: "gray",
+      },
     ],
   },
 ];
@@ -123,17 +194,6 @@ const statusMeta = {
 };
 
 let currentDocId = null;
-
-// ── Dark Mode Logic (EVE Style) ────────────────────────────────────
-function toggleDarkMode(isDark) {
-  if (isDark) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    localStorage.setItem('theme', 'dark');
-  } else {
-    document.documentElement.removeAttribute('data-theme');
-    localStorage.setItem('theme', 'light');
-  }
-}
 
 // ── Navegación entre pantallas de nivel superior ───────────────────
 function showTop(id) {
@@ -181,7 +241,8 @@ function setAdminView(id) {
     "view-generar-qr": "Generador de Accesos QR",
     "view-configuracion": "Configuración",
   };
-  document.getElementById("topbar-title").textContent = titles[id] || "";
+  const titleEl = document.getElementById("topbar-title");
+  if (titleEl) titleEl.textContent = titles[id] || "";
 
   const navMap = {
     "view-dashboard": "nav-inicio",
@@ -192,6 +253,7 @@ function setAdminView(id) {
   document
     .querySelectorAll(".nav-item")
     .forEach((n) => n.classList.remove("active"));
+
   if (navMap[id]) {
     const navEl = document.getElementById(navMap[id]);
     if (navEl) navEl.classList.add("active");
@@ -224,8 +286,10 @@ function toggleSidebar() {
 }
 
 function closeMobileSidebar() {
-  document.getElementById("sidebar").classList.remove("mobile-open");
-  document.getElementById("sidebar-overlay").classList.remove("visible");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebar-overlay");
+  if (sidebar) sidebar.classList.remove("mobile-open");
+  if (overlay) overlay.classList.remove("visible");
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────
@@ -245,7 +309,7 @@ function renderDashboard() {
     .slice(0, 4)
     .map(
       (d) => `
-    <tr onclick="openDocumento('${d.id}')" style="cursor:pointer">
+    <tr class="clickable-doc-row" data-id="${d.id}">
       <td><strong>#${d.id}</strong></td>
       <td>${d.paciente}</td>
       <td>${d.tipo}</td>
@@ -266,7 +330,7 @@ function renderDashboard() {
 
 function badgeHtml(estado) {
   const m = statusMeta[estado] || statusMeta.pendiente;
-  return `<span class="badge-hc ${m.cls}"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> ${m.label}</span>`;
+  return `<span class="badge-hc ${m.cls}"><i class="bi bi-circle-fill badge-circle-icon"></i> ${m.label}</span>`;
 }
 
 // ── Documentos Clínicos ─────────────────────────────────────────────
@@ -279,15 +343,15 @@ function renderDocumentosTable() {
     <tr>
       <td><strong>#${d.id}</strong></td>
       <td>
-        <div style="font-weight:600;">${d.paciente}</div>
-        <div style="font-size:0.76rem;color:var(--hc-gray-400);">CI ${d.ci}</div>
+        <div class="table-cell-title">${d.paciente}</div>
+        <div class="table-cell-subtitle">CI ${d.ci}</div>
       </td>
       <td>${d.tipo}</td>
-      <td style="color:var(--hc-gray-500);font-size:0.82rem;">${d.fecha}</td>
+      <td class="table-cell-date">${d.fecha}</td>
       <td>${badgeHtml(d.estado)}</td>
       <td>
-        <div class="actions" style="justify-content:flex-end;">
-          <button class="btn-hc btn-hc-ghost btn-xs" title="Ver" onclick="openDocumento('${d.id}')"><i class="bi bi-eye"></i></button>
+        <div class="actions flex-end-actions">
+          <button class="btn-hc btn-hc-ghost btn-xs btn-view-doc" title="Ver" data-id="${d.id}"><i class="bi bi-eye"></i></button>
           <button class="btn-hc btn-hc-ghost btn-xs" title="Descargar"><i class="bi bi-download"></i></button>
         </div>
       </td>
@@ -319,17 +383,28 @@ function saveDoc() {
     ci,
     nacimiento: "—",
     tipo,
-    fecha: new Date().toLocaleDateString("es-UY", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }) + ", " + new Date().toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" }),
+    fecha:
+      new Date().toLocaleDateString("es-UY", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }) +
+      ", " +
+      new Date().toLocaleTimeString("es-UY", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     estado,
     tituloVisor: tipo.toUpperCase(),
     resumenHeading: "Contenido",
     resumenText: contenido || "Sin contenido adicional cargado.",
     audit: [
-      { label: "Carga de Documento completada", who: "Dr. Daniel Muñoz", when: "recién", tone: "gray" },
+      {
+        label: "Carga de Documento completada",
+        who: "Dr. Daniel Muñoz",
+        when: "recién",
+        tone: "gray",
+      },
     ],
   };
   docs.unshift(nuevo);
@@ -407,7 +482,12 @@ function getPacientesUnicos() {
   const map = {};
   docs.forEach((d) => {
     if (!map[d.ci]) {
-      map[d.ci] = { paciente: d.paciente, ci: d.ci, nacimiento: d.nacimiento, count: 0 };
+      map[d.ci] = {
+        paciente: d.paciente,
+        ci: d.ci,
+        nacimiento: d.nacimiento,
+        count: 0,
+      };
     }
     map[d.ci].count += 1;
   });
@@ -420,6 +500,7 @@ function initQr() {
   select.innerHTML = pacientes
     .map((p) => `<option value="${p.ci}">${p.paciente}</option>`)
     .join("");
+
   document.getElementById("qr-result").style.display = "none";
   document.getElementById("qr-empty").style.display = "block";
   renderQrDocs();
@@ -434,7 +515,7 @@ function renderQrDocs() {
       (d, i) => `
     <div class="form-check mb-2">
       <input class="form-check-input qr-doc-check" type="checkbox" value="${d.id}" id="qr-doc-${d.id}" ${i === 0 ? "checked" : ""}>
-      <label class="form-check-label" for="qr-doc-${d.id}" style="font-size:0.85rem">${d.tipo} (#${d.id})</label>
+      <label class="form-check-label qr-checkbox-label" for="qr-doc-${d.id}">${d.tipo} (#${d.id})</label>
     </div>`,
     )
     .join("");
@@ -444,7 +525,9 @@ function generarQr() {
   const ci = document.getElementById("qr-paciente").value;
   const pacienteDoc = docs.find((d) => d.ci === ci);
   const paciente = pacienteDoc ? pacienteDoc.paciente : "";
-  const seleccionados = document.querySelectorAll(".qr-doc-check:checked").length;
+  const seleccionados = document.querySelectorAll(
+    ".qr-doc-check:checked",
+  ).length;
 
   if (seleccionados === 0) {
     alert("Seleccione al menos un documento para incluir en el QR.");
@@ -453,7 +536,8 @@ function generarQr() {
 
   document.getElementById("qr-empty").style.display = "none";
   document.getElementById("qr-result").style.display = "block";
-  document.getElementById("qr-result-paciente").textContent = `Paciente: ${paciente}`;
+  document.getElementById("qr-result-paciente").textContent =
+    `Paciente: ${paciente}`;
   document.getElementById("qr-result-desc").textContent =
     `Acceso restringido a ${seleccionados} documento${seleccionados > 1 ? "s" : ""} clínico${seleccionados > 1 ? "s" : ""}`;
 
@@ -470,22 +554,108 @@ function showToast(msg, icon) {
   toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
 }
 
-// ── Init ────────────────────────────────------------------------------
+// ── Bind Events & Init ────────────────────────────────----------------
 document.addEventListener("DOMContentLoaded", function () {
-  document
-    .getElementById("sidebar-overlay")
-    .addEventListener("click", function () {
-      closeMobileSidebar();
-    });
-    
-  // Load Dark Mode Preference
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    const chk = document.getElementById('cfg-darkmode');
-    if(chk) chk.checked = true;
+  /* Events: Global App */
+  const sidebarOverlay = document.getElementById("sidebar-overlay");
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener("click", closeMobileSidebar);
   }
 
+  const btnLogin = document.getElementById("btnLogin");
+  if (btnLogin) btnLogin.addEventListener("click", doLogin);
+
+  const btnBackPortal = document.getElementById("btnBackPortal");
+  if (btnBackPortal) {
+    btnBackPortal.addEventListener("click", () => {
+      location.href = "../../index.html";
+    });
+  }
+
+  const btnLogoutEl = document.getElementById("btnLogout");
+  if (btnLogoutEl) btnLogoutEl.addEventListener("click", logout);
+
+  /* Events: Sidebar & Navigation Toggle */
+  document.querySelectorAll(".btn-toggle-sidebar").forEach((btn) => {
+    btn.addEventListener("click", toggleSidebar);
+  });
+
+  document.querySelectorAll(".btn-nav-view").forEach((btn) => {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      setAdminView(this.getAttribute("data-view"));
+    });
+  });
+
+  /* Events: Config Theme */
+  const darkModeToggle = document.getElementById("cfg-darkmode");
+  if (darkModeToggle) {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      darkModeToggle.checked = true;
+    }
+    darkModeToggle.addEventListener("change", function () {
+      if (this.checked) {
+        document.documentElement.setAttribute("data-theme", "dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("theme", "light");
+      }
+    });
+  }
+
+  /* Events: Documents Interaction via Delegation */
+  document.addEventListener("click", (e) => {
+    const docRow = e.target.closest(".clickable-doc-row");
+    if (docRow) {
+      openDocumento(docRow.dataset.id);
+    }
+    const viewBtn = e.target.closest(".btn-view-doc");
+    if (viewBtn) {
+      openDocumento(viewBtn.dataset.id);
+    }
+  });
+
+  /* Events: Document Viewer Action Buttons */
+  const btnApprove = document.getElementById("btnApproveDoc");
+  if (btnApprove) {
+    btnApprove.addEventListener("click", () =>
+      setEstado(currentDocId, "aprobado"),
+    );
+  }
+
+  const btnReject = document.getElementById("btnRejectDoc");
+  if (btnReject) {
+    btnReject.addEventListener("click", () =>
+      setEstado(currentDocId, "rechazado"),
+    );
+  }
+
+  /* Events: Upload & Save Docs */
+  const btnSaveDocEl = document.getElementById("btnSaveDoc");
+  if (btnSaveDocEl) btnSaveDocEl.addEventListener("click", saveDoc);
+
+  const uploadZone = document.getElementById("uploadZoneArea");
+  if (uploadZone) {
+    uploadZone.addEventListener("click", function () {
+      const input = document.getElementById("hiddenFileInput");
+      if (input) input.click();
+    });
+  }
+
+  /* Events: QR Generator */
+  const qrPacienteSelect = document.getElementById("qr-paciente");
+  if (qrPacienteSelect) {
+    qrPacienteSelect.addEventListener("change", renderQrDocs);
+  }
+
+  const btnGenQr = document.getElementById("btnGenerarQr");
+  if (btnGenQr) {
+    btnGenQr.addEventListener("click", generarQr);
+  }
+
+  /* Initialize starting views */
   renderDashboard();
   renderDocumentosTable();
 });

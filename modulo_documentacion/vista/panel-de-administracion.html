@@ -19,43 +19,17 @@
     />
 
     <link rel="stylesheet" href="./assets/css/panel-de-administracion.css" />
-  
-  <script>
-    const savedTheme = localStorage.getItem('theme') || localStorage.getItem('traslados_theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-  </script>
-</head>
-
+  </head>
 
   <body>
     <!-- ════════════════════════════════════════
          PORTAL DE SELECCIÓN DE MÓDULOS
     ════════════════════════════════════════ -->
-    <div id="view-login" style="display: flex">
+    <div id="view-login" class="login-view-wrapper">
       <div class="login-card">
         <div class="login-logo-circle"><i class="bi bi-lock"></i></div>
-        <h2
-          style="
-            text-align: center;
-            font-weight: 700;
-            font-size: 1.25rem;
-            margin: 0 0 4px;
-          "
-        >
-          Acceso para Funcionarios
-        </h2>
-        <p
-          style="
-            text-align: center;
-            color: var(--hc-gray-500);
-            font-size: 0.84rem;
-            margin: 0 0 28px;
-          "
-        >
-          Ingrese sus credenciales del Hospital
-        </p>
+        <h2 class="login-title">Acceso para Funcionarios</h2>
+        <p class="login-subtitle">Ingrese sus credenciales del Hospital</p>
 
         <div class="mb-3">
           <label class="hc-label">Usuario Institucional</label>
@@ -84,28 +58,19 @@
           </div>
         </div>
         <button
-          class="btn-hc btn-hc-primary w-100"
-          onclick="doLogin()"
-          style="justify-content: center"
+          class="btn-hc btn-hc-primary w-100 flex-center-content"
+          id="btnLogin"
         >
           Iniciar Sesión
         </button>
-        <p
-          style="
-            text-align: center;
-            font-size: 0.78rem;
-            color: var(--hc-gray-400);
-            margin-top: 16px;
-          "
-        >
+        <p class="login-help-text">
           ¿Olvidó sus credenciales? Comuníquese con la Dirección de Informática
           (Int. 3200) para blanqueo de clave.
         </p>
         <div class="hc-divider"></div>
         <button
-          class="btn-hc btn-hc-ghost w-100"
-          onclick="location.href='../../index.html'"
-          style="justify-content: center; font-size: 0.82rem"
+          class="btn-hc btn-hc-ghost w-100 btn-text-sm flex-center-content"
+          id="btnBackPortal"
         >
           <i class="bi bi-arrow-left"></i> Volver al inicio del portal
         </button>
@@ -117,27 +82,23 @@
     ════════════════════════════════════════ -->
     <div id="sidebar-overlay"></div>
 
-    <div id="app-shell" style="display: none">
+    <div id="app-shell" class="hidden-by-default">
       <!-- SIDEBAR -->
       <nav id="sidebar">
         <div class="sidebar-logo">
-          <div
-            class="logo-icon"
-            style="background: transparent; overflow: hidden"
-          >
+          <div class="logo-icon sidebar-logo-bg">
             <img
               src="../../servicios_comunes/vista_general/logo.png"
               alt="Logo Hospital de Clínicas"
-              style="height: 40px; object-fit: contain"
+              class="logo-img-contain"
             />
           </div>
           <div class="logo-text">
-            <strong>Hospital de Clínicas</strong>
-            <span>Dr. Manuel Quintela</span>
+            <strong class="sidebar-brand-title">Hospital de Clínicas</strong>
+            <span class="sidebar-brand-subtitle">Dr. Manuel Quintela</span>
           </div>
           <button
-            class="sidebar-toggle-btn"
-            onclick="toggleSidebar()"
+            class="sidebar-toggle-btn btn-toggle-sidebar"
             title="Ocultar menú"
           >
             <i class="bi bi-x-lg"></i>
@@ -146,32 +107,32 @@
 
         <div class="sidebar-nav">
           <a
-            class="nav-item active"
-            onclick="setAdminView('view-dashboard')"
+            class="nav-item active btn-nav-view"
+            data-view="view-dashboard"
             id="nav-inicio"
           >
             <i class="bi bi-house"></i>
             <span class="nav-label">Inicio</span>
           </a>
           <a
-            class="nav-item"
-            onclick="setAdminView('view-documentos')"
+            class="nav-item btn-nav-view"
+            data-view="view-documentos"
             id="nav-documentos"
           >
             <i class="bi bi-file-earmark-text"></i>
             <span class="nav-label">Documentos</span>
           </a>
           <a
-            class="nav-item"
-            onclick="setAdminView('view-generar-qr')"
+            class="nav-item btn-nav-view"
+            data-view="view-generar-qr"
             id="nav-generar-qr"
           >
             <i class="bi bi-qr-code"></i>
             <span class="nav-label">Generar QR</span>
           </a>
           <a
-            class="nav-item"
-            onclick="setAdminView('view-configuracion')"
+            class="nav-item btn-nav-view"
+            data-view="view-configuracion"
             id="nav-configuracion"
           >
             <i class="bi bi-gear"></i>
@@ -187,10 +148,9 @@
               <div class="urole">Administrador</div>
             </div>
             <button
-              class="topbar-icon-btn"
+              class="topbar-icon-btn btn-logout-style"
               title="Cerrar sesión"
-              onclick="logout()"
-              style="margin-left: auto; color: rgba(255, 255, 255, 0.5)"
+              id="btnLogout"
             >
               <i class="bi bi-box-arrow-right"></i>
             </button>
@@ -202,7 +162,7 @@
       <div id="main-content">
         <!-- Topbar (solo mobile toggle) -->
         <div class="topbar">
-          <button class="toggle-btn" onclick="toggleSidebar()" title="Menú">
+          <button class="toggle-btn btn-toggle-sidebar" title="Menú">
             <i class="bi bi-list"></i>
           </button>
           <div class="topbar-breadcrumb">
@@ -246,9 +206,7 @@
                     <i class="bi bi-exclamation-circle"></i> Revisión Pendiente
                   </p>
                   <p class="stat-value" id="stat-pendientes">0</p>
-                  <p class="stat-delta" style="color: var(--hc-accent)">
-                    Requieren firma
-                  </p>
+                  <p class="stat-delta stat-delta-accent">Requieren firma</p>
                 </div>
               </div>
               <div class="col-xl-3 col-md-6">
@@ -280,13 +238,13 @@
                       Recientes
                     </p>
                     <button
-                      class="btn-hc btn-hc-ghost btn-xs"
-                      onclick="setAdminView('view-documentos')"
+                      class="btn-hc btn-hc-ghost btn-xs btn-nav-view"
+                      data-view="view-documentos"
                     >
                       Ver todos <i class="bi bi-arrow-right"></i>
                     </button>
                   </div>
-                  <div style="overflow-x: auto">
+                  <div class="table-responsive-wrapper">
                     <table class="hc-table">
                       <thead>
                         <tr>
@@ -321,17 +279,10 @@
                         />
                       </svg>
                     </div>
-                    <p
-                      style="
-                        text-align: center;
-                        font-size: 0.78rem;
-                        color: var(--hc-gray-500);
-                        margin: 6px 0 18px;
-                      "
-                    >
+                    <p class="chart-subtitle-text">
                       142 validaciones promedio diarias
                     </p>
-                    <p class="section-heading" style="margin-bottom: 10px">
+                    <p class="section-heading mb-custom-10">
                       Estado de Servidores
                     </p>
                     <div class="server-status-row">
@@ -359,16 +310,16 @@
                 </p>
               </div>
               <button
-                class="btn-hc btn-hc-primary"
-                onclick="setAdminView('view-nuevo-doc')"
+                class="btn-hc btn-hc-primary btn-nav-view"
+                data-view="view-nuevo-doc"
               >
                 <i class="bi bi-plus-lg"></i> Nuevo Documento
               </button>
             </div>
 
             <div class="panel">
-              <div class="panel-header" style="flex-wrap: wrap; gap: 10px">
-                <div class="search-wrap" style="flex: 1; min-width: 220px">
+              <div class="panel-header panel-header-wrap">
+                <div class="search-wrap search-wrap-flexible">
                   <i class="bi bi-search"></i>
                   <input
                     type="text"
@@ -376,10 +327,7 @@
                     placeholder="Buscar por Paciente, CI o Funcionario..."
                   />
                 </div>
-                <select
-                  class="hc-input"
-                  style="width: auto; font-size: 0.82rem; padding: 8px 10px"
-                >
+                <select class="hc-input select-sm">
                   <option>Tipo: Todos</option>
                   <option>Epicrisis de Alta</option>
                   <option>Informe Radiológico</option>
@@ -388,10 +336,7 @@
                   <option>Historia Clínica</option>
                   <option>Reporte de Guardia</option>
                 </select>
-                <select
-                  class="hc-input"
-                  style="width: auto; font-size: 0.82rem; padding: 8px 10px"
-                >
+                <select class="hc-input select-sm">
                   <option>Estado: Todos</option>
                   <option>Pendiente</option>
                   <option>En Revisión</option>
@@ -402,7 +347,7 @@
                   <i class="bi bi-funnel"></i> Limpiar
                 </button>
               </div>
-              <div style="overflow-x: auto">
+              <div class="table-responsive-wrapper">
                 <table class="hc-table">
                   <thead>
                     <tr>
@@ -411,18 +356,15 @@
                       <th>Tipo de Documento</th>
                       <th>Fecha de Carga</th>
                       <th>Estado</th>
-                      <th style="text-align: right">Acciones</th>
+                      <th class="text-right">Acciones</th>
                     </tr>
                   </thead>
                   <tbody id="admin-doc-list-table"></tbody>
                 </table>
               </div>
               <div class="panel-footer">
-                <span
-                  style="font-size: 0.78rem; color: var(--hc-gray-500)"
-                  id="doc-count-label"
-                ></span>
-                <div style="display: flex; gap: 6px">
+                <span class="doc-count-text" id="doc-count-label"></span>
+                <div class="pagination-controls">
                   <button class="btn-hc btn-hc-secondary btn-xs">
                     Anterior
                   </button>
@@ -444,8 +386,8 @@
                 </p>
               </div>
               <button
-                class="btn-hc btn-hc-secondary"
-                onclick="setAdminView('view-documentos')"
+                class="btn-hc btn-hc-secondary btn-nav-view"
+                data-view="view-documentos"
               >
                 <i class="bi bi-arrow-left"></i> Volver
               </button>
@@ -465,7 +407,7 @@
                       <div class="col-md-8">
                         <label class="hc-label"
                           >Paciente
-                          <span style="color: var(--hc-red)">*</span></label
+                          <span class="text-red-asterisk">*</span></label
                         >
                         <input
                           type="text"
@@ -477,7 +419,7 @@
                       <div class="col-md-4">
                         <label class="hc-label"
                           >Cédula de Identidad
-                          <span style="color: var(--hc-red)">*</span></label
+                          <span class="text-red-asterisk">*</span></label
                         >
                         <input
                           type="text"
@@ -489,7 +431,7 @@
                       <div class="col-md-6">
                         <label class="hc-label"
                           >Tipo de Documento
-                          <span style="color: var(--hc-red)">*</span></label
+                          <span class="text-red-asterisk">*</span></label
                         >
                         <select class="hc-input" id="nd-tipo">
                           <option value="">Seleccione un tipo</option>
@@ -511,10 +453,9 @@
                       <div class="col-12">
                         <label class="hc-label">Contenido del Documento</label>
                         <textarea
-                          class="hc-input hc-textarea"
+                          class="hc-input hc-textarea hc-textarea-large"
                           id="nd-contenido"
                           placeholder="Ingrese el resumen clínico o contenido del documento..."
-                          style="min-height: 160px"
                         ></textarea>
                       </div>
                     </div>
@@ -529,35 +470,18 @@
                     </p>
                   </div>
                   <div class="panel-body">
-                    <div
-                      class="upload-zone"
-                      onclick="this.querySelector('input').click()"
-                    >
-                      <i
-                        class="bi bi-cloud-upload"
-                        style="
-                          font-size: 2rem;
-                          color: var(--hc-gray-400);
-                          display: block;
-                          margin-bottom: 10px;
-                        "
-                      ></i>
-                      <div
-                        style="
-                          font-size: 0.84rem;
-                          font-weight: 600;
-                          color: var(--hc-gray-600);
-                          margin-bottom: 4px;
-                        "
-                      >
+                    <div class="upload-zone" id="uploadZoneArea">
+                      <i class="bi bi-cloud-upload upload-icon-lg"></i>
+                      <div class="upload-text-bold">
                         Haga clic para seleccionar
                       </div>
-                      <div
-                        style="font-size: 0.76rem; color: var(--hc-gray-400)"
-                      >
-                        PDF hasta 10 MB
-                      </div>
-                      <input type="file" accept=".pdf" style="display: none" />
+                      <div class="upload-text-sm">PDF hasta 10 MB</div>
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        class="hidden-file-input"
+                        id="hiddenFileInput"
+                      />
                     </div>
                   </div>
                 </div>
@@ -567,16 +491,14 @@
                 </div>
               </div>
               <div class="col-12">
-                <div
-                  style="display: flex; gap: 10px; justify-content: flex-end"
-                >
+                <div class="flex-end-gap">
                   <button
-                    class="btn-hc btn-hc-secondary"
-                    onclick="setAdminView('view-documentos')"
+                    class="btn-hc btn-hc-secondary btn-nav-view"
+                    data-view="view-documentos"
                   >
                     Cancelar
                   </button>
-                  <button class="btn-hc btn-hc-primary" onclick="saveDoc()">
+                  <button class="btn-hc btn-hc-primary" id="btnSaveDoc">
                     <i class="bi bi-floppy"></i> Guardar Documento
                   </button>
                 </div>
@@ -588,37 +510,22 @@
           <div id="view-documento-detalle" class="view">
             <div class="page-header">
               <div>
-                <p
-                  style="
-                    font-size: 0.76rem;
-                    color: var(--hc-gray-400);
-                    text-transform: uppercase;
-                    letter-spacing: 0.06em;
-                    margin: 0 0 4px;
-                  "
-                >
+                <p class="breadcrumb-link-wrapper">
                   <a
-                    href="javascript:void(0)"
-                    onclick="setAdminView('view-documentos')"
-                    style="color: var(--hc-gray-400); text-decoration: none"
+                    href="#"
+                    class="breadcrumb-link btn-nav-view"
+                    data-view="view-documentos"
                     >Documentos</a
                   >
                   &nbsp;›&nbsp; Detalle
                 </p>
                 <h1 id="dd-title">Documento</h1>
               </div>
-              <div style="display: flex; gap: 8px; flex-shrink: 0">
-                <button
-                  class="btn-hc"
-                  style="background: #dcfce7; color: var(--hc-green)"
-                  onclick="setEstado(currentDocId, 'aprobado')"
-                >
+              <div class="header-actions-flex">
+                <button class="btn-hc btn-approve-custom" id="btnApproveDoc">
                   <i class="bi bi-check-lg"></i> Aprobar
                 </button>
-                <button
-                  class="btn-hc btn-hc-danger"
-                  onclick="setEstado(currentDocId, 'rechazado')"
-                >
+                <button class="btn-hc btn-hc-danger" id="btnRejectDoc">
                   <i class="bi bi-x-lg"></i> Rechazar
                 </button>
                 <button class="btn-hc btn-hc-secondary">
@@ -632,9 +539,7 @@
                 <div class="panel">
                   <div class="panel-header">
                     <p class="panel-title">Visor de Documento Homologado</p>
-                    <span style="font-size: 0.78rem; color: var(--hc-gray-400)"
-                      >Pág 1 de 1</span
-                    >
+                    <span class="page-info-text">Pág 1 de 1</span>
                   </div>
                   <div class="panel-body">
                     <div class="viewer-box" id="dd-content"></div>
@@ -681,11 +586,7 @@
                   <div class="panel-body">
                     <div class="mb-3">
                       <label class="hc-label">Seleccionar Paciente</label>
-                      <select
-                        class="hc-input"
-                        id="qr-paciente"
-                        onchange="renderQrDocs()"
-                      ></select>
+                      <select class="hc-input" id="qr-paciente"></select>
                     </div>
                     <div class="mb-3">
                       <label class="hc-label">Cédula de Identidad</label>
@@ -707,9 +608,8 @@
                       </select>
                     </div>
                     <button
-                      class="btn-hc btn-hc-primary w-100"
-                      style="justify-content: center"
-                      onclick="generarQr()"
+                      class="btn-hc btn-hc-primary w-100 flex-center-content"
+                      id="btnGenerarQr"
                     >
                       Generar Código de Acceso QR
                     </button>
@@ -722,35 +622,17 @@
                     <p class="panel-title">Código de Acceso Listo</p>
                   </div>
                   <div class="panel-body text-center" id="qr-empty">
-                    <div
-                      style="
-                        border: 1.5px dashed var(--hc-gray-200);
-                        border-radius: 10px;
-                        padding: 40px 20px;
-                        color: var(--hc-gray-400);
-                        font-size: 0.85rem;
-                      "
-                    >
-                      <i
-                        class="bi bi-qr-code"
-                        style="
-                          font-size: 2.2rem;
-                          display: block;
-                          margin-bottom: 10px;
-                        "
-                      ></i>
+                    <div class="empty-qr-box">
+                      <i class="bi bi-qr-code qr-icon-lg"></i>
                       Complete el formulario y genere un código de acceso.
                     </div>
                   </div>
                   <div
-                    class="panel-body text-center"
+                    class="panel-body text-center hidden-by-default"
                     id="qr-result"
-                    style="display: none"
                   >
-                    <div
-                      class="qr-code-img"
-                      style="margin: 0 auto 16px; width: 164px"
-                    >
+                    <div class="qr-code-img qr-result-img-wrapper">
+                      <!-- SVG inline kept for rendering, classes applied to wrapper -->
                       <svg viewBox="0 0 100 100" width="164" height="164">
                         <rect width="100" height="100" fill="white" />
                         <rect
@@ -893,21 +775,9 @@
                         />
                       </svg>
                     </div>
-                    <p
-                      style="font-weight: 700; margin: 0 0 2px"
-                      id="qr-result-paciente"
-                    ></p>
-                    <p
-                      style="
-                        font-size: 0.8rem;
-                        color: var(--hc-gray-500);
-                        margin: 0 0 18px;
-                      "
-                      id="qr-result-desc"
-                    ></p>
-                    <div
-                      style="display: flex; gap: 8px; justify-content: center"
-                    >
+                    <p class="qr-result-patient" id="qr-result-paciente"></p>
+                    <p class="qr-result-desc" id="qr-result-desc"></p>
+                    <div class="qr-actions">
                       <button class="btn-hc btn-hc-secondary btn-sm">
                         <i class="bi bi-printer"></i> Imprimir
                       </button>
@@ -968,25 +838,17 @@
                   <div class="panel-body">
                     <div class="form-check form-switch mb-0">
                       <input
-                        class="form-check-input"
+                        class="form-check-input check-cursor-pointer"
                         type="checkbox"
                         id="cfg-darkmode"
-                        onchange="toggleDarkMode(this.checked)"
                       />
                       <label
-                        class="form-check-label"
+                        class="form-check-label dark-mode-label"
                         for="cfg-darkmode"
-                        style="font-size: 0.85rem; font-weight: 600"
                       >
                         Modo Oscuro (Estilo EVE)
                       </label>
-                      <p
-                        style="
-                          font-size: 0.75rem;
-                          color: var(--hc-gray-400);
-                          margin-top: 4px;
-                        "
-                      >
+                      <p class="dark-mode-desc">
                         Cambia la interfaz a una paleta de colores oscuros ideal
                         para ambientes de baja luminosidad.
                       </p>
@@ -1008,10 +870,7 @@
                         checked
                         id="cfg-1"
                       />
-                      <label
-                        class="form-check-label"
-                        for="cfg-1"
-                        style="font-size: 0.85rem"
+                      <label class="form-check-label check-label-sm" for="cfg-1"
                         >Avisar cuando un documento queda pendiente de
                         firma</label
                       >
@@ -1023,10 +882,7 @@
                         checked
                         id="cfg-2"
                       />
-                      <label
-                        class="form-check-label"
-                        for="cfg-2"
-                        style="font-size: 0.85rem"
+                      <label class="form-check-label check-label-sm" for="cfg-2"
                         >Avisar cuando se genera un código QR</label
                       >
                     </div>
@@ -1036,10 +892,7 @@
                         type="checkbox"
                         id="cfg-3"
                       />
-                      <label
-                        class="form-check-label"
-                        for="cfg-3"
-                        style="font-size: 0.85rem"
+                      <label class="form-check-label check-label-sm" for="cfg-3"
                         >Resumen diario por correo</label
                       >
                     </div>
