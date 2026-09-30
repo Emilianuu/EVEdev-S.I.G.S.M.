@@ -97,7 +97,7 @@ git clone https://github.com/tu-usuario/nombre-repositorio.git .
    _Vía línea de comandos:_
 
    ```bash
-   mysql -u root -p -e "CREATE DATABASE sigsm_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   mysql -u root -p -e "CREATE DATABASE sigsm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
    mysql -u root -p sigsm < servicios_comunes/base_de_datos/01_ddl_tablas.sql
    mysql -u root -p sigsm < servicios_comunes/base_de_datos/02_triggers.sql
    mysql -u root -p sigsm < servicios_comunes/base_de_datos/03_dml_datos_prueba.sql
