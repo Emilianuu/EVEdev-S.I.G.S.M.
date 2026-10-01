@@ -543,7 +543,16 @@
           <div class="header-subtitle">Dr. Manuel Quintela</div>
         </div>
       </div>
-      <span class="header-badge">Sistema interno</span>
+      <div style="display: flex; align-items: center; gap: 12px">
+        <span class="header-badge">Sistema interno</span>
+        <button
+          class="btn-hc btn-hc-ghost btn-text-sm"
+          id="btnCerrarSesion"
+          style="display: none; padding: 4px 12px"
+        >
+          <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+        </button>
+      </div>
     </header>
 
     <!-- Main -->
@@ -677,10 +686,17 @@
       if (savedTheme === "dark") {
         document.documentElement.setAttribute("data-theme", "dark");
       }
+
+      // Definir las variables de los elementos del DOM
+      const viewLogin = document.getElementById("view-login");
+      const viewPortal = document.getElementById("view-portal");
+      const btnCerrarSesion = document.getElementById("btnCerrarSesion");
+
       // 1. Revisar si el usuario ya inició sesión previamente
       if (localStorage.getItem("sesionActiva") === "true") {
         document.getElementById("view-login").style.display = "none";
         document.getElementById("view-portal").style.display = "block";
+        btnCerrarSesion.style.display = "inline-flex";
       }
 
       // 2. Lógica para iniciar sesión
@@ -691,7 +707,16 @@
           localStorage.setItem("sesionActiva", "true"); // Guardamos la sesión en el navegador
           document.getElementById("view-login").style.display = "none";
           document.getElementById("view-portal").style.display = "block";
+          btnCerrarSesion.style.display = "inline-flex";
         });
+
+      // 3. Lógica para cerrar sesión
+      btnCerrarSesion.addEventListener("click", function () {
+        localStorage.removeItem("sesionActiva"); // Borra la credencial
+        viewPortal.style.display = "none";
+        viewLogin.style.display = "flex"; // Vuelve a mostrar el login
+        btnCerrarSesion.style.display = "none"; // Oculta el botón de salir
+      });
     </script>
   </body>
 </html>
