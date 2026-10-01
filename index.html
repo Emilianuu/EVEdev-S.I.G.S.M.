@@ -61,7 +61,9 @@
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        transition: background 0.3s, color 0.3s;
+        transition:
+          background 0.3s,
+          color 0.3s;
       }
 
       /* ── Header ── */
@@ -76,7 +78,9 @@
         position: sticky;
         top: 0;
         z-index: 100;
-        transition: background 0.3s, border-color 0.3s;
+        transition:
+          background 0.3s,
+          border-color 0.3s;
       }
 
       .header-brand {
@@ -278,7 +282,9 @@
         background: var(--slate-100);
         color: var(--slate-700);
         letter-spacing: 0.02em;
-        transition: background 0.3s, color 0.3s;
+        transition:
+          background 0.3s,
+          color 0.3s;
       }
 
       .card-arrow {
@@ -302,7 +308,180 @@
         color: var(--slate-500);
         border-top: 1px solid var(--slate-200);
         background: var(--white);
-        transition: background 0.3s, border-color 0.3s, color 0.3s;
+        transition:
+          background 0.3s,
+          border-color 0.3s,
+          color 0.3s;
+      }
+
+      /* ════════════════════════════════════════
+   ESTILOS DEL LOGIN (Migrados)
+════════════════════════════════════════ */
+
+      /* ── Contenedores y Textos ── */
+      #view-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 24px;
+      }
+      .login-view-wrapper {
+        display: flex;
+      }
+      .login-card {
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow-hover);
+        padding: 44px 44px 36px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .login-logo-circle {
+        width: 52px;
+        height: 52px;
+        background: var(--blue-700);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: #ffffff;
+        margin: 0 auto 20px;
+      }
+      .flex-center-content {
+        justify-content: center;
+      }
+      .login-title {
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: var(--blue-900);
+        margin: 0 0 4px;
+      }
+      .login-subtitle {
+        text-align: center;
+        color: var(--slate-500);
+        font-size: 0.84rem;
+        margin: 0 0 28px;
+      }
+      .login-help-text {
+        text-align: center;
+        font-size: 0.78rem;
+        color: var(--slate-500);
+        margin-top: 16px;
+      }
+      .hc-divider {
+        height: 1px;
+        background: var(--slate-200);
+        margin: 20px 0;
+      }
+
+      /* ── Formularios e Inputs ── */
+      .hc-label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--slate-700);
+        margin-bottom: 5px;
+      }
+      .hc-input {
+        width: 100%;
+        padding: 9px 12px;
+        border: 1.5px solid var(--slate-200);
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.875rem;
+        color: var(--slate-700);
+        background: var(--white);
+        outline: none;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .hc-input:focus {
+        border-color: var(--blue-500);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+      .hc-input::placeholder {
+        color: var(--slate-500);
+      }
+      .search-wrap {
+        position: relative;
+      }
+      .search-wrap i {
+        position: absolute;
+        left: 11px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--slate-500);
+        font-size: 0.9rem;
+        pointer-events: none;
+      }
+      .search-wrap .hc-input {
+        padding-left: 34px;
+      }
+
+      /* ── Botones ── */
+      .btn-hc {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.845rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+        transition:
+          background 0.15s,
+          transform 0.1s,
+          color 0.15s;
+        text-decoration: none;
+      }
+      .btn-hc:active {
+        transform: scale(0.97);
+      }
+      .btn-hc-primary {
+        background: var(--blue-700);
+        color: #ffffff;
+      }
+      .btn-hc-primary:hover {
+        background: var(--blue-900);
+      }
+      .btn-hc-ghost {
+        background: transparent;
+        color: var(--slate-500);
+        border: 1px solid transparent;
+      }
+      .btn-hc-ghost:hover {
+        background: var(--slate-100);
+        color: var(--slate-700);
+      }
+      .btn-text-sm {
+        font-size: 0.82rem;
+      }
+
+      /* ── Responsividad Móvil ── */
+      @media (max-width: 768px) {
+        .login-card {
+          padding: 30px 24px 26px;
+        }
+      }
+
+      /* ── Adaptación para Modo Oscuro (EVE STYLE) ── */
+      [data-theme="dark"] .hc-input {
+        background: var(--hc-bg-dark);
+        border-color: var(--hc-border-dark);
+        color: var(--hc-text-main);
+      }
+      [data-theme="dark"] .hc-label {
+        color: var(--hc-text-main);
+      }
+      [data-theme="dark"] .btn-hc-ghost:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--hc-text-main);
       }
 
       /* ── DARK MODE OVERRIDE (EVE STYLE) ───────────── */
@@ -323,7 +502,12 @@
       }
 
       [data-theme="dark"] body {
-        background: linear-gradient(150deg, #101424 0%, #070913 55%, #05060d 100%);
+        background: linear-gradient(
+          150deg,
+          #101424 0%,
+          #070913 55%,
+          #05060d 100%
+        );
         color: var(--hc-text-main);
       }
 
@@ -337,7 +521,7 @@
       [data-theme="dark"] .module-card {
         background: var(--hc-panel-dark);
         border-color: var(--hc-border-dark);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
       }
 
       [data-theme="dark"] .chip {
@@ -364,7 +548,59 @@
 
     <!-- Main -->
     <main>
-      <div class="wrapper">
+      <div id="view-login" class="login-view-wrapper">
+        <div class="login-card">
+          <div class="login-logo-circle"><i class="bi bi-lock"></i></div>
+          <h2 class="login-title">Acceso para Funcionarios</h2>
+          <p class="login-subtitle">Ingrese sus credenciales del Hospital</p>
+
+          <div class="mb-3">
+            <label class="hc-label">Usuario Institucional</label>
+            <div class="search-wrap">
+              <i class="bi bi-person"></i>
+              <input
+                type="text"
+                class="hc-input"
+                placeholder="usuario@clinicas.edu.uy"
+                id="login-user"
+                value="daniel.munoz@clinicas.edu.uy"
+              />
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="hc-label">Contraseña</label>
+            <div class="search-wrap">
+              <i class="bi bi-lock"></i>
+              <input
+                type="password"
+                class="hc-input"
+                placeholder="Ingrese su contraseña"
+                id="login-pass"
+                value="hc-demo-2026"
+              />
+            </div>
+          </div>
+          <button
+            class="btn-hc btn-hc-primary w-100 flex-center-content"
+            id="btnLogin"
+          >
+            Iniciar Sesión
+          </button>
+          <p class="login-help-text">
+            ¿Olvidó sus credenciales? Comuníquese con la Dirección de
+            Informática (Int. 3200) para blanqueo de clave.
+          </p>
+          <div class="hc-divider"></div>
+          <button
+            class="btn-hc btn-hc-ghost w-100 btn-text-sm flex-center-content"
+            id="btnBackPortal"
+          >
+            <i class="bi bi-arrow-left"></i> Volver al inicio del portal
+          </button>
+        </div>
+      </div>
+
+      <div class="wrapper" id="view-portal" style="display: none">
         <p class="page-eyebrow">Portal de módulos</p>
         <h1 class="page-heading">Sistema de Gestión<br />Institucional</h1>
         <p class="page-desc">
@@ -435,10 +671,27 @@
 
     <script>
       // Load Dark Mode Preference across windows/tabs
-      const savedTheme = localStorage.getItem('theme') || localStorage.getItem('traslados_theme');
-      if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
+      const savedTheme =
+        localStorage.getItem("theme") ||
+        localStorage.getItem("traslados_theme");
+      if (savedTheme === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
       }
+      // 1. Revisar si el usuario ya inició sesión previamente
+      if (localStorage.getItem("sesionActiva") === "true") {
+        document.getElementById("view-login").style.display = "none";
+        document.getElementById("view-portal").style.display = "block";
+      }
+
+      // 2. Lógica para iniciar sesión
+      document
+        .getElementById("btnLogin")
+        .addEventListener("click", function () {
+          // Aquí puedes validar el #login-user y #login-pass
+          localStorage.setItem("sesionActiva", "true"); // Guardamos la sesión en el navegador
+          document.getElementById("view-login").style.display = "none";
+          document.getElementById("view-portal").style.display = "block";
+        });
     </script>
   </body>
 </html>

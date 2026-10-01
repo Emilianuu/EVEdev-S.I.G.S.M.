@@ -195,32 +195,6 @@ const statusMeta = {
 
 let currentDocId = null;
 
-// ── Navegación entre pantallas de nivel superior ───────────────────
-function showTop(id) {
-  ["view-portal", "view-login", "app-shell"].forEach((v) => {
-    const el = document.getElementById(v);
-    if (el) el.style.display = "none";
-  });
-  const target = document.getElementById(id);
-  if (!target) return;
-  if (id === "app-shell" || id === "view-login") {
-    target.style.display = "flex";
-  } else {
-    target.style.display = "block";
-  }
-}
-
-function doLogin() {
-  const u = document.getElementById("login-user").value;
-  const p = document.getElementById("login-pass").value;
-  if (!u || !p) {
-    alert("Ingrese usuario y contraseña.");
-    return;
-  }
-  showTop("app-shell");
-  setAdminView("view-dashboard");
-}
-
 function logout() {
   window.location.href = "../../index.html";
 }
