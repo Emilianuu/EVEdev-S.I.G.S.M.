@@ -88,12 +88,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* --- Mobile sidebar toggle --- */
+  /* --- Toggle del Sidebar (Mobile y Escritorio) --- */
   const mobileToggle = document.getElementById("mobileToggle");
   const sidebar = document.getElementById("sidebar");
-  if (mobileToggle && sidebar) {
+  const main = document.getElementById("main");
+
+  if (mobileToggle && sidebar && main) {
     mobileToggle.addEventListener("click", () => {
-      sidebar.classList.toggle("open");
+      if (window.innerWidth <= 768) {
+        // En móvil: despliega o esconde el menú lateral
+        sidebar.classList.toggle("open");
+      } else {
+        // En escritorio: contrae el menú y ajusta el contenedor principal
+        sidebar.classList.toggle("collapsed");
+        main.classList.toggle("collapsed");
+      }
     });
   }
 });

@@ -4,6 +4,7 @@
   --primary-bg: #e3f2fd;
   --sidebar-bg: #f8f9fa;
   --sidebar-width: 256px;
+  --sidebar-w-sm: 68px; /* Ancho del menú reducido */
   --topbar-h: 0px;
   --green: #2e7d32;
   --orange: #e65100;
@@ -224,6 +225,7 @@ body {
   flex-direction: column;
   z-index: 1000;
   transition:
+    width 0.3s ease,
     transform 0.3s ease,
     background 0.3s,
     border-color 0.3s;
@@ -800,9 +802,6 @@ body {
     margin-left: 0;
     padding: 20px 16px 20px 16px;
   }
-  .mobile-toggle {
-    display: flex;
-  }
 }
 
 /* info box */
@@ -953,4 +952,60 @@ body {
 
 [data-theme="dark"] .table-custom tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* ── COMPORTAMIENTO COLAPSADO (DESKTOP) ── */
+#sidebar.collapsed {
+  width: var(--sidebar-w-sm);
+}
+
+#main.collapsed {
+  margin-left: var(--sidebar-w-sm);
+}
+
+/* Ocultar textos e información innecesaria al contraer */
+#sidebar.collapsed .brand-wrapper > div:nth-child(2),
+#sidebar.collapsed .sidebar-section-label,
+#sidebar.collapsed .sidebar-label-bold,
+#sidebar.collapsed .footer-user-info {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Centrar la estructura del Header y el Footer */
+#sidebar.collapsed .sidebar-brand {
+  padding: 20px 0 16px;
+  display: flex;
+  justify-content: center;
+}
+
+#sidebar.collapsed .brand-wrapper {
+  gap: 0;
+}
+
+#sidebar.collapsed .sidebar-footer {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+/* Ocultar el texto reduciendo su fuente a 0 para que no ocupe espacio físico */
+#sidebar.collapsed .nav-link-custom {
+  font-size: 0;
+  padding-left: 0;
+  padding-right: 0;
+  justify-content: center; /* Centra el icono */
+}
+
+/* Restaurar el tamaño de fuente exclusivamente para el icono */
+#sidebar.collapsed .nav-link-custom i {
+  font-size: 1.25rem; /* Hacemos el icono un poco más grande para que destaque */
+  color: rgba(255, 255, 255, 0.65);
+}
+
+#sidebar.collapsed .nav-link-custom.active i {
+  color: #fff;
 }
