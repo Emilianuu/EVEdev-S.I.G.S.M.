@@ -1,8 +1,6 @@
-// ── Init Temprano del Tema (previene parpadeo) ──────────────────────
+// ── Init Temprano del Tema Unificado ──────────────────────
 (function initTheme() {
-  const savedTheme =
-    localStorage.getItem("theme") || localStorage.getItem("traslados_theme");
-  if (savedTheme === "dark") {
+  if (localStorage.getItem("theme") === "dark") {
     document.documentElement.setAttribute("data-theme", "dark");
   }
 })();
@@ -561,13 +559,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  /* Events: Config Theme */
+  /* Events: Config Theme Sincronizado */
   const darkModeToggle = document.getElementById("cfg-darkmode");
   if (darkModeToggle) {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      darkModeToggle.checked = true;
-    }
+    darkModeToggle.checked = localStorage.getItem("theme") === "dark";
+
     darkModeToggle.addEventListener("change", function () {
       if (this.checked) {
         document.documentElement.setAttribute("data-theme", "dark");
@@ -575,6 +571,19 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         document.documentElement.removeAttribute("data-theme");
         localStorage.setItem("theme", "light");
+      }
+    });
+
+    window.addEventListener("storage", (e) => {
+      if (e.key === "theme") {
+        const isDark = e.newValue === "dark";
+        darkModeToggle.checked = isDark;
+
+        if (isDark) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+        }
       }
     });
   }

@@ -1,8 +1,6 @@
-// 1. Inicialización Temprana del Tema (previene el parpadeo blanco)
+// 1. Inicialización Temprana del Tema Unificado
 (function initTheme() {
-  const savedTheme =
-    localStorage.getItem("theme") || localStorage.getItem("traslados_theme");
-  if (savedTheme === "dark") {
+  if (localStorage.getItem("theme") === "dark") {
     document.documentElement.setAttribute("data-theme", "dark");
   }
 })();
@@ -11,21 +9,34 @@
 document.addEventListener("DOMContentLoaded", () => {
   /* --- Sincronizar el checkbox de Dark Mode al cargar --- */
   const darkModeToggle = document.getElementById("cfg-darkmode");
-  if (darkModeToggle) {
-    const savedTheme = localStorage.getItem("traslados_theme");
-    if (savedTheme === "dark") {
-      darkModeToggle.checked = true;
-    }
 
-    /* Evento para el cambio de Dark Mode */
+  if (darkModeToggle) {
+    // Leer estado actual de la clave unificada "theme"
+    darkModeToggle.checked = localStorage.getItem("theme") === "dark";
+
+    /* Evento para el cambio manual de Dark Mode */
     darkModeToggle.addEventListener("change", function () {
       const isDark = this.checked;
       if (isDark) {
         document.documentElement.setAttribute("data-theme", "dark");
-        localStorage.setItem("traslados_theme", "dark");
+        localStorage.setItem("theme", "dark");
       } else {
         document.documentElement.removeAttribute("data-theme");
-        localStorage.setItem("traslados_theme", "light");
+        localStorage.setItem("theme", "light");
+      }
+    });
+
+    /* Escuchar cambios desde otras ventanas en tiempo real */
+    window.addEventListener("storage", (e) => {
+      if (e.key === "theme") {
+        const isDark = e.newValue === "dark";
+        darkModeToggle.checked = isDark; // Sincroniza el botón visualmente
+
+        if (isDark) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+        }
       }
     });
   }

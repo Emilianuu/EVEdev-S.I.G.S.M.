@@ -672,12 +672,20 @@
 
     <script>
       // Load Dark Mode Preference across windows/tabs
-      const savedTheme =
-        localStorage.getItem("theme") ||
-        localStorage.getItem("traslados_theme");
-      if (savedTheme === "dark") {
+      if (localStorage.getItem("theme") === "dark") {
         document.documentElement.setAttribute("data-theme", "dark");
       }
+
+      // Sincronización en tiempo real si el usuario cambia el tema en un módulo abierto
+      window.addEventListener("storage", (e) => {
+        if (e.key === "theme") {
+          if (e.newValue === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+          } else {
+            document.documentElement.removeAttribute("data-theme");
+          }
+        }
+      });
 
       // Definir las variables de los elementos del DOM
       const viewLogin = document.getElementById("view-login");
