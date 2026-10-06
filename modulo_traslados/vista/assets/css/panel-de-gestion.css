@@ -990,6 +990,7 @@ body {
 #sidebar.collapsed .sidebar-footer {
   justify-content: center;
   padding: 12px 0;
+  gap: 0;
 }
 
 /* Ocultar el texto reduciendo su fuente a 0 para que no ocupe espacio físico */

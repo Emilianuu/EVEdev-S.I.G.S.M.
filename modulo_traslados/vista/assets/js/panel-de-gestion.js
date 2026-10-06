@@ -122,4 +122,133 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+  /* --- LÓGICA DEL FORMULARIO WIZARD --- */
+  const formWizard = document.getElementById("formNuevoTraslado");
+
+  if (formWizard) {
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    const panels = formWizard.querySelectorAll(".wizard-panel");
+    const stepsIndicators = document.querySelectorAll(
+      "#view-nuevo-traslado .wizard-step",
+    );
+
+    const btnPrev = document.getElementById("btnPrevStep");
+    const btnNext = document.getElementById("btnNextStep");
+    const btnSubmit = document.getElementById("btnSubmitForm");
+
+    // Función para actualizar la vista de los pasos
+    function updateWizard() {
+      // Mostrar y ocultar paneles
+      panels.forEach((panel) => {
+        if (parseInt(panel.getAttribute("data-step")) === currentStep) {
+          panel.classList.remove("d-none");
+        } else {
+          panel.classList.add("d-none");
+        }
+      });
+
+      // Actualizar bolitas de progreso superiores
+      stepsIndicators.forEach((step, index) => {
+        if (index < currentStep) {
+          step.classList.add("active");
+        } else {
+          step.classList.remove("active");
+        }
+      });
+
+      // Ajustar botones inferiores
+      btnPrev.disabled = currentStep === 1;
+
+      if (currentStep === totalSteps) {
+        btnNext.classList.add("d-none");
+        btnSubmit.classList.remove("d-none");
+      } else {
+        btnNext.classList.remove("d-none");
+        btnSubmit.classList.add("d-none");
+      }
+    }
+
+    // Función para validar que los datos del paso actual estén completos
+    function validateCurrentStep() {
+      const currentPanel = formWizard.querySelector(
+        `.wizard-panel[data-step="${currentStep}"]`,
+      );
+      const inputs = currentPanel.querySelectorAll(
+        "input[required], select[required], textarea[required]",
+      );
+      let isValid = true;
+
+      inputs.forEach((input) => {
+        if (!input.checkValidity()) {
+          isValid = false;
+          input.classList.add("is-invalid");
+        } else {
+          input.classList.remove("is-invalid");
+        }
+      });
+
+      return isValid;
+    }
+
+    // Limpiar alertas rojas apenas el usuario empieza a corregir el campo
+    formWizard.addEventListener("input", (e) => {
+      if (e.target.classList.contains("is-invalid")) {
+        e.target.classList.remove("is-invalid");
+      }
+    });
+
+    // Acción botón Siguiente
+    btnNext.addEventListener("click", () => {
+      if (validateCurrentStep()) {
+        currentStep++;
+        updateWizard();
+      }
+    });
+
+    // Acción botón Anterior
+    btnPrev.addEventListener("click", () => {
+      currentStep--;
+      updateWizard();
+    });
+
+    // Acción botón Guardar (Submit final)
+    formWizard.addEventListener("submit", (e) => {
+      e.preventDefault(); // Evita recargar la página
+
+      if (validateCurrentStep()) {
+        // --- AQUÍ RECOPILAMOS LOS DATOS PARA LA BASE DE DATOS ---
+        const formData = new FormData(formWizard);
+        const dataParaBaseDeDatos = Object.fromEntries(formData.entries());
+
+        console.log(
+          "Datos capturados listos para enviar:",
+          dataParaBaseDeDatos,
+        );
+
+        /* 
+          Aquí iría tu lógica Fetch/AJAX para enviar 'dataParaBaseDeDatos' al backend (Node, PHP, Python, etc.)
+          Ejemplo:
+          fetch('/api/traslados', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataParaBaseDeDatos)
+          })
+        */
+
+        // Feedback al usuario y reinicio del formulario
+        alert(
+          "¡Traslado validado y listo para guardar! (Revisa la consola para ver el JSON)",
+        );
+
+        formWizard.reset();
+        currentStep = 1;
+        updateWizard();
+
+        // Opcional: Redirigir a la vista de "Traslados"
+        document.querySelector('[data-view="traslados"]').click();
+      }
+    });
+  }
 });

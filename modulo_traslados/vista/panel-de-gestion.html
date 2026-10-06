@@ -156,7 +156,7 @@
         </div>
 
         <div class="section-card">
-          <h5>Traslados Activos en Tiempo Real</h5>
+          <h5>Traslados Activos</h5>
 
           <div class="traslado-card">
             <div class="d-flex justify-content-between align-items-start mb-2">
@@ -348,62 +348,246 @@
         <div class="page-title">Nueva Solicitud de Traslado</div>
 
         <div class="section-card">
-          <!-- Wizard -->
+          <!-- Wizard Header -->
           <div class="wizard-steps mb-4">
             <div class="wizard-step active">
               <div class="step-num">1</div>
-              <span>Tipo de Traslado</span>
+              <span>Tipo</span>
             </div>
             <div class="step-line"></div>
             <div class="wizard-step">
               <div class="step-num">2</div>
-              <span>Datos del Traslado</span>
+              <span>Datos</span>
             </div>
             <div class="step-line"></div>
             <div class="wizard-step">
               <div class="step-num">3</div>
-              <span>Asignación de Recursos</span>
+              <span>Recursos</span>
             </div>
             <div class="step-line"></div>
             <div class="wizard-step">
               <div class="step-num">4</div>
-              <span>Ruta y Horarios</span>
+              <span>Ruta</span>
             </div>
           </div>
 
-          <p class="wizard-subtitle">Seleccione el tipo de traslado</p>
+          <!-- INICIO DEL FORMULARIO -->
+          <form id="formNuevoTraslado" novalidate>
+            <!-- PASO 1: TIPO DE TRASLADO -->
+            <div class="wizard-panel" data-step="1">
+              <p class="wizard-subtitle">Seleccione el tipo de traslado</p>
+              <div class="d-flex flex-column gap-3 radio-group-container">
+                <label class="radio-label">
+                  <input
+                    type="radio"
+                    name="tipo_traslado"
+                    value="paciente"
+                    checked
+                    class="radio-input"
+                  />
+                  <span class="radio-text">Paciente (persona)</span>
+                </label>
+                <label class="radio-label">
+                  <input
+                    type="radio"
+                    name="tipo_traslado"
+                    value="material_biologico"
+                    class="radio-input"
+                  />
+                  <span class="radio-text"
+                    >Material biológico (muestras, órganos)</span
+                  >
+                </label>
+                <label class="radio-label">
+                  <input
+                    type="radio"
+                    name="tipo_traslado"
+                    value="equipamiento"
+                    class="radio-input"
+                  />
+                  <span class="radio-text">Equipamiento médico o insumos</span>
+                </label>
+              </div>
+              <div class="info-box mt-3">
+                <i class="bi bi-info-circle-fill"></i>
+                El tipo de traslado determinará si se asigna una ambulancia u
+                otro vehículo.
+              </div>
+            </div>
 
-          <div class="d-flex flex-column gap-3 radio-group-container">
-            <label class="radio-label">
-              <input type="radio" name="tipo" checked class="radio-input" />
-              <span class="radio-text">Paciente (persona)</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="tipo" class="radio-input" />
-              <span class="radio-text"
-                >Material biológico (muestras, órganos)</span
+            <!-- PASO 2: DATOS DEL TRASLADO -->
+            <div class="wizard-panel d-none" data-step="2">
+              <p class="wizard-subtitle">Información del Paciente / Elemento</p>
+              <div class="row g-3">
+                <div class="col-md-7">
+                  <label class="form-label form-label-custom"
+                    >Nombre Completo o Descripción
+                    <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="descripcion"
+                    placeholder="Ej: Juan Pérez"
+                    required
+                  />
+                  <div class="invalid-feedback">
+                    Por favor, ingrese un nombre o descripción.
+                  </div>
+                </div>
+                <div class="col-md-5">
+                  <label class="form-label form-label-custom"
+                    >CI / ID <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="identificador"
+                    placeholder="Ej: 1.234.567-8"
+                    required
+                  />
+                  <div class="invalid-feedback">Este campo es obligatorio.</div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label form-label-custom"
+                    >Motivo del Traslado</label
+                  >
+                  <textarea
+                    class="form-control"
+                    name="motivo"
+                    rows="2"
+                    placeholder="Detalles adicionales..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- PASO 3: ASIGNACIÓN DE RECURSOS -->
+            <div class="wizard-panel d-none" data-step="3">
+              <p class="wizard-subtitle">Asignación de Vehículo y Personal</p>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label form-label-custom"
+                    >Vehículo <span class="text-danger">*</span></label
+                  >
+                  <select class="form-select" name="vehiculo" required>
+                    <option value="" selected disabled>Seleccionar...</option>
+                    <option value="AMB-01">Ambulancia 01</option>
+                    <option value="AMB-03">Ambulancia 03</option>
+                    <option value="AUTO-10">Auto 10</option>
+                  </select>
+                  <div class="invalid-feedback">Seleccione un vehículo.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label form-label-custom"
+                    >Conductor <span class="text-danger">*</span></label
+                  >
+                  <select class="form-select" name="conductor" required>
+                    <option value="" selected disabled>Seleccionar...</option>
+                    <option value="1">Carlos Méndez</option>
+                    <option value="2">Roberto Silva</option>
+                  </select>
+                  <div class="invalid-feedback">Asigne un conductor.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label form-label-custom">Enfermero</label>
+                  <select class="form-select" name="enfermero">
+                    <option value="" selected>Ninguno / No requiere</option>
+                    <option value="1">Ana García</option>
+                    <option value="2">Lucía Fernández</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- PASO 4: RUTA Y HORARIOS -->
+            <div class="wizard-panel d-none" data-step="4">
+              <p class="wizard-subtitle">Establecer Origen, Destino y Hora</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label form-label-custom"
+                    >Origen <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="origen"
+                    value="Hospital de Clínicas"
+                    required
+                  />
+                  <div class="invalid-feedback">Ingrese el origen.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label form-label-custom"
+                    >Destino <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="destino"
+                    placeholder="Ej: Hospital Maciel"
+                    required
+                  />
+                  <div class="invalid-feedback">Ingrese el destino.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label form-label-custom"
+                    >Fecha <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    name="fecha"
+                    required
+                  />
+                  <div class="invalid-feedback">Seleccione una fecha.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label form-label-custom"
+                    >Hora estimada <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="time"
+                    class="form-control"
+                    name="hora"
+                    required
+                  />
+                  <div class="invalid-feedback">Seleccione una hora.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOTONERA DE NAVEGACIÓN -->
+            <div
+              class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top"
+            >
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-wizard-prev"
+                id="btnPrevStep"
+                disabled
               >
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="tipo" class="radio-input" />
-              <span class="radio-text">Equipamiento médico o insumos</span>
-            </label>
-          </div>
+                <i class="bi bi-chevron-left"></i> ANTERIOR
+              </button>
 
-          <div class="info-box">
-            <i class="bi bi-info-circle-fill"></i>
-            El tipo de traslado determinará si se asigna una ambulancia u otro
-            vehículo.
-          </div>
+              <button
+                type="button"
+                class="btn btn-primary btn-wizard-next"
+                id="btnNextStep"
+              >
+                SIGUIENTE <i class="bi bi-chevron-right"></i>
+              </button>
 
-          <div class="d-flex justify-content-between align-items-center mt-4">
-            <button class="btn btn-outline-secondary btn-wizard-prev" disabled>
-              <i class="bi bi-chevron-left"></i> ANTERIOR
-            </button>
-            <button class="btn btn-primary btn-wizard-next">
-              SIGUIENTE <i class="bi bi-chevron-right"></i>
-            </button>
-          </div>
+              <!-- Botón final oculto por defecto -->
+              <button
+                type="submit"
+                class="btn btn-success d-none"
+                id="btnSubmitForm"
+              >
+                <i class="bi bi-floppy"></i> GUARDAR TRASLADO
+              </button>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -467,7 +651,7 @@
               <!-- Map placeholder -->
               <div class="map-placeholder mt-4">
                 <i class="bi bi-geo-alt-fill map-icon"></i>
-                <span class="map-text">Mapa en Tiempo Real</span>
+                <span class="map-text">Mapa</span>
               </div>
             </div>
           </div>
