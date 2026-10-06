@@ -4,7 +4,7 @@
   --primary-bg: #e3f2fd;
   --sidebar-bg: #f8f9fa;
   --sidebar-width: 256px;
-  --sidebar-w-sm: 68px; /* Ancho del menú reducido */
+  --sidebar-w-sm: 68px;
   --topbar-h: 0px;
   --green: #2e7d32;
   --orange: #e65100;
@@ -997,7 +997,8 @@ body {
   font-size: 0;
   padding-left: 0;
   padding-right: 0;
-  justify-content: center; /* Centra el icono */
+  justify-content: center;
+  gap: 0;
 }
 
 /* Restaurar el tamaño de fuente exclusivamente para el icono */
