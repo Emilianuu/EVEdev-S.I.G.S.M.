@@ -32,11 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* --- Navigation (Sidebar) --- */
   const navLinks = document.querySelectorAll(".nav-link-custom");
+  const topbarTitle = document.getElementById("topbar-title");
+
+  // Mapeo de identificadores a títulos para el breadcrumb
+  const sectionTitles = {
+    dashboard: "Dashboard",
+    traslados: "Gestión de Traslados",
+    "nuevo-traslado": "Nuevo Traslado",
+    seguimiento: "Seguimiento de Traslados",
+    recursos: "Gestión de Recursos",
+    configuracion: "Configuración",
+  };
+
   navLinks.forEach((link) => {
     link.addEventListener("click", function (e) {
       e.preventDefault();
 
-      // Remover active de todos
+      // Remover active de todos los enlaces
       navLinks.forEach((l) => l.classList.remove("active"));
       this.classList.add("active");
 
@@ -52,7 +64,12 @@ document.addEventListener("DOMContentLoaded", () => {
         viewElement.classList.add("active");
       }
 
-      // Cerrar sidebar en móviles
+      // --- ACTUALIZAR EL TÍTULO DEL TOPBAR ---
+      if (topbarTitle && sectionTitles[target]) {
+        topbarTitle.textContent = sectionTitles[target];
+      }
+
+      // Cerrar sidebar en dispositivos móviles
       if (window.innerWidth <= 768) {
         document.getElementById("sidebar").classList.remove("open");
       }
