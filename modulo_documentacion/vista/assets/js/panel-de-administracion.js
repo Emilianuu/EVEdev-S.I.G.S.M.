@@ -11,9 +11,6 @@ let hcCounter = 4029;
 const docs = [
   {
     id: "HC-4029",
-    paciente: "Ana María Rodríguez",
-    ci: "1.948.328-9",
-    nacimiento: "14 de Abril de 1959 (65 años)",
     tipo: "Epicrisis de Alta",
     fecha: "24 Oct 2026, 08:32",
     estado: "aprobado",
@@ -49,9 +46,6 @@ const docs = [
   },
   {
     id: "HC-4028",
-    paciente: "Carlos Eduardo Sosa",
-    ci: "3.829.112-4",
-    nacimiento: "2 de Enero de 1978 (48 años)",
     tipo: "Informe Radiológico",
     fecha: "23 Oct 2026, 15:10",
     estado: "pendiente",
@@ -78,16 +72,13 @@ const docs = [
   },
   {
     id: "HC-4027",
-    paciente: "Mercedes Varela",
-    ci: "4.103.882-1",
-    nacimiento: "19 de Julio de 1990 (36 años)",
     tipo: "Análisis de Sangre",
     fecha: "23 Oct 2026, 11:05",
     estado: "revision",
     tituloVisor: "ANÁLISIS DE SANGRE",
     resumenHeading: "Resultados",
     resumenText:
-      "Hemograma completo y perfil metabólico dentro de parámetros normales. Se adjuntan valores de referencia comparados con estudio previo del paciente.",
+      "Hemograma completo y perfil metabólico dentro de parámetros normales. Se adjuntan valores de referencia comparados con estudio previo.",
     audit: [
       {
         label: "Carga de Documento completada",
@@ -105,9 +96,6 @@ const docs = [
   },
   {
     id: "HC-4026",
-    paciente: "Juan Pedro Gómez",
-    ci: "2.778.441-5",
-    nacimiento: "5 de Marzo de 1965 (61 años)",
     tipo: "Consentimiento Quirúrgico",
     fecha: "22 Oct 2026, 18:40",
     estado: "rechazado",
@@ -136,9 +124,6 @@ const docs = [
   },
   {
     id: "HC-4025",
-    paciente: "Lucía Fernández",
-    ci: "3.204.771-2",
-    nacimiento: "28 de Noviembre de 1982 (43 años)",
     tipo: "Historia Clínica",
     fecha: "22 Oct 2026, 09:15",
     estado: "aprobado",
@@ -163,9 +148,6 @@ const docs = [
   },
   {
     id: "HC-4024",
-    paciente: "Roberto Silva",
-    ci: "2.991.340-6",
-    nacimiento: "11 de Junio de 1971 (55 años)",
     tipo: "Reporte de Guardia",
     fecha: "21 Oct 2026, 20:03",
     estado: "pendiente",
@@ -283,7 +265,6 @@ function renderDashboard() {
       (d) => `
     <tr class="clickable-doc-row" data-id="${d.id}">
       <td><strong>#${d.id}</strong></td>
-      <td>${d.paciente}</td>
       <td>${d.tipo}</td>
       <td>${badgeHtml(d.estado)}</td>
     </tr>`,
@@ -314,10 +295,6 @@ function renderDocumentosTable() {
       (d) => `
     <tr>
       <td><strong>#${d.id}</strong></td>
-      <td>
-        <div class="table-cell-title">${d.paciente}</div>
-        <div class="table-cell-subtitle">CI ${d.ci}</div>
-      </td>
       <td>${d.tipo}</td>
       <td class="table-cell-date">${d.fecha}</td>
       <td>${badgeHtml(d.estado)}</td>
@@ -337,23 +314,18 @@ function renderDocumentosTable() {
 
 // ── Nuevo Documento ──────────────────────────────────────────────────
 function saveDoc() {
-  const paciente = document.getElementById("nd-paciente").value.trim();
-  const ci = document.getElementById("nd-ci").value.trim();
   const tipo = document.getElementById("nd-tipo").value;
   const estado = document.getElementById("nd-estado").value;
   const contenido = document.getElementById("nd-contenido").value.trim();
 
-  if (!paciente || !ci || !tipo) {
-    alert("Complete paciente, cédula y tipo de documento.");
+  if (!tipo) {
+    alert("Seleccione el tipo de documento.");
     return;
   }
 
   hcCounter += 1;
   const nuevo = {
     id: `HC-${hcCounter}`,
-    paciente,
-    ci,
-    nacimiento: "—",
     tipo,
     fecha:
       new Date().toLocaleDateString("es-UY", {
@@ -381,9 +353,7 @@ function saveDoc() {
   };
   docs.unshift(nuevo);
 
-  ["nd-paciente", "nd-ci", "nd-contenido"].forEach(
-    (id) => (document.getElementById(id).value = ""),
-  );
+  document.getElementById("nd-contenido").value = "";
   document.getElementById("nd-tipo").value = "";
   document.getElementById("nd-estado").value = "pendiente";
 
@@ -397,7 +367,7 @@ function openDocumento(id) {
   const d = docs.find((x) => x.id === id);
   if (!d) return;
 
-  document.getElementById("dd-title").textContent = `${d.tipo} — ${d.paciente}`;
+  document.getElementById("dd-title").textContent = `${d.tipo} (#${d.id})`;
 
   let html = `<h3>${d.tituloVisor}</h3>`;
   html += `<h4>${d.resumenHeading}</h4><p>${d.resumenText}</p>`;
@@ -405,12 +375,6 @@ function openDocumento(id) {
     html += `<h4>${d.listHeading}</h4><ul>${d.listItems.map((i) => `<li>${i}</li>`).join("")}</ul>`;
   }
   document.getElementById("dd-content").innerHTML = html;
-
-  document.getElementById("dd-patient").innerHTML = `
-    <div class="patient-field"><p class="pf-label">Nombre</p><p class="pf-value">${d.paciente}</p></div>
-    <div class="patient-field"><p class="pf-label">Cédula de Identidad</p><p class="pf-value">CI ${d.ci}</p></div>
-    <div class="patient-field"><p class="pf-label">Fecha de Nacimiento</p><p class="pf-value">${d.nacimiento}</p></div>
-  `;
 
   renderAudit(d);
   setAdminView("view-documento-detalle");
@@ -450,68 +414,33 @@ function setEstado(id, estado) {
 }
 
 // ── Generador de Accesos QR ──────────────────────────────────────────
-function getPacientesUnicos() {
-  const map = {};
-  docs.forEach((d) => {
-    if (!map[d.ci]) {
-      map[d.ci] = {
-        paciente: d.paciente,
-        ci: d.ci,
-        nacimiento: d.nacimiento,
-        count: 0,
-      };
-    }
-    map[d.ci].count += 1;
-  });
-  return Object.values(map);
-}
-
 function initQr() {
-  const select = document.getElementById("qr-paciente");
-  const pacientes = getPacientesUnicos();
-  select.innerHTML = pacientes
-    .map((p) => `<option value="${p.ci}">${p.paciente}</option>`)
-    .join("");
+  const select = document.getElementById("qr-documento");
+  select.innerHTML =
+    `<option value="">Seleccione un documento...</option>` +
+    docs
+      .map((d) => `<option value="${d.id}">${d.tipo} (#${d.id})</option>`)
+      .join("");
 
   document.getElementById("qr-result").style.display = "none";
   document.getElementById("qr-empty").style.display = "block";
-  renderQrDocs();
-}
-
-function renderQrDocs() {
-  const ci = document.getElementById("qr-paciente").value;
-  document.getElementById("qr-ci").value = ci;
-  const docsPaciente = docs.filter((d) => d.ci === ci);
-  document.getElementById("qr-docs-list").innerHTML = docsPaciente
-    .map(
-      (d, i) => `
-    <div class="form-check mb-2">
-      <input class="form-check-input qr-doc-check" type="checkbox" value="${d.id}" id="qr-doc-${d.id}" ${i === 0 ? "checked" : ""}>
-      <label class="form-check-label qr-checkbox-label" for="qr-doc-${d.id}">${d.tipo} (#${d.id})</label>
-    </div>`,
-    )
-    .join("");
 }
 
 function generarQr() {
-  const ci = document.getElementById("qr-paciente").value;
-  const pacienteDoc = docs.find((d) => d.ci === ci);
-  const paciente = pacienteDoc ? pacienteDoc.paciente : "";
-  const seleccionados = document.querySelectorAll(
-    ".qr-doc-check:checked",
-  ).length;
-
-  if (seleccionados === 0) {
-    alert("Seleccione al menos un documento para incluir en el QR.");
+  const docId = document.getElementById("qr-documento").value;
+  if (!docId) {
+    alert("Seleccione un documento para generar el código QR.");
     return;
   }
 
+  const doc = docs.find((d) => d.id === docId);
+
   document.getElementById("qr-empty").style.display = "none";
   document.getElementById("qr-result").style.display = "block";
-  document.getElementById("qr-result-paciente").textContent =
-    `Paciente: ${paciente}`;
+  document.getElementById("qr-result-doc-title").textContent =
+    `${doc.tipo} (#${doc.id})`;
   document.getElementById("qr-result-desc").textContent =
-    `Acceso restringido a ${seleccionados} documento${seleccionados > 1 ? "s" : ""} clínico${seleccionados > 1 ? "s" : ""}`;
+    `Acceso QR exclusivo para el documento seleccionado`;
 
   showToast("Código QR generado correctamente", "bi-qr-code");
 }
@@ -526,7 +455,7 @@ function showToast(msg, icon) {
   toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
 }
 
-// ── Bind Events & Init ────────────────────────────────----------------
+// ── Bind Events & Init ────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", function () {
   /* Events: Global App */
   const sidebarOverlay = document.getElementById("sidebar-overlay");
@@ -628,11 +557,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* Events: QR Generator */
-  const qrPacienteSelect = document.getElementById("qr-paciente");
-  if (qrPacienteSelect) {
-    qrPacienteSelect.addEventListener("change", renderQrDocs);
-  }
-
   const btnGenQr = document.getElementById("btnGenerarQr");
   if (btnGenQr) {
     btnGenQr.addEventListener("click", generarQr);

@@ -52,12 +52,13 @@
 
       body {
         font-family: "DM Sans", sans-serif;
-        background: linear-gradient(
-          150deg,
-          var(--blue-50) 0%,
-          #f8fafc 55%,
-          var(--white) 100%
-        );
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.1)),
+          url("/servicios_comunes/vista_general/fondo.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
@@ -502,12 +503,7 @@
       }
 
       [data-theme="dark"] body {
-        background: linear-gradient(
-          150deg,
-          #101424 0%,
-          #070913 55%,
-          #05060d 100%
-        );
+        background-image: url("/servicios_comunes/vista_general/fondo-oscuro.jpg");
         color: var(--hc-text-main);
       }
 

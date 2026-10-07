@@ -171,7 +171,7 @@
                     <i class="bi bi-qr-code"></i> QR Generados
                   </p>
                   <p class="stat-value" id="stat-qr">1,829</p>
-                  <p class="stat-delta">Accesos externos pacientes</p>
+                  <p class="stat-delta">Accesos externos</p>
                 </div>
               </div>
             </div>
@@ -196,7 +196,6 @@
                       <thead>
                         <tr>
                           <th>ID</th>
-                          <th>Paciente</th>
                           <th>Tipo de Archivo</th>
                           <th>Estado</th>
                         </tr>
@@ -271,7 +270,7 @@
                   <input
                     type="text"
                     class="hc-input"
-                    placeholder="Buscar por Paciente, CI o Funcionario..."
+                    placeholder="Buscar por ID, Tipo o Funcionario..."
                   />
                 </div>
                 <select class="hc-input select-sm">
@@ -299,7 +298,6 @@
                   <thead>
                     <tr>
                       <th>Código HC</th>
-                      <th>Paciente (CI)</th>
                       <th>Tipo de Documento</th>
                       <th>Fecha de Carga</th>
                       <th>Estado</th>
@@ -351,30 +349,6 @@
                   </div>
                   <div class="panel-body">
                     <div class="row g-3">
-                      <div class="col-md-8">
-                        <label class="hc-label"
-                          >Paciente
-                          <span class="text-red-asterisk">*</span></label
-                        >
-                        <input
-                          type="text"
-                          class="hc-input"
-                          id="nd-paciente"
-                          placeholder="Nombre completo del paciente"
-                        />
-                      </div>
-                      <div class="col-md-4">
-                        <label class="hc-label"
-                          >Cédula de Identidad
-                          <span class="text-red-asterisk">*</span></label
-                        >
-                        <input
-                          type="text"
-                          class="hc-input"
-                          id="nd-ci"
-                          placeholder="Ej: 4.123.456-7"
-                        />
-                      </div>
                       <div class="col-md-6">
                         <label class="hc-label"
                           >Tipo de Documento
@@ -494,12 +468,6 @@
                 </div>
               </div>
               <div class="col-lg-4">
-                <div class="panel mb-3">
-                  <div class="panel-header">
-                    <p class="panel-title">Datos del Paciente</p>
-                  </div>
-                  <div class="panel-body" id="dd-patient"></div>
-                </div>
                 <div class="panel">
                   <div class="panel-header">
                     <p class="panel-title">Historial de Auditoría</p>
@@ -518,8 +486,8 @@
               <div>
                 <h1>Generador de Accesos QR</h1>
                 <p class="subtitle">
-                  Cree códigos QR temporales para que pacientes o médicos
-                  externos puedan leer reportes clínicos validados
+                  Cree un código QR temporal para acceder externamente a un
+                  documento validado
                 </p>
               </div>
             </div>
@@ -532,16 +500,10 @@
                   </div>
                   <div class="panel-body">
                     <div class="mb-3">
-                      <label class="hc-label">Seleccionar Paciente</label>
-                      <select class="hc-input" id="qr-paciente"></select>
-                    </div>
-                    <div class="mb-3">
-                      <label class="hc-label">Cédula de Identidad</label>
-                      <input type="text" class="hc-input" id="qr-ci" disabled />
-                    </div>
-                    <div class="mb-3">
-                      <label class="hc-label">Documentos a incluir en QR</label>
-                      <div id="qr-docs-list"></div>
+                      <label class="hc-label">Seleccionar Documento</label>
+                      <select class="hc-input" id="qr-documento">
+                        <option value="">Seleccione un documento...</option>
+                      </select>
                     </div>
                     <div class="mb-4">
                       <label class="hc-label">Plazo de Expiración</label>
@@ -571,7 +533,7 @@
                   <div class="panel-body text-center" id="qr-empty">
                     <div class="empty-qr-box">
                       <i class="bi bi-qr-code qr-icon-lg"></i>
-                      Complete el formulario y genere un código de acceso.
+                      Seleccione un documento y genere su código de acceso.
                     </div>
                   </div>
                   <div
@@ -722,7 +684,7 @@
                         />
                       </svg>
                     </div>
-                    <p class="qr-result-patient" id="qr-result-paciente"></p>
+                    <p class="qr-result-patient" id="qr-result-doc-title"></p>
                     <p class="qr-result-desc" id="qr-result-desc"></p>
                     <div class="qr-actions">
                       <button class="btn-hc btn-hc-secondary btn-sm">
