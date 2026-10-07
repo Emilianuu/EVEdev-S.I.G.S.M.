@@ -233,9 +233,47 @@ body {
 }
 
 .sidebar-brand {
-  padding: 20px 18px 16px;
+  padding: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  transition: border-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 144px;
+  transition:
+    border-color 0.3s,
+    height 0.3s ease;
+  overflow: hidden;
+}
+
+.brand-img-normal {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 0;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+#sidebar.collapsed .sidebar-brand {
+  padding: 0;
+  height: 68px; /* Cambia a la altura exacta del menú cerrado para hacer un cuadrado perfecto */
+  margin-bottom: 5px;
+}
+
+#sidebar.collapsed .brand-img-normal {
+  display: none; /* Oculta el banner con texto */
+}
+
+#sidebar.collapsed .brand-img-collapsed {
+  display: block; /* Muestra el ícono pequeño */
+}
+
+.brand-img-collapsed {
+  display: none; /* Oculta el ícono pequeño */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .sidebar-section-label {
   font-size: 0.62rem;
@@ -1010,4 +1048,27 @@ body {
 
 #sidebar.collapsed .nav-link-custom.active i {
   color: #fff;
+}
+
+/* ── NUEVA IMAGEN DEL SIDEBAR ── */
+.brand-full-image {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 0px;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+/* ── COMPORTAMIENTO AL COLAPSAR ── */
+#sidebar.collapsed .brand-full-image {
+  width: 100%;
+  height: 68px;
+}
+
+#sidebar.collapsed .sidebar-brand {
+  padding: 0;
+  display: flex;
+  justify-content: center;
 }
