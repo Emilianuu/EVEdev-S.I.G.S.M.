@@ -30,66 +30,70 @@
     <div id="app-shell">
       <!-- SIDEBAR -->
       <nav id="sidebar">
-        <div class="sidebar-logo">
-          <div class="logo-icon sidebar-logo-bg">
-            <img
-              src="../../servicios_comunes/vista_general/logo.png"
-              alt="Logo Hospital de Clínicas"
-              class="logo-img-contain"
-            />
-          </div>
-          <div class="logo-text">
-            <strong class="sidebar-brand-title">Hospital de Clínicas</strong>
-            <span class="sidebar-brand-subtitle">Dr. Manuel Quintela</span>
-          </div>
-            <i class="bi bi-x-lg"></i>
-          </button>
+        <div class="sidebar-brand">
+          <img
+            src="../../servicios_comunes/vista_general/banner.jpg"
+            alt="Banner Hospital de Clínicas"
+            class="brand-img-normal"
+          />
+          <img
+            src="../../servicios_comunes/vista_general/banner-reducido.jpg"
+            alt="Ícono Hospital de Clínicas"
+            class="brand-img-collapsed"
+          />
         </div>
 
-        <div class="sidebar-nav">
-          <a
-            class="nav-item active btn-nav-view"
-            data-view="view-dashboard"
-            id="nav-inicio"
-          >
-            <i class="bi bi-house"></i>
-            <span class="nav-label">Inicio</span>
-          </a>
-          <a
-            class="nav-item btn-nav-view"
-            data-view="view-documentos"
-            id="nav-documentos"
-          >
-            <i class="bi bi-file-earmark-text"></i>
-            <span class="nav-label">Documentos</span>
-          </a>
-          <a
-            class="nav-item btn-nav-view"
-            data-view="view-generar-qr"
-            id="nav-generar-qr"
-          >
-            <i class="bi bi-qr-code"></i>
-            <span class="nav-label">Generar QR</span>
-          </a>
-          <a
-            class="nav-item btn-nav-view"
-            data-view="view-configuracion"
-            id="nav-configuracion"
-          >
-            <i class="bi bi-gear"></i>
-            <span class="nav-label">Configuración</span>
-          </a>
-        </div>
+        <div class="sidebar-section-label">Sistema de Administración</div>
+        <div class="sidebar-label-bold">Gestión de Documentos</div>
+
+        <ul class="sidebar-menu-list mb-0">
+          <li class="nav-item-custom">
+            <a
+              class="nav-link-custom active btn-nav-view"
+              data-view="view-dashboard"
+              id="nav-inicio"
+              href="#"
+            >
+              <i class="bi bi-house"></i> Inicio
+            </a>
+          </li>
+          <li class="nav-item-custom">
+            <a
+              class="nav-link-custom btn-nav-view"
+              data-view="view-documentos"
+              id="nav-documentos"
+              href="#"
+            >
+              <i class="bi bi-file-earmark-text"></i> Documentos
+            </a>
+          </li>
+          <li class="nav-item-custom">
+            <a
+              class="nav-link-custom btn-nav-view"
+              data-view="view-generar-qr"
+              id="nav-generar-qr"
+              href="#"
+            >
+              <i class="bi bi-qr-code"></i> Generar QR
+            </a>
+          </li>
+          <li class="nav-item-custom">
+            <a
+              class="nav-link-custom btn-nav-view"
+              data-view="view-configuracion"
+              id="nav-configuracion"
+              href="#"
+            >
+              <i class="bi bi-gear"></i> Configuración
+            </a>
+          </li>
+        </ul>
 
         <div class="sidebar-footer">
-          <div class="sidebar-user">
-            <div class="user-avatar" id="user-avatar">DM</div>
-            <div class="user-info">
-              <div class="uname" id="user-name">Dr. Daniel Muñoz</div>
-              <div class="urole">Administrador</div>
-            </div>
-              <i class="bi bi-box-arrow-right"></i>
-            </button>
+          <div class="avatar-circle">DM</div>
+          <div class="footer-user-info">
+            <div class="avatar-name" id="user-name">Dr. Daniel Muñoz</div>
+            <div class="avatar-role">Administrador</div>
           </div>
         </div>
       </nav>
@@ -102,12 +106,14 @@
             <i class="bi bi-list"></i>
           </button>
           <div class="topbar-breadcrumb">
-            <span>Hospital de Clínicas</span>
-            <i class="bi bi-chevron-right"></i>
             <span class="bc-current" id="topbar-title">Panel Principal</span>
           </div>
           <div class="topbar-actions ms-auto">
-            <button class="btn-hc btn-hc-ghost btn-text-sm" id="btnBackPortal" style="padding: 4px 12px">
+            <button
+              class="btn-hc btn-hc-ghost btn-text-sm"
+              id="btnBackPortal"
+              style="padding: 4px 12px"
+            >
               <i class="bi bi-box-arrow-left"></i> Volver al portal principal
             </button>
           </div>

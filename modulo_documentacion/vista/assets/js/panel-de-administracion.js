@@ -223,7 +223,7 @@ function setAdminView(id) {
     "view-configuracion": "nav-configuracion",
   };
   document
-    .querySelectorAll(".nav-item")
+    .querySelectorAll(".nav-link-custom")
     .forEach((n) => n.classList.remove("active"));
 
   if (navMap[id]) {
