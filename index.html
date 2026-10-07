@@ -90,17 +90,11 @@
         gap: 14px;
       }
 
-      .header-logo {
-        width: 36px;
-        height: 36px;
-        background: var(--blue-700);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--white);
-        font-size: 18px;
+      .custom-logo {
+        height: 52px;
+        width: auto;
         flex-shrink: 0;
+        object-fit: contain;
       }
 
       .header-title {
@@ -531,9 +525,12 @@
     <!-- Header -->
     <header>
       <div class="header-brand">
-        <div class="header-logo">
-          <i class="bi bi-hospital"></i>
-        </div>
+        <img
+          src="/servicios_comunes/vista_general/logo.png"
+          alt="Logo Hospital de Clínicas"
+          class="custom-logo"
+        />
+
         <div>
           <div class="header-title">Hospital de Clínicas</div>
           <div class="header-subtitle">Dr. Manuel Quintela</div>

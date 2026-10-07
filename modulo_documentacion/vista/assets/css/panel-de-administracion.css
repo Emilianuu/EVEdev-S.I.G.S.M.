@@ -1460,6 +1460,14 @@ body {
   color: var(--hc-text-main);
 }
 
+[data-theme="dark"] .brand-img-normal {
+  content: url("../../../../servicios_comunes/vista_general/banner-oscuro.jpg");
+}
+
+[data-theme="dark"] .brand-img-collapsed {
+  content: url("../../../../servicios_comunes/vista_general/banner-oscuro-reducido.jpg");
+}
+
 [data-theme="dark"] .panel,
 [data-theme="dark"] .stat-card,
 [data-theme="dark"] .login-card,

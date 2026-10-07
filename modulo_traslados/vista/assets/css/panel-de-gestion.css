@@ -822,6 +822,14 @@ body {
   color: var(--text-main);
 }
 
+[data-theme="dark"] .brand-img-normal {
+  content: url("../../../../servicios_comunes/vista_general/banner-oscuro.jpg");
+}
+
+[data-theme="dark"] .brand-img-collapsed {
+  content: url("../../../../servicios_comunes/vista_general/banner-oscuro-reducido.jpg");
+}
+
 /* Ajuste de márgenes para la vista en dispositivos móviles */
 @media (max-width: 768px) {
   .topbar {
