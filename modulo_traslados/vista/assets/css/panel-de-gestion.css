@@ -24,7 +24,7 @@
 }
 
 body {
-  font-family: "DM Sans", sans-serif;
+  font-family: "Inter", sans-serif;
   background: #f4f6f9;
   color: var(--text-main);
   margin: 0;
@@ -1079,4 +1079,14 @@ body {
   padding: 0;
   display: flex;
   justify-content: center;
+}
+
+.dc-val,
+.stat-value,
+.table-custom tbody td:first-child, /* IDs de traslados (Ej: AMB-001) */
+.tl-time, /* Horas en el timeline */
+.badge-estado,
+.badge-tipo {
+  font-family: "IBM Plex Mono", monospace;
+  letter-spacing: -0.02em;
 }

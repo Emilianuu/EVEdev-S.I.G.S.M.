@@ -39,7 +39,7 @@
 }
 
 body {
-  font-family: "DM Sans", sans-serif;
+  font-family: "Inter", sans-serif;
   background: var(--hc-gray-100);
   color: var(--hc-gray-800);
   margin: 0;
@@ -389,7 +389,7 @@ body {
   margin-bottom: 24px;
 }
 .page-header h1 {
-  font-family: "DM Serif Display", serif;
+  font-family: "Inter", sans-serif;
   font-size: 1.55rem;
   font-weight: 400;
   color: var(--hc-gray-900);
@@ -1145,7 +1145,7 @@ body {
   margin: 0 0 10px;
 }
 .portal-title {
-  font-family: "DM Serif Display", serif;
+  font-family: "Inter", sans-serif;
   font-weight: 400;
   font-size: 2.1rem;
   color: var(--hc-gray-900);
@@ -1760,4 +1760,13 @@ body {
 }
 .check-label-sm {
   font-size: 0.85rem;
+}
+
+.stat-value,
+.hc-table tbody td:first-child, /* Códigos HC */
+.hc-table th, 
+.badge-hc,
+.timeline-sub {
+  font-family: "IBM Plex Mono", monospace;
+  letter-spacing: -0.02em;
 }
