@@ -1,0 +1,396 @@
+/* =========================================
+   S.I.G.S.M - HOJA DE ESTILOS CENTRAL
+   ========================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --blue-900: #0f2a5e;
+  --blue-700: #1a4da2;
+  --blue-50: #eff6ff;
+  --slate-700: #334155;
+  --slate-500: #64748b;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --white: #ffffff;
+  --accent-admin: #2563eb;
+  --accent-traslado: #0891b2;
+  --radius: 14px;
+  --shadow-card:
+    0 2px 12px rgba(15, 42, 94, 0.08), 0 1px 3px rgba(15, 42, 94, 0.06);
+  --shadow-hover:
+    0 8px 28px rgba(15, 42, 94, 0.14), 0 2px 6px rgba(15, 42, 94, 0.08);
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  /* La ruta asume que fondo.jpg está en la misma carpeta que estilos.css */
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.1)),
+    url("fondo.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================
+   ELEMENTOS COMPARTIDOS (HEADER / FOOTER)
+   ========================================= */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--slate-200);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.custom-logo {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+}
+.header-title {
+  font-size: 1.1rem;
+  color: var(--blue-900);
+  line-height: 1.2;
+  font-weight: 600;
+}
+.header-subtitle {
+  font-size: 0.72rem;
+  color: var(--slate-500);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 0.75rem;
+  color: var(--slate-500);
+  border-top: 1px solid var(--slate-200);
+  background: var(--white);
+  margin-top: auto;
+}
+
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--slate-200);
+  background: transparent;
+  color: var(--slate-500);
+  text-decoration: none;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-logout:hover {
+  background: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+.wrapper {
+  width: 100%;
+  max-width: 860px;
+}
+
+/* =========================================
+   PORTAL DE MÓDULOS (TARJETAS)
+   ========================================= */
+.page-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blue-700);
+  margin-bottom: 10px;
+}
+.page-heading {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: var(--blue-900);
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+.page-desc {
+  font-size: 0.95rem;
+  color: var(--slate-500);
+  margin-bottom: 40px;
+  max-width: 520px;
+}
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.module-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--slate-200);
+  box-shadow: var(--shadow-card);
+  padding: 28px 26px 24px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+.module-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--card-accent);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: transparent;
+}
+.module-card:hover::before {
+  opacity: 1;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: color-mix(in srgb, var(--card-accent) 10%, transparent);
+  color: var(--card-accent);
+}
+.card-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--card-accent);
+  margin-bottom: 5px;
+}
+.card-title {
+  font-size: 1.2rem;
+  color: var(--blue-900);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+.card-desc {
+  font-size: 0.83rem;
+  color: var(--slate-500);
+  line-height: 1.55;
+  flex: 1;
+}
+.card-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--slate-100);
+}
+.card-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.chip {
+  font-size: 0.67rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--slate-100);
+  color: var(--slate-700);
+}
+.card-arrow {
+  font-size: 1rem;
+  color: var(--slate-200);
+  transition:
+    color 0.18s,
+    transform 0.18s;
+}
+.module-card:hover .card-arrow {
+  color: var(--card-accent);
+  transform: translateX(3px);
+}
+
+/* =========================================
+   PANTALLA DE LOGIN
+   ========================================= */
+.login-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--slate-200);
+  box-shadow: var(--shadow-card);
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 420px;
+  border-top: 4px solid var(--blue-900);
+}
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.login-logo {
+  height: 60px;
+  width: auto;
+  margin-bottom: 16px;
+}
+.login-header h2 {
+  font-size: 1.4rem;
+  color: var(--blue-900);
+  margin-bottom: 8px;
+}
+.login-header p {
+  font-size: 0.9rem;
+  color: var(--slate-500);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--slate-700);
+}
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--slate-700);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent-admin);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--blue-900);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.btn-submit:hover {
+  background-color: var(--blue-700);
+}
+.alert-error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+  border: 1px solid #fecaca;
+}
+
+.login-footer {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--slate-500);
+}
+.login-footer hr {
+  border: 0;
+  border-top: 1px solid var(--slate-200);
+  margin: 20px 0;
+}
+
+/* =========================================
+   MODO OSCURO
+   ========================================= */
+[data-theme="dark"] {
+  --blue-900: #f1f5f9;
+  --blue-700: #9f7aea;
+  --slate-500: #94a3b8;
+  --slate-200: #1c233c;
+  --slate-100: rgba(255, 255, 255, 0.04);
+  --white: #101424;
+}
+[data-theme="dark"] body {
+  background-image: url("fondo-oscuro.jpg");
+  color: #f1f5f9;
+  background-color: #070913;
+}
+[data-theme="dark"] header,
+[data-theme="dark"] footer,
+[data-theme="dark"] .module-card,
+[data-theme="dark"] .login-card {
+  background: #101424;
+  border-color: #1c233c;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .chip {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+[data-theme="dark"] .form-group input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #1c233c;
+  color: #f1f5f9;
+}
+[data-theme="dark"] .form-group input:focus {
+  border-color: #3b82f6;
+}
+[data-theme="dark"] .btn-submit {
+  background-color: #2563eb;
+}

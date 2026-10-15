@@ -1,0 +1,11 @@
+# --- Entorno local y servidor ---
+.idea/
+.vscode/
+*.swp
+*.tmp
+.DS_Store
+Thumbs.db
+
+# --- Logs y archivos temporales ---
+*.log
+logs/
