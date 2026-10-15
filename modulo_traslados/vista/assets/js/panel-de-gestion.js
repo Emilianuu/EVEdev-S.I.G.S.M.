@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Mapeo de identificadores a títulos para el breadcrumb
   const sectionTitles = {
-    dashboard: "Dashboard",
+    dashboard: "Panel Principal",
     traslados: "Gestión de Traslados",
     "nuevo-traslado": "Nuevo Traslado",
     seguimiento: "Seguimiento de Traslados",

@@ -1,4 +1,25 @@
-﻿<!doctype html>
+﻿<?php
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+
+// Proteger la ruta: si no está logueado, lo mandamos al login
+if (!isset($_SESSION['id_usuario'])) {
+  header("Location: ../../servicios_comunes/autenticacion/login_controlador.php");
+  exit();
+}
+
+// Rescatar los datos de la sesión
+$nombreSesion = $_SESSION['nombre_completo'] ?? 'Usuario';
+$emailSesion  = $_SESSION['email'] ?? '';
+
+// Calcular las iniciales para el círculo del avatar
+$palabras = explode(' ', trim($nombreSesion));
+$iniciales = '';
+if (isset($palabras[0])) $iniciales .= strtoupper(substr($palabras[0], 0, 1));
+if (isset($palabras[1])) $iniciales .= strtoupper(substr($palabras[1], 0, 1));
+?>
+<!doctype html>
 <html lang="es">
 
 <head>
@@ -46,7 +67,7 @@
     <ul class="list-unstyled mb-0 sidebar-menu-list">
       <li class="nav-item-custom">
         <a class="nav-link-custom active" data-view="dashboard" href="#">
-          <i class="bi bi-grid-fill"></i> Dashboard
+          <i class="bi bi-grid-fill"></i> Panel Principal
         </a>
       </li>
       <li class="nav-item-custom">
@@ -77,10 +98,10 @@
     </ul>
 
     <div class="sidebar-footer">
-      <div class="avatar-circle">A</div>
+      <div class="avatar-circle"><?php echo $iniciales; ?></div>
       <div class="footer-user-info">
-        <div class="avatar-name">Admin Usuario</div>
-        <div class="avatar-role">Administrativo</div>
+        <div class="avatar-name"><?php echo htmlspecialchars($nombreSesion); ?></div>
+        <div class="avatar-role">Funcionario</div>
       </div>
     </div>
   </aside>
@@ -92,7 +113,7 @@
         <i class="bi bi-list"></i>
       </button>
       <div class="topbar-breadcrumb">
-        <span class="bc-current" id="topbar-title">Dashboard</span>
+        <span class="bc-current" id="topbar-title">Panel Principal</span>
       </div>
       <div class="topbar-actions ms-auto">
         <button
@@ -105,7 +126,7 @@
     </div>
     <!-- DASHBOARD -->
     <section class="view active" id="view-dashboard">
-      <div class="page-title">Dashboard</div>
+      <div class="page-title">Panel Principal</div>
 
       <div class="row g-3 mb-4">
         <div class="col-12 col-sm-6 col-xl-3">

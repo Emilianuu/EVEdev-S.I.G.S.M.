@@ -1,3 +1,24 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+
+// Proteger la ruta: si no está logueado, lo mandamos al login
+if (!isset($_SESSION['id_usuario'])) {
+  header("Location: ../../servicios_comunes/autenticacion/login_controlador.php");
+  exit();
+}
+
+// Rescatar los datos de la sesión
+$nombreSesion = $_SESSION['nombre_completo'] ?? 'Usuario';
+$emailSesion  = $_SESSION['email'] ?? '';
+
+// Calcular las iniciales para el círculo del avatar
+$palabras = explode(' ', trim($nombreSesion));
+$iniciales = '';
+if (isset($palabras[0])) $iniciales .= strtoupper(substr($palabras[0], 0, 1));
+if (isset($palabras[1])) $iniciales .= strtoupper(substr($palabras[1], 0, 1));
+?>
 <!doctype html>
 <html lang="es">
 
@@ -51,7 +72,7 @@
             data-view="view-dashboard"
             id="nav-inicio"
             href="#">
-            <i class="bi bi-house"></i> Inicio
+            <i class="bi bi-house"></i> Panel Principal
           </a>
         </li>
         <li class="nav-item-custom">
@@ -84,10 +105,10 @@
       </ul>
 
       <div class="sidebar-footer">
-        <div class="avatar-circle">DM</div>
+        <div class="avatar-circle"><?php echo $iniciales; ?></div>
         <div class="footer-user-info">
-          <div class="avatar-name" id="user-name">Dr. Daniel Muñoz</div>
-          <div class="avatar-role">Administrador</div>
+          <div class="avatar-name" id="user-name"><?php echo htmlspecialchars($nombreSesion); ?></div>
+          <div class="avatar-role">Funcionario</div>
         </div>
       </div>
     </nav>
@@ -119,7 +140,7 @@
           <div class="page-header">
             <div>
               <h1>
-                Bienvenido, <span id="dash-username">Dr. Daniel Muñoz</span>
+                Bienvenido, <span id="dash-username"><?php echo htmlspecialchars($nombreSesion); ?></span>
               </h1>
               <p class="subtitle">
                 Módulo de Gestión de Historias Clínicas y Documentos de
