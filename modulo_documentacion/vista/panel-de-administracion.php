@@ -72,7 +72,7 @@ if (isset($palabras[1])) $iniciales .= strtoupper(substr($palabras[1], 0, 1));
             data-view="view-dashboard"
             id="nav-inicio"
             href="#">
-            <i class="bi bi-house"></i> Panel Principal
+            <i class="bi bi-grid-fill"></i> Panel Principal
           </a>
         </li>
         <li class="nav-item-custom">
