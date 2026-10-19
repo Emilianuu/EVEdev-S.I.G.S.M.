@@ -253,97 +253,11 @@ if (isset($palabras[1])) $iniciales .= strtoupper(substr($palabras[1], 0, 1));
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="tabla-traslados-body">
               <tr>
-                <td>AMB-001</td>
-                <td>27/05/2026 08:30</td>
-                <td>Carlos Méndez</td>
-                <td>Ana García</td>
-                <td>Juan Pérez (CI: 1.234.567-8)</td>
-                <td><span class="badge-tipo-traslado">Paciente</span></td>
-                <td>Ambulancia 01</td>
-                <td>Hospital Maciel</td>
-                <td>
-                  <span class="badge-estado b-transito">En tránsito</span>
-                </td>
-                <td>
-                  <button class="btn-eye">
-                    <i class="bi bi-eye-fill"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>AMB-002</td>
-                <td>27/05/2026 07:45</td>
-                <td>Roberto Silva</td>
-                <td>Lucía Fernández</td>
-                <td>María González (CI: 2.345.678-9)</td>
-                <td><span class="badge-tipo-traslado">Paciente</span></td>
-                <td>Ambulancia 03</td>
-                <td>Sanatorio CASMU</td>
-                <td>
-                  <span class="badge-estado b-completado">Completado</span>
-                </td>
-                <td>
-                  <button class="btn-eye">
-                    <i class="bi bi-eye-fill"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>AUTO-012</td>
-                <td>27/05/2026 09:00</td>
-                <td>Diego Martínez</td>
-                <td>N/A</td>
-                <td>Equipamiento médico – Ecógrafo portátil</td>
-                <td><span class="badge-tipo-traslado">Equipamiento</span></td>
-                <td>Auto 12</td>
-                <td>Centro de Salud Cerro</td>
-                <td>
-                  <span class="badge-estado b-prep">En preparación</span>
-                </td>
-                <td>
-                  <button class="btn-eye">
-                    <i class="bi bi-eye-fill"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>AMB-005</td>
-                <td>27/05/2026 06:15</td>
-                <td>Fernando López</td>
-                <td>Patricia Suárez</td>
-                <td>Muestras biológicas – Lab Central</td>
-                <td>
-                  <span class="badge-tipo-traslado">Material biológico</span>
-                </td>
-                <td>Ambulancia 05</td>
-                <td>Laboratorio Central</td>
-                <td>
-                  <span class="badge-estado b-completado">Completado</span>
-                </td>
-                <td>
-                  <button class="btn-eye">
-                    <i class="bi bi-eye-fill"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>AMB-007</td>
-                <td>27/05/2026 10:30</td>
-                <td>Gabriel Torres</td>
-                <td>Mónica Benítez</td>
-                <td>Pedro Sánchez (CI: 3.456.789-0)</td>
-                <td><span class="badge-tipo-traslado">Paciente</span></td>
-                <td>Ambulancia 07</td>
-                <td>Hospital Saint Bois</td>
-                <td>
-                  <span class="badge-estado b-programado">Programado</span>
-                </td>
-                <td>
-                  <button class="btn-eye">
-                    <i class="bi bi-eye-fill"></i>
-                  </button>
+                <td colspan="10" class="text-center text-muted py-4">
+                  <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                  Cargando información desde la base de datos...
                 </td>
               </tr>
             </tbody>

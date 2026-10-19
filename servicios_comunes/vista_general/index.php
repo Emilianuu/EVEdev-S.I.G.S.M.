@@ -48,7 +48,7 @@ if (!isset($_SESSION['id_usuario'])) {
             <p class="page-desc">Seleccioná el módulo al que querés acceder. Cada sección es independiente y cuenta con control de acceso por rol.</p>
 
             <div class="modules-grid">
-                <a href="../../modulo_traslados/controlador/dashboard_controlador.php" class="module-card" style="--card-accent: var(--accent-traslado)">
+                <a href="../../modulo_traslados/vista/panel-de-gestion.php" class="module-card" style="--card-accent: var(--accent-traslado)">
                     <div class="card-icon"><i class="bi bi-truck"></i></div>
                     <div class="card-body">
                         <div class="card-label">Operaciones</div>
@@ -56,9 +56,6 @@ if (!isset($_SESSION['id_usuario'])) {
                         <p class="card-desc">Gestión de solicitudes, asignación de vehículos y seguimiento en tiempo real.</p>
                     </div>
                     <div class="card-footer-row">
-                        <div class="card-chips">
-                            <span class="chip">Conductor</span><span class="chip">Enfermero</span><span class="chip">Operador</span>
-                        </div>
                         <i class="bi bi-arrow-right card-arrow"></i>
                     </div>
                 </a>
@@ -71,7 +68,6 @@ if (!isset($_SESSION['id_usuario'])) {
                         <p class="card-desc">Administración de registros, documentos clínicos y configuración del sistema.</p>
                     </div>
                     <div class="card-footer-row">
-                        <div class="card-chips"><span class="chip">Administrador</span></div>
                         <i class="bi bi-arrow-right card-arrow"></i>
                     </div>
                 </a>

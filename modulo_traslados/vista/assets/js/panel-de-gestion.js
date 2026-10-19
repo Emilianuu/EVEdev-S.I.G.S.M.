@@ -262,4 +262,70 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+  /* --- CARGA DINÁMICA DE TRASLADOS DESDE LA BD --- */
+  cargarTraslados();
+
+  function cargarTraslados() {
+    // Apuntamos al Controlador Maestro y le decimos qué acción queremos
+    fetch("../controlador/traslado_controlador.php?accion=listar")
+      .then((respuesta) => {
+        if (!respuesta.ok)
+          throw new Error("Error en la respuesta del servidor");
+        return respuesta.json();
+      })
+      .then((datos) => {
+        const tbody = document.getElementById("tabla-traslados-body");
+        if (!tbody) return;
+
+        tbody.innerHTML = "";
+
+        if (datos.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="10" class="text-center text-muted py-4">No hay traslados registrados.</td></tr>';
+          return;
+        }
+
+        datos.forEach((t) => {
+          let claseEstado = "b-prep";
+          let textoEstado = t.estado || "Pendiente";
+          const estadoMin = textoEstado.toLowerCase();
+
+          if (estadoMin.includes("camino") || estadoMin.includes("transito"))
+            claseEstado = "b-transito";
+          else if (estadoMin.includes("completado"))
+            claseEstado = "b-completado";
+          else if (estadoMin.includes("asignado")) claseEstado = "b-programado";
+          else if (estadoMin.includes("cancelado")) claseEstado = "badge-red"; // Puedes definir esta clase en tu CSS
+
+          const tr = document.createElement("tr");
+
+          tr.innerHTML = `
+            <td><strong>AMB-${t.id_traslado || "N/A"}</strong></td>
+            <td>${t.fecha || ""} ${t.hora || ""}</td>
+            <td>${t.conductor || "-"}</td>
+            <td>${t.enfermero || "-"}</td>
+            <td>${t.descripcion || "-"}</td>
+            <td><span class="badge-tipo-traslado">${t.tipo_traslado || "Paciente"}</span></td>
+            <td>${t.vehiculo || "-"}</td>
+            <td>${t.destino || "-"}</td>
+            <td>
+              <span class="badge-estado ${claseEstado}">${textoEstado.replace("_", " ")}</span>
+            </td>
+            <td>
+              <button class="btn-eye" title="Ver detalles">
+                <i class="bi bi-eye-fill"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch((error) => {
+        console.error("Error consultando BD:", error);
+        const tbody = document.getElementById("tabla-traslados-body");
+        if (tbody)
+          tbody.innerHTML =
+            '<tr><td colspan="10" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle"></i> Error al cargar los datos desde el servidor.</td></tr>';
+      });
+  }
 });
