@@ -155,42 +155,25 @@ CREATE TABLE CANAL_SOLICITUD (
     CONSTRAINT uq_canal_nombre UNIQUE (nombre)
 ) ENGINE = InnoDB;
 
-CREATE TABLE TIPO_ELEMENTO (
-    id_tipo_elemento INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion VARCHAR(255) NULL,
-    CONSTRAINT uq_tipoelemento_nombre UNIQUE (nombre)
-) ENGINE = InnoDB;
-
+-- Se eliminó TIPO_ELEMENTO y COMPATIBILIDAD. 
+-- Ahora las capacidades son atributos del vehículo.
 CREATE TABLE TIPO_VEHICULO (
     id_tipo_vehiculo INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion VARCHAR(255) NULL,
+    apto_silla_ruedas BOOLEAN NOT NULL DEFAULT FALSE,
+    apto_camilla BOOLEAN NOT NULL DEFAULT FALSE,
+    apto_uti BOOLEAN NOT NULL DEFAULT FALSE,
+    apto_biologico BOOLEAN NOT NULL DEFAULT FALSE,
+    apto_insumos BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT uq_tipovehiculo_nombre UNIQUE (nombre)
-) ENGINE = InnoDB;
-
-CREATE TABLE COMPATIBILIDAD (
-    id_tipo_vehiculo INT NOT NULL,
-    id_tipo_elemento INT NOT NULL,
-    observaciones VARCHAR(255) NULL,
-    PRIMARY KEY (
-        id_tipo_vehiculo,
-        id_tipo_elemento
-    ),
-    CONSTRAINT fk_compat_tipovehiculo FOREIGN KEY (id_tipo_vehiculo) REFERENCES TIPO_VEHICULO (id_tipo_vehiculo) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_compat_tipoelemento FOREIGN KEY (id_tipo_elemento) REFERENCES TIPO_ELEMENTO (id_tipo_elemento) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE UBICACION (
     id_ubicacion INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(150) NOT NULL,
     direccion VARCHAR(255) NOT NULL,
-    tipo_ubicacion ENUM(
-        'HOSPITAL',
-        'CLINICA',
-        'DOMICILIO',
-        'OTRO'
-    ) NOT NULL
+    tipo_ubicacion ENUM('HOSPITAL','CLINICA','DOMICILIO','OTRO') NOT NULL
 ) ENGINE = InnoDB;
 
 CREATE TABLE RUTA (
@@ -202,34 +185,28 @@ CREATE TABLE RUTA (
     CONSTRAINT fk_ruta_origen FOREIGN KEY (id_origen) REFERENCES UBICACION (id_ubicacion) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_ruta_destino FOREIGN KEY (id_destino) REFERENCES UBICACION (id_ubicacion) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT chk_ruta_distancia CHECK (distancia_km > 0)
-    -- Nota: id_origen <> id_destino se valida por trigger (son columnas FK;
-    -- MariaDB no admite CHECK sobre columnas que participan de una FK).
 ) ENGINE = InnoDB;
 
+-- SOLICITUD DE TRASLADO completamente normalizada
 CREATE TABLE SOLICITUD_TRASLADO (
     id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
-    ci_paciente VARCHAR(15) NOT NULL,
-    id_tipo_elemento INT NOT NULL,
+    categoria_traslado ENUM('PACIENTE', 'MATERIAL_BIOLOGICO', 'EQUIPAMIENTO', 'INSUMOS') NOT NULL,
+    ci_paciente VARCHAR(15) NULL,         -- NULL si es un objeto/logística
+    detalle_carga VARCHAR(255) NULL,      -- Ej: "Tubo de sangre", "Ecógrafo" (NULL si es paciente)
+    tipo_movilidad ENUM('AMBULATORIO', 'SILLA_RUEDAS', 'CAMILLA', 'NO_APLICA') NOT NULL,
+    requiere_soporte_uti BOOLEAN NOT NULL DEFAULT FALSE,
     id_origen INT NOT NULL,
     id_destino INT NOT NULL,
     id_canal INT NOT NULL,
     id_usuario_solicit INT NOT NULL,
     fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     motivo VARCHAR(255) NOT NULL,
-    estado_solicitud ENUM(
-        'PENDIENTE',
-        'ASIGNADA',
-        'CANCELADA',
-        'COMPLETADA'
-    ) NOT NULL DEFAULT 'PENDIENTE',
+    estado_solicitud ENUM('PENDIENTE', 'ASIGNADA', 'CANCELADA', 'COMPLETADA') NOT NULL DEFAULT 'PENDIENTE',
     CONSTRAINT fk_solicitud_paciente FOREIGN KEY (ci_paciente) REFERENCES PACIENTE (ci) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_solicitud_tipoelemento FOREIGN KEY (id_tipo_elemento) REFERENCES TIPO_ELEMENTO (id_tipo_elemento) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_solicitud_origen FOREIGN KEY (id_origen) REFERENCES UBICACION (id_ubicacion) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_solicitud_destino FOREIGN KEY (id_destino) REFERENCES UBICACION (id_ubicacion) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_solicitud_canal FOREIGN KEY (id_canal) REFERENCES CANAL_SOLICITUD (id_canal) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_solicitud_usuario FOREIGN KEY (id_usuario_solicit) REFERENCES USUARIO (id_usuario) ON DELETE RESTRICT ON UPDATE CASCADE
-    -- Nota: id_origen <> id_destino se valida por trigger (son columnas FK;
-    -- MariaDB no admite CHECK sobre columnas que participan de una FK).
 ) ENGINE = InnoDB;
 
 CREATE TABLE VEHICULO (

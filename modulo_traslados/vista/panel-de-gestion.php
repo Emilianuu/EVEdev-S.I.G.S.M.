@@ -12,12 +12,46 @@ if (!isset($_SESSION['id_usuario'])) {
 // Rescatar los datos de la sesión
 $nombreSesion = $_SESSION['nombre_completo'] ?? 'Usuario';
 $emailSesion  = $_SESSION['email'] ?? '';
-
-// Calcular las iniciales para el círculo del avatar
 $palabras = explode(' ', trim($nombreSesion));
 $iniciales = '';
 if (isset($palabras[0])) $iniciales .= strtoupper(substr($palabras[0], 0, 1));
 if (isset($palabras[1])) $iniciales .= strtoupper(substr($palabras[1], 0, 1));
+
+// =======================================================================
+// CARGA DINÁMICA DE RECURSOS DESDE LA BD
+// =======================================================================
+require_once $_SERVER['DOCUMENT_ROOT'] . '/sigsm/servicios_comunes/conexion_BD/conexion.php';
+
+$vehiculosDisponibles = [];
+$conductoresDisponibles = [];
+$enfermerosDisponibles = [];
+$destinosDisponibles = [];
+
+try {
+  // 1. Vehículos (Solo los Disponibles)
+  $sqlVehiculos = "SELECT v.id_vehiculo, v.matricula, v.marca, v.modelo, 
+                            tv.nombre as tipo, tv.apto_silla_ruedas, tv.apto_camilla, 
+                            tv.apto_uti, tv.apto_biologico, tv.apto_insumos 
+                     FROM VEHICULO v 
+                     JOIN TIPO_VEHICULO tv ON v.id_tipo_vehiculo = tv.id_tipo_vehiculo 
+                     WHERE v.estado_disponibilidad = 'DISPONIBLE' AND v.activo = TRUE";
+  $vehiculosDisponibles = $conexion->query($sqlVehiculos)->fetchAll(PDO::FETCH_ASSOC);
+
+  // 2. Conductores (Activos)
+  $sqlConductores = "SELECT id_personal, nombre, apellido FROM PERSONAL WHERE rol_personal = 'CONDUCTOR' AND activo = TRUE";
+  $conductoresDisponibles = $conexion->query($sqlConductores)->fetchAll(PDO::FETCH_ASSOC);
+
+  // 3. Enfermeros (Activos)
+  $sqlEnfermeros = "SELECT id_personal, nombre, apellido FROM PERSONAL WHERE rol_personal = 'ENFERMERO' AND activo = TRUE";
+  $enfermerosDisponibles = $conexion->query($sqlEnfermeros)->fetchAll(PDO::FETCH_ASSOC);
+
+  // 4. Destinos (Cualquier ubicación que no sea el Hospital ID 1)
+  $sqlDestinos = "SELECT id_ubicacion, nombre, tipo_ubicacion FROM UBICACION WHERE id_ubicacion != 1";
+  $destinosDisponibles = $conexion->query($sqlDestinos)->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+  error_log("Error cargando listas dinámicas: " . $e->getMessage());
+}
+
 ?>
 <!doctype html>
 <html lang="es">
@@ -299,75 +333,64 @@ if (isset($palabras[1])) $iniciales .= strtoupper(substr($palabras[1], 0, 1));
           <!-- PASO 1: TIPO DE TRASLADO -->
           <div class="wizard-panel" data-step="1">
             <p class="wizard-subtitle">Seleccione el tipo de traslado</p>
-            <div class="d-flex flex-column gap-3 radio-group-container">
-              <label class="radio-label">
-                <input
-                  type="radio"
-                  name="tipo_traslado"
-                  value="paciente"
-                  checked
-                  class="radio-input" />
-                <span class="radio-text">Paciente (persona)</span>
-              </label>
-              <label class="radio-label">
-                <input
-                  type="radio"
-                  name="tipo_traslado"
-                  value="material_biologico"
-                  class="radio-input" />
-                <span class="radio-text">Material biológico (muestras, órganos)</span>
-              </label>
-              <label class="radio-label">
-                <input
-                  type="radio"
-                  name="tipo_traslado"
-                  value="equipamiento"
-                  class="radio-input" />
-                <span class="radio-text">Equipamiento médico o insumos</span>
-              </label>
+            <div class="col-md-12 mb-3">
+              <label class="form-label form-label-custom">Categoría <span class="text-danger">*</span></label>
+              <select class="form-select" name="categoria_traslado" id="categoria_traslado" required>
+                <option value="" selected disabled>Seleccione...</option>
+                <option value="PACIENTE">Paciente (Humano)</option>
+                <option value="MATERIAL_BIOLOGICO">Material Biológico / Órganos</option>
+                <option value="EQUIPAMIENTO">Equipamiento Médico</option>
+                <option value="INSUMOS">Insumos / Farmacia</option>
+              </select>
             </div>
             <div class="info-box mt-3">
               <i class="bi bi-info-circle-fill"></i>
-              El tipo de traslado determinará si se asigna una ambulancia u
-              otro vehículo.
+              La categoría determina si se requerirán datos clínicos o detalle de carga.
             </div>
           </div>
 
           <!-- PASO 2: DATOS DEL TRASLADO -->
           <div class="wizard-panel d-none" data-step="2">
-            <p class="wizard-subtitle">Información del Paciente / Elemento</p>
-            <div class="row g-3">
-              <div class="col-md-7">
-                <label class="form-label form-label-custom">Nombre Completo o Descripción
-                  <span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="descripcion"
-                  placeholder="Ej: Juan Pérez"
-                  required />
-                <div class="invalid-feedback">
-                  Por favor, ingrese un nombre o descripción.
+            <p class="wizard-subtitle">Información Específica</p>
+
+            <!-- Panel Dinámico: Paciente -->
+            <div id="seccion_paciente" class="d-none">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label form-label-custom">Cédula de Identidad <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="ci_paciente" id="ci_paciente" placeholder="Ej: 12345678">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label form-label-custom">Modo de Movilidad <span class="text-danger">*</span></label>
+                  <select class="form-select" name="tipo_movilidad" id="tipo_movilidad">
+                    <option value="AMBULATORIO">Ambulatorio (Camina)</option>
+                    <option value="SILLA_RUEDAS">Silla de Ruedas</option>
+                    <option value="CAMILLA">Camilla</option>
+                  </select>
+                </div>
+                <div class="col-12 mt-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="requiere_soporte_uti" id="requiere_soporte_uti" value="1">
+                    <label class="form-check-label text-danger fw-bold" for="requiere_soporte_uti">
+                      Requiere Soporte Vital / UTI
+                    </label>
+                  </div>
                 </div>
               </div>
-              <div class="col-md-5">
-                <label class="form-label form-label-custom">CI / ID <span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="identificador"
-                  placeholder="Ej: 1.234.567-8"
-                  required />
-                <div class="invalid-feedback">Este campo es obligatorio.</div>
-              </div>
+            </div>
+
+            <!-- Panel Dinámico: Logística -->
+            <div id="seccion_logistica" class="d-none">
               <div class="col-12">
-                <label class="form-label form-label-custom">Motivo del Traslado</label>
-                <textarea
-                  class="form-control"
-                  name="motivo"
-                  rows="2"
-                  placeholder="Detalles adicionales..."></textarea>
+                <label class="form-label form-label-custom">Detalle exacto de la carga <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="detalle_carga" id="detalle_carga" placeholder="Ej: 10 Tubos de sangre">
               </div>
+            </div>
+
+            <!-- Motivo General -->
+            <div class="col-12 mt-3">
+              <label class="form-label form-label-custom">Motivo del Traslado <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="motivo" rows="2" placeholder="Detalles adicionales..." required></textarea>
             </div>
           </div>
 
@@ -375,33 +398,52 @@ if (isset($palabras[1])) $iniciales .= strtoupper(substr($palabras[1], 0, 1));
           <div class="wizard-panel d-none" data-step="3">
             <p class="wizard-subtitle">Asignación de Vehículo y Personal</p>
             <div class="row g-3">
+
+              <!-- Vehículos Dinámicos -->
               <div class="col-md-4">
                 <label class="form-label form-label-custom">Vehículo <span class="text-danger">*</span></label>
-                <select class="form-select" name="vehiculo" required>
+                <select class="form-select" name="vehiculo" id="vehiculo_select" required>
                   <option value="" selected disabled>Seleccionar...</option>
-                  <option value="AMB-01">Ambulancia 01</option>
-                  <option value="AMB-03">Ambulancia 03</option>
-                  <option value="AUTO-10">Auto 10</option>
+                  <?php foreach ($vehiculosDisponibles as $v): ?>
+                    <option value="<?= $v['id_vehiculo'] ?>"
+                      data-sr="<?= $v['apto_silla_ruedas'] ?>"
+                      data-cam="<?= $v['apto_camilla'] ?>"
+                      data-uti="<?= $v['apto_uti'] ?>"
+                      data-bio="<?= $v['apto_biologico'] ?>"
+                      data-ins="<?= $v['apto_insumos'] ?>">
+                      <?= htmlspecialchars($v['tipo'] . ' - ' . $v['marca'] . ' ' . $v['modelo'] . ' (' . $v['matricula'] . ')') ?>
+                    </option>
+                  <?php endforeach; ?>
                 </select>
-                <div class="invalid-feedback">Seleccione un vehículo.</div>
+                <div id="vehiculo_warning" class="text-danger mt-1 d-none" style="font-size: 0.85rem;">No hay vehículos que cumplan los requisitos de esta categoría.</div>
               </div>
+
+              <!-- Conductores Dinámicos -->
               <div class="col-md-4">
                 <label class="form-label form-label-custom">Conductor <span class="text-danger">*</span></label>
                 <select class="form-select" name="conductor" required>
                   <option value="" selected disabled>Seleccionar...</option>
-                  <option value="1">Carlos Méndez</option>
-                  <option value="2">Roberto Silva</option>
+                  <?php foreach ($conductoresDisponibles as $c): ?>
+                    <option value="<?= $c['id_personal'] ?>">
+                      <?= htmlspecialchars($c['nombre'] . ' ' . $c['apellido']) ?>
+                    </option>
+                  <?php endforeach; ?>
                 </select>
-                <div class="invalid-feedback">Asigne un conductor.</div>
               </div>
+
+              <!-- Enfermeros Dinámicos -->
               <div class="col-md-4">
                 <label class="form-label form-label-custom">Enfermero</label>
                 <select class="form-select" name="enfermero">
                   <option value="" selected>Ninguno / No requiere</option>
-                  <option value="1">Ana García</option>
-                  <option value="2">Lucía Fernández</option>
+                  <?php foreach ($enfermerosDisponibles as $e): ?>
+                    <option value="<?= $e['id_personal'] ?>">
+                      <?= htmlspecialchars($e['nombre'] . ' ' . $e['apellido']) ?>
+                    </option>
+                  <?php endforeach; ?>
                 </select>
               </div>
+
             </div>
           </div>
 
@@ -409,42 +451,35 @@ if (isset($palabras[1])) $iniciales .= strtoupper(substr($palabras[1], 0, 1));
           <div class="wizard-panel d-none" data-step="4">
             <p class="wizard-subtitle">Establecer Origen, Destino y Hora</p>
             <div class="row g-3">
+
+              <!-- Origen Fijo (Bloqueado visualmente, envía ID 1) -->
               <div class="col-md-6">
-                <label class="form-label form-label-custom">Origen <span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="origen"
-                  value="Hospital de Clínicas"
-                  required />
-                <div class="invalid-feedback">Ingrese el origen.</div>
+                <label class="form-label form-label-custom">Origen</label>
+                <input type="text" class="form-control text-muted bg-light" value="Hospital de Clínicas" readonly />
+                <input type="hidden" name="origen" value="1" />
               </div>
+
+              <!-- Destinos Dinámicos -->
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Destino <span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="destino"
-                  placeholder="Ej: Hospital Maciel"
-                  required />
-                <div class="invalid-feedback">Ingrese el destino.</div>
+                <select class="form-select" name="destino" required>
+                  <option value="" selected disabled>Seleccionar destino...</option>
+                  <?php foreach ($destinosDisponibles as $d): ?>
+                    <option value="<?= $d['id_ubicacion'] ?>">
+                      <?= htmlspecialchars($d['nombre']) ?> (<?= htmlspecialchars($d['tipo_ubicacion']) ?>)
+                    </option>
+                  <?php endforeach; ?>
+                </select>
               </div>
+
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Fecha <span class="text-danger">*</span></label>
-                <input
-                  type="date"
-                  class="form-control"
-                  name="fecha"
-                  required />
+                <input type="date" class="form-control" name="fecha" required />
                 <div class="invalid-feedback">Seleccione una fecha.</div>
               </div>
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Hora estimada <span class="text-danger">*</span></label>
-                <input
-                  type="time"
-                  class="form-control"
-                  name="hora"
-                  required />
+                <input type="time" class="form-control" name="hora" required />
                 <div class="invalid-feedback">Seleccione una hora.</div>
               </div>
             </div>

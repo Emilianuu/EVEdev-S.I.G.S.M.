@@ -28,7 +28,20 @@ switch ($accion) {
         echo json_encode($traslados);
         break;
 
-    // Aquí abajo irás agregando más casos en el futuro (case 'guardar':, case 'eliminar':, etc.)
+    case 'guardar':
+        $datos = $_POST;
+        $id_usuario = $_SESSION['id_usuario']; // El usuario que hace la gestión
+
+        $resultado = TrasladoModelo::guardarTraslado($datos, $id_usuario);
+
+        header('Content-Type: application/json; charset=utf-8');
+        if ($resultado['status'] === 'success') {
+            echo json_encode($resultado);
+        } else {
+            http_response_code(500);
+            echo json_encode($resultado);
+        }
+        break;
 
     default:
         http_response_code(400);

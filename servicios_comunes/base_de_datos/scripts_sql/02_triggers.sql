@@ -98,52 +98,80 @@ END$$
 -- ser compatible con el tipo de elemento de la solicitud,
 -- y la ruta debe coincidir con el origen/destino de la solicitud.
 -- Además valida la exclusión mutua proveedor externo / personal propio (parte 1: proveedor + insert previo de personal no aplica aquí).
+
+-- 1. NUEVO: Asegura la coherencia de datos al crear una solicitud
+CREATE TRIGGER trg_solicitud_coherencia
+BEFORE INSERT ON SOLICITUD_TRASLADO
+FOR EACH ROW
+BEGIN
+    IF NEW.categoria_traslado = 'PACIENTE' THEN
+        IF NEW.ci_paciente IS NULL THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un traslado de paciente REQUIERE una cédula de paciente.';
+        END IF;
+    ELSE
+        -- Si es Biológico, Equipo o Insumo
+        IF NEW.ci_paciente IS NOT NULL THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un traslado logístico NO DEBE tener cédula de paciente.';
+        END IF;
+        IF NEW.detalle_carga IS NULL OR NEW.detalle_carga = '' THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Debe especificar qué objeto transporta en detalle_carga.';
+        END IF;
+        IF NEW.tipo_movilidad != 'NO_APLICA' THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Para objetos logísticos, el tipo de movilidad debe ser NO_APLICA.';
+        END IF;
+    END IF;
+END$$
+
+-- 2. ACTUALIZADO: Comprueba que el vehículo pueda llevar la carga/paciente
 CREATE TRIGGER trg_traslado_validaciones
 BEFORE INSERT ON TRASLADO
 FOR EACH ROW
 BEGIN
     DECLARE v_disponibilidad VARCHAR(20);
-    DECLARE v_tipo_vehiculo INT;
-    DECLARE v_tipo_elemento INT;
-    DECLARE v_compatibles INT;
-    DECLARE v_sol_origen INT;
-    DECLARE v_sol_destino INT;
-    DECLARE v_ruta_origen INT;
-    DECLARE v_ruta_destino INT;
+    DECLARE v_apto_sr, v_apto_cam, v_apto_uti, v_apto_bio, v_apto_ins BOOLEAN;
+    DECLARE v_cat ENUM('PACIENTE', 'MATERIAL_BIOLOGICO', 'EQUIPAMIENTO', 'INSUMOS');
+    DECLARE v_movilidad ENUM('AMBULATORIO', 'SILLA_RUEDAS', 'CAMILLA', 'NO_APLICA');
+    DECLARE v_uti BOOLEAN;
+    DECLARE v_sol_origen, v_sol_destino, v_ruta_origen, v_ruta_destino INT;
 
-    SELECT estado_disponibilidad, id_tipo_vehiculo
-      INTO v_disponibilidad, v_tipo_vehiculo
-      FROM VEHICULO WHERE id_vehiculo = NEW.id_vehiculo;
+    -- Datos del Vehículo
+    SELECT v.estado_disponibilidad, tv.apto_silla_ruedas, tv.apto_camilla, tv.apto_uti, tv.apto_biologico, tv.apto_insumos
+      INTO v_disponibilidad, v_apto_sr, v_apto_cam, v_apto_uti, v_apto_bio, v_apto_ins
+      FROM VEHICULO v JOIN TIPO_VEHICULO tv ON v.id_tipo_vehiculo = tv.id_tipo_vehiculo 
+     WHERE v.id_vehiculo = NEW.id_vehiculo;
 
     IF v_disponibilidad <> 'DISPONIBLE' THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'El vehículo asignado no está DISPONIBLE.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo asignado no está DISPONIBLE.';
     END IF;
 
-    SELECT id_tipo_elemento, id_origen, id_destino
-      INTO v_tipo_elemento, v_sol_origen, v_sol_destino
+    -- Datos de la Solicitud
+    SELECT categoria_traslado, tipo_movilidad, requiere_soporte_uti, id_origen, id_destino
+      INTO v_cat, v_movilidad, v_uti, v_sol_origen, v_sol_destino
       FROM SOLICITUD_TRASLADO WHERE id_solicitud = NEW.id_solicitud;
 
-    SELECT COUNT(*) INTO v_compatibles
-      FROM COMPATIBILIDAD
-     WHERE id_tipo_vehiculo = v_tipo_vehiculo
-       AND id_tipo_elemento = v_tipo_elemento;
-
-    IF v_compatibles = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'El tipo de vehículo no es compatible con el tipo de elemento solicitado.';
+    -- LÓGICA DE COMPATIBILIDAD DINÁMICA
+    IF v_cat = 'PACIENTE' THEN
+        IF v_uti = TRUE AND v_apto_uti = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo no tiene soporte UTI/Respirador.';
+        END IF;
+        IF v_movilidad = 'SILLA_RUEDAS' AND v_apto_sr = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo no está adaptado para silla de ruedas.';
+        END IF;
+        IF v_movilidad = 'CAMILLA' AND v_apto_cam = FALSE THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo no tiene espacio para camilla.';
+        END IF;
+    ELSEIF v_cat = 'MATERIAL_BIOLOGICO' AND v_apto_bio = FALSE THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo no cuenta con cadena de frío / permisos biológicos.';
+    ELSEIF v_cat IN ('EQUIPAMIENTO', 'INSUMOS') AND v_apto_ins = FALSE THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Vehículo no apto para logística pesada/voluminosa.';
     END IF;
 
-    SELECT id_origen, id_destino INTO v_ruta_origen, v_ruta_destino
-      FROM RUTA WHERE id_ruta = NEW.id_ruta;
-
+    -- Ruta
+    SELECT id_origen, id_destino INTO v_ruta_origen, v_ruta_destino FROM RUTA WHERE id_ruta = NEW.id_ruta;
     IF v_ruta_origen <> v_sol_origen OR v_ruta_destino <> v_sol_destino THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'La ruta asignada no coincide con el origen/destino de la solicitud.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La ruta asignada no coincide con el origen/destino de la solicitud.';
     END IF;
 
-    -- Marca el vehículo como EN_USO al asignarlo
-    UPDATE VEHICULO SET estado_disponibilidad = 'EN_USO' WHERE id_vehiculo = NEW.id_vehiculo;
 END$$
 
 -- Un traslado no puede tener proveedor externo y personal propio a la vez
@@ -207,24 +235,20 @@ BEGIN
     SELECT nombre INTO v_nombre_estado FROM ESTADO_TRASLADO WHERE id_estado = NEW.id_estado;
     SELECT id_solicitud INTO v_id_solicitud FROM TRASLADO WHERE id_traslado = NEW.id_traslado;
 
-    SET v_nuevo_estado_solicitud = CASE v_nombre_estado
-        WHEN 'ASIGNADO'    THEN 'ASIGNADA'
-        WHEN 'EN_CAMINO'   THEN 'ASIGNADA'
-        WHEN 'COMPLETADO'  THEN 'COMPLETADA'
-        WHEN 'CANCELADO'   THEN 'CANCELADA'
-        ELSE NULL
-    END;
-
     IF v_nuevo_estado_solicitud IS NOT NULL THEN
-        UPDATE SOLICITUD_TRASLADO
-           SET estado_solicitud = v_nuevo_estado_solicitud
-         WHERE id_solicitud = v_id_solicitud;
+        UPDATE SOLICITUD_TRASLADO SET estado_solicitud = v_nuevo_estado_solicitud WHERE id_solicitud = v_id_solicitud;
+    END IF;
+
+    -- NUEVO: Ocupa el vehículo solo cuando el traslado inicia realmente
+    IF v_nombre_estado = 'EN_CAMINO' THEN
+        UPDATE VEHICULO v JOIN TRASLADO t ON t.id_vehiculo = v.id_vehiculo
+           SET v.estado_disponibilidad = 'EN_USO'
+         WHERE t.id_traslado = NEW.id_traslado;
     END IF;
 
     -- Libera el vehículo cuando el traslado se completa o cancela
     IF v_nombre_estado IN ('COMPLETADO', 'CANCELADO') THEN
-        UPDATE VEHICULO v
-          JOIN TRASLADO t ON t.id_vehiculo = v.id_vehiculo
+        UPDATE VEHICULO v JOIN TRASLADO t ON t.id_vehiculo = v.id_vehiculo
            SET v.estado_disponibilidad = 'DISPONIBLE'
          WHERE t.id_traslado = NEW.id_traslado;
     END IF;

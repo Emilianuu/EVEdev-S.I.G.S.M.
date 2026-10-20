@@ -149,6 +149,91 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnNext = document.getElementById("btnNextStep");
     const btnSubmit = document.getElementById("btnSubmitForm");
 
+    const selectCategoria = document.getElementById("categoria_traslado");
+    const secPaciente = document.getElementById("seccion_paciente");
+    const secLogistica = document.getElementById("seccion_logistica");
+    const inputCi = document.getElementById("ci_paciente");
+    const selectMovilidad = document.getElementById("tipo_movilidad");
+    const inputDetalle = document.getElementById("detalle_carga");
+
+    if (selectCategoria) {
+      selectCategoria.addEventListener("change", function () {
+        const cat = this.value;
+        inputCi.required = false;
+        selectMovilidad.required = false;
+        inputDetalle.required = false;
+
+        if (cat === "PACIENTE") {
+          secPaciente.classList.remove("d-none");
+          secLogistica.classList.add("d-none");
+          inputCi.required = true;
+          selectMovilidad.required = true;
+        } else {
+          secPaciente.classList.add("d-none");
+          secLogistica.classList.remove("d-none");
+          inputDetalle.required = true;
+        }
+      });
+    }
+
+    function filtrarVehiculosCompatibles() {
+      const cat = document.getElementById("categoria_traslado")?.value;
+      const movilidad = document.getElementById("tipo_movilidad")
+        ? document.getElementById("tipo_movilidad").value
+        : "NO_APLICA";
+      const reqUti = document.getElementById("requiere_soporte_uti")
+        ? document.getElementById("requiere_soporte_uti").checked
+        : false;
+
+      const selectVehiculo = document.getElementById("vehiculo_select");
+      if (!selectVehiculo) return;
+
+      const opciones = selectVehiculo.querySelectorAll(
+        'option:not([value=""])',
+      );
+      let vehiculosValidos = 0;
+
+      opciones.forEach((opt) => {
+        let esCompatible = true;
+        if (cat === "PACIENTE") {
+          if (reqUti && opt.getAttribute("data-uti") == "0")
+            esCompatible = false;
+          if (
+            movilidad === "SILLA_RUEDAS" &&
+            opt.getAttribute("data-sr") == "0"
+          )
+            esCompatible = false;
+          if (movilidad === "CAMILLA" && opt.getAttribute("data-cam") == "0")
+            esCompatible = false;
+        } else if (cat === "MATERIAL_BIOLOGICO") {
+          if (opt.getAttribute("data-bio") == "0") esCompatible = false;
+        } else if (cat === "EQUIPAMIENTO" || cat === "INSUMOS") {
+          if (opt.getAttribute("data-ins") == "0") esCompatible = false;
+        }
+
+        if (esCompatible) {
+          opt.disabled = false;
+          opt.text = opt.text.replace(" (No compatible)", "");
+          vehiculosValidos++;
+        } else {
+          opt.disabled = true;
+          if (!opt.text.includes("(No compatible)"))
+            opt.text += " (No compatible)";
+        }
+      });
+
+      if (
+        selectVehiculo.selectedIndex > 0 &&
+        selectVehiculo.options[selectVehiculo.selectedIndex].disabled
+      ) {
+        selectVehiculo.value = "";
+      }
+
+      document
+        .getElementById("vehiculo_warning")
+        ?.classList.toggle("d-none", vehiculosValidos > 0);
+    }
+
     // Función para actualizar la vista de los pasos
     function updateWizard() {
       // Mostrar y ocultar paneles
@@ -159,6 +244,8 @@ document.addEventListener("DOMContentLoaded", () => {
           panel.classList.add("d-none");
         }
       });
+
+      if (currentStep === 3) filtrarVehiculosCompatibles();
 
       // Actualizar bolitas de progreso superiores
       stepsIndicators.forEach((step, index) => {
@@ -229,36 +316,48 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault(); // Evita recargar la página
 
       if (validateCurrentStep()) {
-        // --- AQUÍ RECOPILAMOS LOS DATOS PARA LA BASE DE DATOS ---
         const formData = new FormData(formWizard);
-        const dataParaBaseDeDatos = Object.fromEntries(formData.entries());
 
-        console.log(
-          "Datos capturados listos para enviar:",
-          dataParaBaseDeDatos,
-        );
+        // Le indicamos al controlador que la acción ahora es "guardar"
+        formData.append("accion", "guardar");
 
-        /* 
-          Aquí iría tu lógica Fetch/AJAX para enviar 'dataParaBaseDeDatos' al backend (Node, PHP, Python, etc.)
-          Ejemplo:
-          fetch('/api/traslados', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dataParaBaseDeDatos)
+        // Efecto visual de carga en el botón
+        const btnSubmit = document.getElementById("btnSubmitForm");
+        btnSubmit.innerHTML =
+          '<i class="spinner-border spinner-border-sm"></i> GUARDANDO...';
+        btnSubmit.disabled = true;
+
+        fetch("../controlador/traslado_controlador.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            btnSubmit.innerHTML =
+              '<i class="bi bi-floppy"></i> GUARDAR TRASLADO';
+            btnSubmit.disabled = false;
+
+            if (data.status === "success") {
+              alert("¡Traslado guardado con éxito!");
+
+              formWizard.reset();
+              currentStep = 1;
+              updateWizard();
+
+              // Recargamos la tabla de traslados y mandamos al usuario allí
+              document.querySelector('[data-view="traslados"]').click();
+              cargarTraslados();
+            } else {
+              alert("Error del servidor: " + data.mensaje);
+            }
           })
-        */
-
-        // Feedback al usuario y reinicio del formulario
-        alert(
-          "¡Traslado validado y listo para guardar! (Revisa la consola para ver el JSON)",
-        );
-
-        formWizard.reset();
-        currentStep = 1;
-        updateWizard();
-
-        // Opcional: Redirigir a la vista de "Traslados"
-        document.querySelector('[data-view="traslados"]').click();
+          .catch((err) => {
+            console.error(err);
+            alert("Error de conexión. Verifica la consola.");
+            btnSubmit.innerHTML =
+              '<i class="bi bi-floppy"></i> GUARDAR TRASLADO';
+            btnSubmit.disabled = false;
+          });
       }
     });
   }
@@ -304,7 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${t.fecha || ""} ${t.hora || ""}</td>
             <td>${t.conductor || "-"}</td>
             <td>${t.enfermero || "-"}</td>
-            <td>${t.descripcion || "-"}</td>
+            <td>${t.paciente_elemento || "-"}</td>
             <td><span class="badge-tipo-traslado">${t.tipo_traslado || "Paciente"}</span></td>
             <td>${t.vehiculo || "-"}</td>
             <td>${t.destino || "-"}</td>
