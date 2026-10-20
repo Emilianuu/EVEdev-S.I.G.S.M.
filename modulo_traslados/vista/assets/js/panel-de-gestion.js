@@ -269,6 +269,60 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Función para validar que los datos del paso actual estén completos
+    // Función para mostrar alertas elegantes en pantalla (reemplaza a los alert() del navegador)
+    function mostrarAlerta(mensaje, tipo = "danger") {
+      const container = document.getElementById("form-alert-container");
+      if (!container) return;
+
+      const icono =
+        tipo === "success"
+          ? "bi-check-circle-fill"
+          : "bi-exclamation-triangle-fill";
+
+      container.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show d-flex align-items-center mt-4 mb-3" role="alert">
+          <i class="bi ${icono} me-2 fs-5"></i>
+          <div>${mensaje}</div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      `;
+
+      // Si es un éxito, la alerta desaparece sola después de 5 segundos
+      if (tipo === "success") {
+        setTimeout(() => {
+          container.innerHTML = "";
+        }, 5000);
+      }
+    }
+
+    // Función de Validación Mejorada
+    // Función para mostrar alertas elegantes en pantalla (reemplaza a los alert() del navegador)
+    function mostrarAlerta(mensaje, tipo = "danger") {
+      const container = document.getElementById("form-alert-container");
+      if (!container) return;
+
+      const icono =
+        tipo === "success"
+          ? "bi-check-circle-fill"
+          : "bi-exclamation-triangle-fill";
+
+      container.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+          <i class="bi ${icono} me-2 fs-5"></i>
+          <div>${mensaje}</div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      `;
+
+      // Si es un éxito, la alerta desaparece sola después de 5 segundos
+      if (tipo === "success") {
+        setTimeout(() => {
+          container.innerHTML = "";
+        }, 5000);
+      }
+    }
+
+    // Función de Validación Mejorada
     function validateCurrentStep() {
       const currentPanel = formWizard.querySelector(
         `.wizard-panel[data-step="${currentStep}"]`,
@@ -278,14 +332,61 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       let isValid = true;
 
+      // 1. Validación base de HTML5 (campos vacíos)
       inputs.forEach((input) => {
-        if (!input.checkValidity()) {
+        if (!input.checkValidity() || input.value.trim() === "") {
           isValid = false;
           input.classList.add("is-invalid");
         } else {
           input.classList.remove("is-invalid");
         }
       });
+
+      // 2. Validaciones Específicas por Paso
+      if (currentStep === 2) {
+        const cat = document.getElementById("categoria_traslado")?.value;
+        if (cat === "PACIENTE") {
+          const ciInput = document.getElementById("ci_paciente");
+          if (ciInput && ciInput.value) {
+            // Limpia todo lo que no sea número y verifica que tenga al menos 7 u 8 dígitos
+            const ciLimpia = ciInput.value.replace(/[^0-9]/g, "");
+            if (ciLimpia.length < 7 || ciLimpia.length > 8) {
+              isValid = false;
+              ciInput.classList.add("is-invalid");
+              document.getElementById("feedback-ci").textContent =
+                "La cédula debe contener 7 u 8 números.";
+            } else {
+              ciInput.value = ciLimpia; // formatea el input para enviarlo limpio al servidor
+            }
+          }
+        }
+      }
+
+      if (currentStep === 4) {
+        const fechaInput = currentPanel.querySelector('input[name="fecha"]');
+        if (fechaInput && fechaInput.value) {
+          // Evitar que programen traslados en el pasado (ayer o antes)
+          const fechaSeleccionada = fechaInput.value;
+          const fechaHoy = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD local
+
+          if (fechaSeleccionada < fechaHoy) {
+            isValid = false;
+            fechaInput.classList.add("is-invalid");
+            fechaInput.nextElementSibling.textContent =
+              "No puede programar un traslado en una fecha pasada.";
+          }
+        }
+      }
+
+      // Si algo falló, mostramos un aviso rápido
+      if (!isValid) {
+        mostrarAlerta(
+          "Por favor, revise los campos marcados en rojo.",
+          "warning",
+        );
+      } else {
+        document.getElementById("form-alert-container").innerHTML = ""; // Limpiar alertas previas
+      }
 
       return isValid;
     }
@@ -311,20 +412,18 @@ document.addEventListener("DOMContentLoaded", () => {
       updateWizard();
     });
 
-    // Acción botón Guardar (Submit final)
+    // Acción botón Guardar (Submit final mejorado)
     formWizard.addEventListener("submit", (e) => {
-      e.preventDefault(); // Evita recargar la página
+      e.preventDefault();
 
       if (validateCurrentStep()) {
         const formData = new FormData(formWizard);
-
-        // Le indicamos al controlador que la acción ahora es "guardar"
         formData.append("accion", "guardar");
 
-        // Efecto visual de carga en el botón
         const btnSubmit = document.getElementById("btnSubmitForm");
+        const textoOriginal = btnSubmit.innerHTML;
         btnSubmit.innerHTML =
-          '<i class="spinner-border spinner-border-sm"></i> GUARDANDO...';
+          '<span class="spinner-border spinner-border-sm me-2"></span> GUARDANDO...';
         btnSubmit.disabled = true;
 
         fetch("../controlador/traslado_controlador.php", {
@@ -333,29 +432,34 @@ document.addEventListener("DOMContentLoaded", () => {
         })
           .then((res) => res.json())
           .then((data) => {
-            btnSubmit.innerHTML =
-              '<i class="bi bi-floppy"></i> GUARDAR TRASLADO';
+            btnSubmit.innerHTML = textoOriginal;
             btnSubmit.disabled = false;
 
             if (data.status === "success") {
-              alert("¡Traslado guardado con éxito!");
+              // ALERTA VISUAL DE ÉXITO (Sin popup del navegador)
+              mostrarAlerta(
+                "¡Traslado guardado y asignado exitosamente!",
+                "success",
+              );
 
               formWizard.reset();
               currentStep = 1;
               updateWizard();
 
-              // Recargamos la tabla de traslados y mandamos al usuario allí
-              document.querySelector('[data-view="traslados"]').click();
-              cargarTraslados();
+              // Redirigir a la vista de tabla suavemente
+              setTimeout(() => {
+                document.querySelector('[data-view="traslados"]').click();
+                cargarTraslados();
+              }, 1500); // Esperamos 1.5s para que vea el mensaje verde antes de cambiar de pantalla
             } else {
-              alert("Error del servidor: " + data.mensaje);
+              // ERROR DESDE EL SERVIDOR
+              mostrarAlerta("Error del servidor: " + data.mensaje, "danger");
             }
           })
           .catch((err) => {
             console.error(err);
-            alert("Error de conexión. Verifica la consola.");
-            btnSubmit.innerHTML =
-              '<i class="bi bi-floppy"></i> GUARDAR TRASLADO';
+            mostrarAlerta("Error de conexión. Verifica la consola.", "danger");
+            btnSubmit.innerHTML = textoOriginal;
             btnSubmit.disabled = false;
           });
       }

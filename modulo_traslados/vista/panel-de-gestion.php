@@ -359,6 +359,7 @@ try {
                 <div class="col-md-6">
                   <label class="form-label form-label-custom">Cédula de Identidad <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" name="ci_paciente" id="ci_paciente" placeholder="Ej: 12345678">
+                  <div class="invalid-feedback" id="feedback-ci">Por favor, ingrese una cédula válida (sin puntos ni guiones).</div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label form-label-custom">Modo de Movilidad <span class="text-danger">*</span></label>
@@ -484,6 +485,9 @@ try {
               </div>
             </div>
           </div>
+
+          <!-- CONTENEDOR DE ALERTAS INLINE -->
+          <div id="form-alert-container"></div>
 
           <!-- BOTONERA DE NAVEGACIÓN -->
           <div
