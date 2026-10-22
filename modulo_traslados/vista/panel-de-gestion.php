@@ -48,6 +48,53 @@ try {
   // 4. Destinos (Cualquier ubicación que no sea el Hospital ID 1)
   $sqlDestinos = "SELECT id_ubicacion, nombre, tipo_ubicacion FROM UBICACION WHERE id_ubicacion != 1";
   $destinosDisponibles = $conexion->query($sqlDestinos)->fetchAll(PDO::FETCH_ASSOC);
+
+  // =========================================================
+  // DATOS PARA LA PESTAÑA "RECURSOS" (TODOS LOS REGISTROS)
+  // =========================================================
+
+  // VEHÍCULOS (Todos, con su estado y conductor si están en uso)
+  $sqlTodosVehiculos = "SELECT v.id_vehiculo, v.matricula, tv.nombre as tipo, v.estado_disponibilidad,
+                          (SELECT CONCAT(p.nombre, ' ', p.apellido) 
+                           FROM PERSONAL p JOIN TRASLADO t ON t.id_vehiculo = v.id_vehiculo 
+                           JOIN PERSONAL_TRASLADO pt ON pt.id_traslado = t.id_traslado 
+                           WHERE pt.id_personal = p.id_personal AND pt.rol_en_traslado = 'CONDUCTOR' 
+                           AND v.estado_disponibilidad = 'EN_USO' ORDER BY t.id_traslado DESC LIMIT 1) as conductor_asignado
+                        FROM VEHICULO v 
+                        JOIN TIPO_VEHICULO tv ON v.id_tipo_vehiculo = tv.id_tipo_vehiculo";
+  $todosVehiculos = $conexion->query($sqlTodosVehiculos)->fetchAll(PDO::FETCH_ASSOC);
+  $vehiculosTotales = count($todosVehiculos);
+  $vehiculosDispCount = count(array_filter($todosVehiculos, function ($v) {
+    return $v['estado_disponibilidad'] === 'DISPONIBLE';
+  }));
+
+  // CONDUCTORES (Todos)
+  $sqlTodosConductores = "SELECT p.id_personal, p.nombre, p.apellido, p.ci, p.activo,
+                            (SELECT v.matricula 
+                             FROM VEHICULO v JOIN TRASLADO t ON t.id_vehiculo = v.id_vehiculo 
+                             JOIN PERSONAL_TRASLADO pt ON pt.id_traslado = t.id_traslado 
+                             WHERE pt.id_personal = p.id_personal AND pt.rol_en_traslado = 'CONDUCTOR' 
+                             AND v.estado_disponibilidad = 'EN_USO' ORDER BY t.id_traslado DESC LIMIT 1) as vehiculo_asignado
+                          FROM PERSONAL p WHERE p.rol_personal = 'CONDUCTOR'";
+  $todosConductores = $conexion->query($sqlTodosConductores)->fetchAll(PDO::FETCH_ASSOC);
+  $conductoresTotales = count($todosConductores);
+  $conductoresDispCount = count(array_filter($todosConductores, function ($c) {
+    return $c['activo'] == 1 && empty($c['vehiculo_asignado']);
+  }));
+
+  // ENFERMEROS (Todos)
+  $sqlTodosEnfermeros = "SELECT p.id_personal, p.nombre, p.apellido, p.ci, p.activo,
+                           (SELECT t.id_traslado 
+                            FROM TRASLADO t JOIN PERSONAL_TRASLADO pt ON pt.id_traslado = t.id_traslado 
+                            JOIN VEHICULO v ON t.id_vehiculo = v.id_vehiculo
+                            WHERE pt.id_personal = p.id_personal AND pt.rol_en_traslado = 'ENFERMERO' 
+                            AND v.estado_disponibilidad = 'EN_USO' ORDER BY t.id_traslado DESC LIMIT 1) as traslado_asignado
+                         FROM PERSONAL p WHERE p.rol_personal = 'ENFERMERO'";
+  $todosEnfermeros = $conexion->query($sqlTodosEnfermeros)->fetchAll(PDO::FETCH_ASSOC);
+  $enfermerosTotales = count($todosEnfermeros);
+  $enfermerosDispCount = count(array_filter($todosEnfermeros, function ($e) {
+    return $e['activo'] == 1 && empty($e['traslado_asignado']);
+  }));
 } catch (Exception $e) {
   error_log("Error cargando listas dinámicas: " . $e->getMessage());
 }
@@ -656,15 +703,16 @@ try {
     </section>
 
     <!-- RECURSOS -->
+    <!-- RECURSOS -->
     <section class="view" id="view-recursos">
       <div class="page-title">Gestión de Recursos</div>
 
-      <!-- Stat cards -->
+      <!-- Stat cards (Dinámicas) -->
       <div class="row g-3 mb-4">
         <div class="col-12 col-sm-4">
           <div class="stat-card">
             <div>
-              <div class="stat-value">2/6</div>
+              <div class="stat-value"><?= $vehiculosDispCount ?>/<?= $vehiculosTotales ?></div>
               <div class="stat-label">Vehículos Totales</div>
               <div class="stat-sub">Disponibles</div>
             </div>
@@ -676,7 +724,7 @@ try {
         <div class="col-12 col-sm-4">
           <div class="stat-card">
             <div>
-              <div class="stat-value">2/5</div>
+              <div class="stat-value"><?= $conductoresDispCount ?>/<?= $conductoresTotales ?></div>
               <div class="stat-label">Conductores</div>
               <div class="stat-sub">Disponibles</div>
             </div>
@@ -688,7 +736,7 @@ try {
         <div class="col-12 col-sm-4">
           <div class="stat-card">
             <div>
-              <div class="stat-value">3/5</div>
+              <div class="stat-value"><?= $enfermerosDispCount ?>/<?= $enfermerosTotales ?></div>
               <div class="stat-label">Enfermeros</div>
               <div class="stat-sub">Disponibles</div>
             </div>
@@ -703,9 +751,7 @@ try {
       <div class="section-card p-0 overflow-hidden">
         <div class="px-3 pt-3">
           <div class="tab-pill-bar">
-            <div class="tab-pill active" data-tab="tab-vehiculos">
-              VEHÍCULOS
-            </div>
+            <div class="tab-pill active" data-tab="tab-vehiculos">VEHÍCULOS</div>
             <div class="tab-pill" data-tab="tab-conductores">CONDUCTORES</div>
             <div class="tab-pill" data-tab="tab-enfermeros">ENFERMEROS</div>
           </div>
@@ -725,70 +771,21 @@ try {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Ambulancia 01</td>
-                  <td>
-                    <span class="badge-tipo bt-ambulancia">Ambulancia</span>
-                  </td>
-                  <td>ABC 1234</td>
-                  <td>
-                    <span class="badge-estado b-servicio">En servicio</span>
-                  </td>
-                  <td>Carlos Méndez</td>
-                </tr>
-                <tr>
-                  <td>Ambulancia 03</td>
-                  <td>
-                    <span class="badge-tipo bt-ambulancia">Ambulancia</span>
-                  </td>
-                  <td>DEF 5678</td>
-                  <td>
-                    <span class="badge-estado b-disponible"><i class="bi bi-check-circle-fill"></i>
-                      Disponible</span>
-                  </td>
-                  <td>–</td>
-                </tr>
-                <tr>
-                  <td>Ambulancia 05</td>
-                  <td>
-                    <span class="badge-tipo bt-ambulancia">Ambulancia</span>
-                  </td>
-                  <td>GHI 9012</td>
-                  <td>
-                    <span class="badge-estado b-servicio">En servicio</span>
-                  </td>
-                  <td>Fernando López</td>
-                </tr>
-                <tr>
-                  <td>Ambulancia 07</td>
-                  <td>
-                    <span class="badge-tipo bt-ambulancia">Ambulancia</span>
-                  </td>
-                  <td>JKL 3456</td>
-                  <td>
-                    <span class="badge-estado b-mant">En mantenimiento</span>
-                  </td>
-                  <td>–</td>
-                </tr>
-                <tr>
-                  <td>Auto 10</td>
-                  <td><span class="badge-tipo bt-auto">Auto</span></td>
-                  <td>MNO 7890</td>
-                  <td>
-                    <span class="badge-estado b-disponible"><i class="bi bi-check-circle-fill"></i>
-                      Disponible</span>
-                  </td>
-                  <td>–</td>
-                </tr>
-                <tr>
-                  <td>Auto 12</td>
-                  <td><span class="badge-tipo bt-auto">Auto</span></td>
-                  <td>PQR 1234</td>
-                  <td>
-                    <span class="badge-estado b-servicio">En servicio</span>
-                  </td>
-                  <td>Diego Martínez</td>
-                </tr>
+                <?php foreach ($todosVehiculos as $v): ?>
+                  <?php
+                  $estado = $v['estado_disponibilidad'];
+                  $badgeClass = $estado === 'DISPONIBLE' ? 'b-disponible' : ($estado === 'EN_USO' ? 'b-servicio' : 'b-mant');
+                  $estadoTxt = $estado === 'DISPONIBLE' ? '<i class="bi bi-check-circle-fill"></i> Disponible' : str_replace('_', ' ', $estado);
+                  $tipoClass = stripos($v['tipo'], 'Ambulancia') !== false ? 'bt-ambulancia' : 'bt-auto';
+                  ?>
+                  <tr>
+                    <td>VEH-<?= $v['id_vehiculo'] ?></td>
+                    <td><span class="badge-tipo <?= $tipoClass ?>"><?= htmlspecialchars($v['tipo']) ?></span></td>
+                    <td><?= htmlspecialchars($v['matricula']) ?></td>
+                    <td><span class="badge-estado <?= $badgeClass ?>"><?= ucfirst(strtolower($estadoTxt)) ?></span></td>
+                    <td><?= $v['conductor_asignado'] ? htmlspecialchars($v['conductor_asignado']) : '–' ?></td>
+                  </tr>
+                <?php endforeach; ?>
               </tbody>
             </table>
           </div>
@@ -807,48 +804,19 @@ try {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Carlos Méndez</td>
-                  <td>1.111.111-1</td>
-                  <td>
-                    <span class="badge-estado b-servicio">En servicio</span>
-                  </td>
-                  <td>Ambulancia 01</td>
-                </tr>
-                <tr>
-                  <td>Roberto Silva</td>
-                  <td>2.222.222-2</td>
-                  <td>
-                    <span class="badge-estado b-disponible"><i class="bi bi-check-circle-fill"></i>
-                      Disponible</span>
-                  </td>
-                  <td>–</td>
-                </tr>
-                <tr>
-                  <td>Diego Martínez</td>
-                  <td>3.333.333-3</td>
-                  <td>
-                    <span class="badge-estado b-servicio">En servicio</span>
-                  </td>
-                  <td>Auto 12</td>
-                </tr>
-                <tr>
-                  <td>Fernando López</td>
-                  <td>4.444.444-4</td>
-                  <td>
-                    <span class="badge-estado b-servicio">En servicio</span>
-                  </td>
-                  <td>Ambulancia 05</td>
-                </tr>
-                <tr>
-                  <td>Gabriel Torres</td>
-                  <td>5.555.555-5</td>
-                  <td>
-                    <span class="badge-estado b-disponible"><i class="bi bi-check-circle-fill"></i>
-                      Disponible</span>
-                  </td>
-                  <td>–</td>
-                </tr>
+                <?php foreach ($todosConductores as $c): ?>
+                  <?php
+                  $enUso = !empty($c['vehiculo_asignado']);
+                  $badgeClass = $enUso ? 'b-servicio' : ($c['activo'] ? 'b-disponible' : 'b-mant');
+                  $estadoTxt = $enUso ? 'En servicio' : ($c['activo'] ? '<i class="bi bi-check-circle-fill"></i> Disponible' : 'Inactivo');
+                  ?>
+                  <tr>
+                    <td><?= htmlspecialchars($c['nombre'] . ' ' . $c['apellido']) ?></td>
+                    <td><?= htmlspecialchars($c['ci']) ?></td>
+                    <td><span class="badge-estado <?= $badgeClass ?>"><?= $estadoTxt ?></span></td>
+                    <td><?= $enUso ? htmlspecialchars($c['vehiculo_asignado']) : '–' ?></td>
+                  </tr>
+                <?php endforeach; ?>
               </tbody>
             </table>
           </div>
@@ -867,48 +835,19 @@ try {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Ana García</td>
-                  <td>6.666.666-6</td>
-                  <td>
-                    <span class="badge-estado b-servicio">En servicio</span>
-                  </td>
-                  <td>AMB-001</td>
-                </tr>
-                <tr>
-                  <td>Lucía Fernández</td>
-                  <td>7.777.777-7</td>
-                  <td>
-                    <span class="badge-estado b-disponible"><i class="bi bi-check-circle-fill"></i>
-                      Disponible</span>
-                  </td>
-                  <td>–</td>
-                </tr>
-                <tr>
-                  <td>Patricia Suárez</td>
-                  <td>8.888.888-8</td>
-                  <td>
-                    <span class="badge-estado b-servicio">En servicio</span>
-                  </td>
-                  <td>AMB-005</td>
-                </tr>
-                <tr>
-                  <td>Mónica Benítez</td>
-                  <td>9.999.999-9</td>
-                  <td>
-                    <span class="badge-estado b-disponible"><i class="bi bi-check-circle-fill"></i>
-                      Disponible</span>
-                  </td>
-                  <td>–</td>
-                </tr>
-                <tr>
-                  <td>María Sosa</td>
-                  <td>1.234.567-8</td>
-                  <td>
-                    <span class="badge-estado b-servicio">En servicio</span>
-                  </td>
-                  <td>AMB-007</td>
-                </tr>
+                <?php foreach ($todosEnfermeros as $e): ?>
+                  <?php
+                  $enUso = !empty($e['traslado_asignado']);
+                  $badgeClass = $enUso ? 'b-servicio' : ($e['activo'] ? 'b-disponible' : 'b-mant');
+                  $estadoTxt = $enUso ? 'En servicio' : ($e['activo'] ? '<i class="bi bi-check-circle-fill"></i> Disponible' : 'Inactivo');
+                  ?>
+                  <tr>
+                    <td><?= htmlspecialchars($e['nombre'] . ' ' . $e['apellido']) ?></td>
+                    <td><?= htmlspecialchars($e['ci']) ?></td>
+                    <td><span class="badge-estado <?= $badgeClass ?>"><?= $estadoTxt ?></span></td>
+                    <td><?= $enUso ? 'ID Traslado: ' . htmlspecialchars($e['traslado_asignado']) : '–' ?></td>
+                  </tr>
+                <?php endforeach; ?>
               </tbody>
             </table>
           </div>
