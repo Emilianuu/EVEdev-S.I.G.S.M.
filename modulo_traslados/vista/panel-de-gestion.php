@@ -211,7 +211,7 @@ try {
         <div class="col-12 col-sm-6 col-xl-3">
           <div class="dash-card dc-blue">
             <div>
-              <div class="dc-val">8</div>
+              <div class="dc-val" id="dash-traslados-activos"><span class="spinner-border spinner-border-sm"></span></div>
               <div class="dc-label">Traslados Activos</div>
             </div>
             <i class="bi bi-plus-circle"></i>
@@ -238,7 +238,7 @@ try {
         <div class="col-12 col-sm-6 col-xl-3">
           <div class="dash-card dc-purple">
             <div>
-              <div class="dc-val">47</div>
+              <div class="dc-val" id="dash-traslados-dia"><span class="spinner-border spinner-border-sm"></span></div>
               <div class="dc-label">Traslados del Día</div>
             </div>
             <i class="bi bi-calendar3"></i>
@@ -247,47 +247,11 @@ try {
       </div>
 
       <div class="section-card">
-        <h5>Traslados Activos</h5>
-        <div class="traslado-card">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <div>
-              <h6>AMB-001 – Juan Pérez</h6>
-              <small>Destino: Hospital Maciel</small>
-            </div>
-            <span class="badge-estado b-transito">En tránsito</span>
+        <h5>Traslados Activos en Curso</h5>
+        <div id="dash-lista-activos">
+          <div class="text-center text-muted py-3">
+            <div class="spinner-border spinner-border-sm me-2"></div> Cargando traslados activos...
           </div>
-          <div class="progress progress-sm">
-            <div class="progress-bar progress-bar-primary" style="width: 65%"></div>
-          </div>
-          <small class="text-muted text-xs">Progreso: 65%</small>
-        </div>
-
-        <div class="traslado-card">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <div>
-              <h6>AMB-003 – María Rodríguez</h6>
-              <small>Destino: Sanatorio CASMU</small>
-            </div>
-            <span class="badge-estado b-transito">En tránsito</span>
-          </div>
-          <div class="progress progress-sm">
-            <div class="progress-bar progress-bar-primary" style="width: 30%"></div>
-          </div>
-          <small class="text-muted text-xs">Progreso: 30%</small>
-        </div>
-
-        <div class="traslado-card">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <div>
-              <h6>AUTO-012 – Equipamiento médico</h6>
-              <small>Destino: Centro de Salud Cerro</small>
-            </div>
-            <span class="badge-estado b-salida">Salida</span>
-          </div>
-          <div class="progress progress-sm">
-            <div class="progress-bar progress-bar-amber" style="width: 10%"></div>
-          </div>
-          <small class="text-muted text-xs">Progreso: 10%</small>
         </div>
       </div>
     </section>
@@ -535,104 +499,59 @@ try {
 
     <!-- SEGUIMIENTO -->
     <section class="view" id="view-seguimiento">
-      <div class="page-title">Seguimiento</div>
-      <div class="row g-4">
+      <div class="page-title mb-4">Seguimiento de Traslado</div>
+
+      <!-- Estado vacío por defecto -->
+      <div id="seg-empty-state" class="text-center py-5 mt-5">
+        <i class="bi bi-geo-alt display-1 text-muted mb-3 opacity-50"></i>
+        <h4 class="text-muted">Seleccione un traslado</h4>
+        <p class="text-muted">Haga clic en el botón "Ver Seguimiento" en la tabla de traslados activos.</p>
+      </div>
+
+      <!-- Contenedor dinámico (oculto inicialmente) -->
+      <div id="seg-content-container" class="row g-4 d-none">
         <div class="col-12 col-xl-8">
           <div class="section-card">
-            <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-              <h5 class="mb-0 seguimiento-title">AMB-001</h5>
-              <span class="badge-estado b-transito"><i class="bi bi-geo-alt-fill me-1"></i>En tránsito</span>
+              <h5 class="mb-0 seguimiento-title" id="seg-titulo">AMB-###</h5>
+              <span id="seg-badge" class="badge-estado b-transito">Estado</span>
             </div>
-            <!-- Info grid -->
+
             <div class="row g-3 mb-4">
               <div class="col-6">
-                <div class="info-label">Paciente</div>
-                <div class="info-value-bold">Juan Pérez (CI: 1.234.567-8)</div>
+                <div class="info-label">Paciente / Carga</div>
+                <div class="info-value-bold" id="seg-paciente">-</div>
               </div>
               <div class="col-6">
                 <div class="info-label">Vehículo</div>
-                <div class="info-value-bold">Ambulancia 01 – Patente ABC 1234</div>
+                <div class="info-value-bold" id="seg-vehiculo">-</div>
               </div>
               <div class="col-6">
                 <div class="info-label">Conductor</div>
-                <div class="info-value">Carlos Méndez</div>
+                <div class="info-value" id="seg-conductor">-</div>
               </div>
               <div class="col-6">
                 <div class="info-label">Enfermero Responsable</div>
-                <div class="info-value">Ana García</div>
+                <div class="info-value" id="seg-enfermero">-</div>
               </div>
             </div>
-            <!-- Progress bar ruta -->
+
             <div class="d-flex justify-content-between mb-1 ruta-label">
-              <span>Hospital de Clínicas</span>
-              <strong>Hospital Maciel</strong>
+              <span id="seg-origen">Origen</span>
+              <strong id="seg-destino">Destino</strong>
             </div>
             <div class="progress mb-1 progress-md">
-              <div class="progress-bar progress-bar-primary" style="width: 65%"></div>
-            </div>
-            <div class="d-flex justify-content-between ruta-time">
-              <span>Salida: 08:30</span>
-              <span>Llegada estimada: 09:15</span>
-            </div>
-            <!-- Map placeholder -->
-            <div class="map-placeholder mt-4">
-              <i class="bi bi-geo-alt-fill map-icon"></i>
-              <span class="map-text">Mapa</span>
+              <div id="seg-progress-bar" class="progress-bar progress-bar-primary" style="width: 0%"></div>
             </div>
           </div>
         </div>
 
-        <!-- Timeline -->
+        <!-- Línea de Tiempo Dinámica -->
         <div class="col-12 col-xl-4">
           <div class="section-card">
             <h5>Línea de Tiempo</h5>
-            <div class="timeline-item">
-              <div class="tl-dot done"><i class="bi bi-check-lg timeline-icon-lg"></i></div>
-              <div>
-                <div class="tl-time">08:15</div>
-                <div class="tl-title">Solicitud creada</div>
-                <div class="tl-sub">Solicitud generada por Dra. María Fernández</div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="tl-dot done"><i class="bi bi-check-lg timeline-icon-lg"></i></div>
-              <div>
-                <div class="tl-time">08:20</div>
-                <div class="tl-title">Personal asignado</div>
-                <div class="tl-sub">Conductor y enfermero confirmados</div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="tl-dot done"><i class="bi bi-check-lg timeline-icon-lg"></i></div>
-              <div>
-                <div class="tl-time">08:25</div>
-                <div class="tl-title">Vehículo preparado</div>
-                <div class="tl-sub">Ambulancia 01 lista para salida</div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="tl-dot done"><i class="bi bi-check-lg timeline-icon-lg"></i></div>
-              <div>
-                <div class="tl-time">08:30</div>
-                <div class="tl-title">Salida del Hospital de Clínicas</div>
-                <div class="tl-sub">Traslado iniciado</div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="tl-dot current"><i class="bi bi-geo-alt-fill timeline-icon-sm"></i></div>
-              <div>
-                <div class="tl-time">08:52</div>
-                <div class="tl-title active-step">En tránsito – Av. 18 de Julio</div>
-                <div class="tl-sub">Ubicación actual del vehículo</div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="tl-dot pending"><i class="bi bi-clock timeline-icon-sm"></i></div>
-              <div>
-                <div class="tl-time">09:15</div>
-                <div class="tl-title timeline-title-muted">Llegada estimada al Hospital Maciel</div>
-              </div>
+            <div id="seg-timeline-container">
+              <!-- JS inyectará los pasos aquí -->
             </div>
           </div>
         </div>

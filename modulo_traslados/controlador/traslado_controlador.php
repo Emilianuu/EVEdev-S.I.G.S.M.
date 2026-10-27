@@ -111,6 +111,21 @@ switch ($accion) {
             echo json_encode(['status' => 'error', 'mensaje' => 'Falta el ID del traslado.']);
             exit;
         }
+
+    case 'datos_dashboard':
+        $datos = TrasladoModelo::obtenerDatosDashboard();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($datos);
+        exit;
+
+    case 'seguimiento':
+        $id_traslado = $_GET['id_traslado'] ?? null;
+        if ($id_traslado) {
+            $datos = TrasladoModelo::obtenerDetalleSeguimiento($id_traslado);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($datos);
+            exit;
+        }
         break;
 
     default:

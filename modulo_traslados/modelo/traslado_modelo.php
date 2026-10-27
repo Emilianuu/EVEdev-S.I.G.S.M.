@@ -284,4 +284,109 @@ class TrasladoModelo
             return ['status' => 'error', 'mensaje' => 'Error al cancelar: ' . $e->getMessage()];
         }
     }
+    public static function obtenerDatosDashboard()
+    {
+        global $conexion;
+        try {
+            // 1. Contador de Traslados Activos (Excluye completados y cancelados)
+            $sqlActivos = "SELECT COUNT(DISTINCT t.id_traslado) 
+                           FROM TRASLADO t
+                           LEFT JOIN (
+                               SELECT id_traslado, id_estado FROM HISTORIAL_ESTADO 
+                               WHERE id_historial IN (SELECT MAX(id_historial) FROM HISTORIAL_ESTADO GROUP BY id_traslado)
+                           ) he ON t.id_traslado = he.id_traslado
+                           LEFT JOIN ESTADO_TRASLADO e ON he.id_estado = e.id_estado
+                           WHERE e.nombre NOT IN ('COMPLETADO', 'CANCELADO') OR e.nombre IS NULL";
+            $stmtAct = $conexion->prepare($sqlActivos);
+            $stmtAct->execute();
+            $cantActivos = $stmtAct->fetchColumn();
+
+            // 2. Contador de Traslados del Día
+            $sqlDia = "SELECT COUNT(*) FROM SOLICITUD_TRASLADO WHERE DATE(fecha_solicitud) = CURDATE()";
+            $stmtDia = $conexion->prepare($sqlDia);
+            $stmtDia->execute();
+            $cantDia = $stmtDia->fetchColumn();
+
+            // 3. Lista de Traslados Activos para las Tarjetas
+            $sqlLista = "SELECT 
+                            t.id_traslado, 
+                            s.categoria_traslado,
+                            COALESCE(e.nombre, 'ASIGNADO') AS estado,
+                            u_dest.nombre AS destino,
+                            COALESCE(CONCAT(pac.nombre, ' ', pac.apellido), s.detalle_carga, 'Sin especificar') AS paciente_elemento
+                        FROM TRASLADO t
+                        JOIN SOLICITUD_TRASLADO s ON t.id_solicitud = s.id_solicitud
+                        LEFT JOIN PACIENTE pac ON s.ci_paciente = pac.ci
+                        JOIN RUTA r ON t.id_ruta = r.id_ruta
+                        JOIN UBICACION u_dest ON r.id_destino = u_dest.id_ubicacion
+                        LEFT JOIN (
+                            SELECT id_traslado, id_estado FROM HISTORIAL_ESTADO 
+                            WHERE id_historial IN (SELECT MAX(id_historial) FROM HISTORIAL_ESTADO GROUP BY id_traslado)
+                        ) he ON t.id_traslado = he.id_traslado
+                        LEFT JOIN ESTADO_TRASLADO e ON he.id_estado = e.id_estado
+                        WHERE e.nombre NOT IN ('COMPLETADO', 'CANCELADO') OR e.nombre IS NULL
+                        ORDER BY s.fecha_solicitud DESC LIMIT 5";
+            $stmtList = $conexion->prepare($sqlLista);
+            $stmtList->execute();
+            $listaActivos = $stmtList->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'status' => 'success',
+                'traslados_activos' => $cantActivos,
+                'traslados_dia' => $cantDia,
+                'lista_activos' => $listaActivos
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'mensaje' => $e->getMessage(),
+                'traslados_activos' => 0,
+                'traslados_dia' => 0,
+                'lista_activos' => []
+            ];
+        }
+    }
+    public static function obtenerDetalleSeguimiento($id_traslado)
+    {
+        global $conexion;
+        try {
+            // 1. Datos generales del traslado y personal
+            $sqlDetalle = "SELECT 
+                            t.id_traslado, 
+                            v.matricula AS vehiculo,
+                            u_orig.nombre AS origen,
+                            u_dest.nombre AS destino,
+                            COALESCE(CONCAT(pac.nombre, ' ', pac.apellido), s.detalle_carga, 'Sin especificar') AS paciente_elemento,
+                            pac.ci AS ci_paciente,
+                            (SELECT CONCAT(p.nombre, ' ', p.apellido) FROM PERSONAL_TRASLADO pt JOIN PERSONAL p ON pt.id_personal = p.id_personal WHERE pt.id_traslado = t.id_traslado AND pt.rol_en_traslado = 'CONDUCTOR' LIMIT 1) AS conductor,
+                            (SELECT CONCAT(p.nombre, ' ', p.apellido) FROM PERSONAL_TRASLADO pt JOIN PERSONAL p ON pt.id_personal = p.id_personal WHERE pt.id_traslado = t.id_traslado AND pt.rol_en_traslado = 'ENFERMERO' LIMIT 1) AS enfermero
+                        FROM TRASLADO t
+                        JOIN SOLICITUD_TRASLADO s ON t.id_solicitud = s.id_solicitud
+                        LEFT JOIN PACIENTE pac ON s.ci_paciente = pac.ci
+                        JOIN VEHICULO v ON t.id_vehiculo = v.id_vehiculo
+                        JOIN RUTA r ON t.id_ruta = r.id_ruta
+                        JOIN UBICACION u_orig ON r.id_origen = u_orig.id_ubicacion
+                        JOIN UBICACION u_dest ON r.id_destino = u_dest.id_ubicacion
+                        WHERE t.id_traslado = ?";
+            $stmt = $conexion->prepare($sqlDetalle);
+            $stmt->execute([$id_traslado]);
+            $detalle = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$detalle) return ['status' => 'error', 'mensaje' => 'Traslado no encontrado'];
+
+            // 2. Historial de estados para la Línea de Tiempo
+            $sqlHist = "SELECT e.nombre as estado, he.observaciones 
+                        FROM HISTORIAL_ESTADO he
+                        JOIN ESTADO_TRASLADO e ON he.id_estado = e.id_estado
+                        WHERE he.id_traslado = ?
+                        ORDER BY he.id_historial ASC";
+            $stmtH = $conexion->prepare($sqlHist);
+            $stmtH->execute([$id_traslado]);
+            $historial = $stmtH->fetchAll(PDO::FETCH_ASSOC);
+
+            return ['status' => 'success', 'detalle' => $detalle, 'historial' => $historial];
+        } catch (PDOException $e) {
+            return ['status' => 'error', 'mensaje' => $e->getMessage()];
+        }
+    }
 }
