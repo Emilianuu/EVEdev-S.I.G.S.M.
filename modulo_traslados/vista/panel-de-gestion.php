@@ -310,6 +310,7 @@ try {
                 <th>Fecha/Hora</th>
                 <th>Vehículo</th>
                 <th>Conductor</th>
+                <th>Enfermero</th>
                 <th>Paciente/Carga</th>
                 <th>Destino</th>
                 <th>Estado</th>

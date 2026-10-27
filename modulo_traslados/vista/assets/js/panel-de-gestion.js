@@ -692,6 +692,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <td>${t.fecha} ${t.hora}</td>
               <td>${t.vehiculo || "-"}</td>
               <td>${t.conductor || "-"}</td>
+              <td>${t.enfermero || "-"}</td>
               <td>${t.paciente_elemento || "-"}</td>
               <td>${t.destino || "-"}</td>
               <td><span class="badge-estado ${claseEstado}">${textoEstado.replace("_", " ")}</span></td>
