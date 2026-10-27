@@ -492,6 +492,170 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /* --- MODIFICAR TRASLADO --- */
+  function mostrarAlertaTrasladosTop(mensaje, tipo = "success") {
+    const container = document.getElementById("alert-traslados-container");
+    if (!container) return;
+    const icono =
+      tipo === "success"
+        ? "bi-check-circle-fill"
+        : "bi-exclamation-triangle-fill";
+    container.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                             <i class="bi ${icono} me-2 fs-5"></i><div>${mensaje}</div>
+                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                           </div>`;
+    setTimeout(() => {
+      container.innerHTML = "";
+    }, 5000);
+  }
+
+  window.modificarTraslado = function (id) {
+    // 1. Obtener datos actuales
+    fetch(
+      `../controlador/traslado_controlador.php?accion=obtener_traslado&id_traslado=${id}`,
+    )
+      .then((r) => r.json())
+      .then((data) => {
+        if (data) {
+          document.getElementById("mod_title_id").textContent = id;
+          document.getElementById("mod_id_traslado").value = id;
+          document.getElementById("mod_estado").value = data.id_estado || "1";
+          document.getElementById("mod_vehiculo").value =
+            data.id_vehiculo || "";
+          document.getElementById("mod_conductor").value =
+            data.id_conductor || "";
+          document.getElementById("mod_enfermero").value =
+            data.id_enfermero || "";
+
+          const modalMod = new bootstrap.Modal(
+            document.getElementById("modalModificarTraslado"),
+          );
+          modalMod.show();
+        }
+      })
+      .catch((err) => alert("Error al cargar los datos del traslado."));
+  };
+
+  const formModificar = document.getElementById("formModificarTraslado");
+  if (formModificar) {
+    formModificar.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const btn = document.getElementById("btnGuardarModificacion");
+      const textoOrig = btn.innerHTML;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+      btn.disabled = true;
+
+      const formData = new FormData(this);
+      formData.append("accion", "modificar");
+
+      fetch("../controlador/traslado_controlador.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          btn.innerHTML = textoOrig;
+          btn.disabled = false;
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalModificarTraslado"),
+          ).hide();
+
+          if (data.status === "success") {
+            mostrarAlertaTrasladosTop(
+              "Traslado AMB-" +
+                formData.get("id_traslado") +
+                " modificado correctamente.",
+              "success",
+            );
+            cargarTraslados(); // Recarga la tabla de arriba
+          } else {
+            mostrarAlertaTrasladosTop("Error: " + data.mensaje, "danger");
+          }
+        })
+        .catch((err) => {
+          btn.innerHTML = textoOrig;
+          btn.disabled = false;
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalModificarTraslado"),
+          ).hide();
+          mostrarAlertaTrasladosTop(
+            "Error de conexión al modificar el traslado.",
+            "danger",
+          );
+        });
+    });
+  }
+
+  /* --- CANCELAR TRASLADO (CON MODAL) --- */
+  let trasladoACancelar = null;
+
+  window.cancelarTraslado = function (id) {
+    trasladoACancelar = id;
+    document.getElementById("cancel-id-text").textContent = id;
+    const modalCancel = new bootstrap.Modal(
+      document.getElementById("modalConfirmarCancelacion"),
+    );
+    modalCancel.show();
+  };
+
+  const btnConfirmarCancelacion = document.getElementById(
+    "btnConfirmarCancelacion",
+  );
+  if (btnConfirmarCancelacion) {
+    btnConfirmarCancelacion.addEventListener("click", function () {
+      if (!trasladoACancelar) return;
+
+      const btn = this;
+      const originalText = btn.innerHTML;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Cancelando...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append("accion", "cancelar");
+      formData.append("id_traslado", trasladoACancelar);
+
+      fetch("../controlador/traslado_controlador.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalConfirmarCancelacion"),
+          ).hide();
+
+          if (data.status === "success") {
+            mostrarAlertaTrasladosTop(
+              "Traslado AMB-" + trasladoACancelar + " cancelado correctamente.",
+              "success",
+            );
+            cargarTraslados(); // Refresca la tabla
+          } else {
+            mostrarAlertaTrasladosTop("Error: " + data.mensaje, "danger");
+          }
+          trasladoACancelar = null;
+        })
+        .catch((err) => {
+          console.error(err);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalConfirmarCancelacion"),
+          ).hide();
+          mostrarAlertaTrasladosTop(
+            "Error de conexión al cancelar el traslado.",
+            "danger",
+          );
+          trasladoACancelar = null;
+        });
+    });
+  }
+
   /* --- CARGA DINÁMICA DE TABLAS --- */
   cargarTraslados();
   cargarSolicitudesPendientes();

@@ -80,6 +80,37 @@ switch ($accion) {
             echo json_encode(['status' => 'error', 'mensaje' => 'Falta el ID de la solicitud.']);
             exit;
         }
+
+    case 'obtener_traslado':
+        $id = $_GET['id_traslado'] ?? null;
+        if ($id) {
+            $datos = TrasladoModelo::obtenerTrasladoPorId($id);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($datos);
+        }
+        exit;
+
+    case 'modificar':
+        $datos = $_POST;
+        $id_usuario = $_SESSION['id_usuario'];
+        $resultado = TrasladoModelo::modificarTraslado($datos, $id_usuario);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($resultado);
+        exit;
+
+    case 'cancelar':
+        $id_traslado = $_POST['id_traslado'] ?? null;
+        if ($id_traslado) {
+            $id_usuario = $_SESSION['id_usuario'];
+            $resultado = TrasladoModelo::cancelarTraslado($id_traslado, $id_usuario);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($resultado);
+            exit;
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'mensaje' => 'Falta el ID del traslado.']);
+            exit;
+        }
         break;
 
     default:

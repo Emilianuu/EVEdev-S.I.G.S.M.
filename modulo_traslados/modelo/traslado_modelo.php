@@ -199,4 +199,89 @@ class TrasladoModelo
             return ['status' => 'error', 'mensaje' => 'Error al rechazar: ' . $e->getMessage()];
         }
     }
+    public static function obtenerTrasladoPorId($id_traslado)
+    {
+        global $conexion;
+        try {
+            $sql = "SELECT t.id_traslado, t.id_vehiculo,
+                           (SELECT pt.id_personal FROM PERSONAL_TRASLADO pt WHERE pt.id_traslado = t.id_traslado AND pt.rol_en_traslado = 'CONDUCTOR' LIMIT 1) as id_conductor,
+                           (SELECT pt.id_personal FROM PERSONAL_TRASLADO pt WHERE pt.id_traslado = t.id_traslado AND pt.rol_en_traslado = 'ENFERMERO' LIMIT 1) as id_enfermero,
+                           (SELECT id_estado FROM HISTORIAL_ESTADO WHERE id_traslado = t.id_traslado ORDER BY id_historial DESC LIMIT 1) as id_estado
+                    FROM TRASLADO t WHERE t.id_traslado = ?";
+            $stmt = $conexion->prepare($sql);
+            $stmt->execute([$id_traslado]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    public static function modificarTraslado($datos, $id_usuario)
+    {
+        global $conexion;
+        try {
+            $conexion->beginTransaction();
+            $id_traslado = $datos['id_traslado'];
+
+            // 1. Actualizar Vehículo
+            if (!empty($datos['vehiculo'])) {
+                $stmtV = $conexion->prepare("UPDATE TRASLADO SET id_vehiculo = ? WHERE id_traslado = ?");
+                $stmtV->execute([$datos['vehiculo'], $id_traslado]);
+            }
+
+            // 2. Actualizar Personal (Borramos los actuales y reinsertamos)
+            $stmtDel = $conexion->prepare("DELETE FROM PERSONAL_TRASLADO WHERE id_traslado = ?");
+            $stmtDel->execute([$id_traslado]);
+
+            if (!empty($datos['conductor'])) {
+                $stmtC = $conexion->prepare("INSERT INTO PERSONAL_TRASLADO (id_traslado, id_personal, rol_en_traslado) VALUES (?, ?, 'CONDUCTOR')");
+                $stmtC->execute([$id_traslado, $datos['conductor']]);
+            }
+            if (!empty($datos['enfermero'])) {
+                $stmtE = $conexion->prepare("INSERT INTO PERSONAL_TRASLADO (id_traslado, id_personal, rol_en_traslado) VALUES (?, ?, 'ENFERMERO')");
+                $stmtE->execute([$id_traslado, $datos['enfermero']]);
+            }
+
+            // 3. Actualizar Estado (Registramos nuevo historial si cambió)
+            if (!empty($datos['estado'])) {
+                $stmtH = $conexion->prepare("INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, id_usuario, observaciones) VALUES (?, ?, ?, 'Modificación manual de traslado')");
+                $stmtH->execute([$id_traslado, $datos['estado'], $id_usuario]);
+            }
+
+            $conexion->commit();
+            return ['status' => 'success', 'mensaje' => 'Traslado modificado exitosamente.'];
+        } catch (PDOException $e) {
+            $conexion->rollBack();
+            return ['status' => 'error', 'mensaje' => 'Error al modificar: ' . $e->getMessage()];
+        }
+    }
+    public static function cancelarTraslado($id_traslado, $id_usuario)
+    {
+        global $conexion;
+        try {
+            $conexion->beginTransaction();
+
+            // 1. Buscamos el ID del estado "CANCELADO" (usualmente es el 4 o 5 dependiendo de tu BD)
+            $stmtEst = $conexion->prepare("SELECT id_estado FROM ESTADO_TRASLADO WHERE nombre = 'CANCELADO' LIMIT 1");
+            $stmtEst->execute();
+            $id_estado_cancelado = $stmtEst->fetchColumn();
+
+            // Fallback por si el nombre varía en la base de datos
+            if (!$id_estado_cancelado) $id_estado_cancelado = 4;
+
+            // 2. Registramos el nuevo estado en el historial del traslado
+            $stmtHist = $conexion->prepare("INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, id_usuario, observaciones) VALUES (?, ?, ?, 'Traslado cancelado por el operador')");
+            $stmtHist->execute([$id_traslado, $id_estado_cancelado, $id_usuario]);
+
+            // 3. (Opcional pero recomendado) Actualizamos también la solicitud a CANCELADA
+            $stmtSol = $conexion->prepare("UPDATE SOLICITUD_TRASLADO SET estado_solicitud = 'CANCELADA' WHERE id_solicitud = (SELECT id_solicitud FROM TRASLADO WHERE id_traslado = ?)");
+            $stmtSol->execute([$id_traslado]);
+
+            $conexion->commit();
+            return ['status' => 'success', 'mensaje' => 'Traslado cancelado correctamente.'];
+        } catch (PDOException $e) {
+            $conexion->rollBack();
+            return ['status' => 'error', 'mensaje' => 'Error al cancelar: ' . $e->getMessage()];
+        }
+    }
 }
