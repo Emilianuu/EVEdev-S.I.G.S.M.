@@ -4,7 +4,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/sigsm/servicios_comunes/conexion_BD/c
 
 class TrasladoModelo
 {
-
     public static function obtenerTodosLosTraslados()
     {
         global $conexion;
@@ -17,10 +16,7 @@ class TrasladoModelo
                         s.categoria_traslado AS tipo_traslado,
                         u_dest.nombre AS destino,
                         e.nombre AS estado,
-                        
-                        -- NUEVO: Mostramos Nombre del Paciente o el Detalle de la Carga
                         COALESCE(CONCAT(pac.nombre, ' ', pac.apellido), s.detalle_carga, 'Sin especificar') AS paciente_elemento,
-                        
                         (SELECT CONCAT(p.nombre, ' ', p.apellido) 
                          FROM PERSONAL_TRASLADO pt JOIN PERSONAL p ON pt.id_personal = p.id_personal 
                          WHERE pt.id_traslado = t.id_traslado AND pt.rol_en_traslado = 'CONDUCTOR' LIMIT 1) AS conductor,
@@ -29,7 +25,7 @@ class TrasladoModelo
                          WHERE pt.id_traslado = t.id_traslado AND pt.rol_en_traslado = 'ENFERMERO' LIMIT 1) AS enfermero
                     FROM TRASLADO t
                     JOIN SOLICITUD_TRASLADO s ON t.id_solicitud = s.id_solicitud
-                    LEFT JOIN PACIENTE pac ON s.ci_paciente = pac.ci -- NUEVO JOIN
+                    LEFT JOIN PACIENTE pac ON s.ci_paciente = pac.ci
                     JOIN VEHICULO v ON t.id_vehiculo = v.id_vehiculo
                     JOIN RUTA r ON t.id_ruta = r.id_ruta
                     JOIN UBICACION u_dest ON r.id_destino = u_dest.id_ubicacion
@@ -49,6 +45,34 @@ class TrasladoModelo
         }
     }
 
+    public static function obtenerSolicitudesPendientes()
+    {
+        global $conexion;
+        try {
+            $sql = "SELECT 
+                        s.id_solicitud, 
+                        DATE_FORMAT(s.fecha_solicitud, '%d/%m/%Y %H:%i') AS fecha,
+                        s.categoria_traslado,
+                        s.tipo_movilidad,
+                        s.requiere_soporte_uti,
+                        COALESCE(CONCAT(pac.nombre, ' ', pac.apellido), s.detalle_carga, 'Sin especificar') AS paciente_elemento,
+                        u_dest.nombre AS destino,
+                        s.motivo
+                    FROM SOLICITUD_TRASLADO s
+                    LEFT JOIN PACIENTE pac ON s.ci_paciente = pac.ci
+                    JOIN UBICACION u_dest ON s.id_destino = u_dest.id_ubicacion
+                    WHERE s.estado_solicitud = 'PENDIENTE' 
+                    ORDER BY s.fecha_solicitud ASC";
+
+            $stmt = $conexion->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en obtenerSolicitudesPendientes: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public static function guardarTraslado($datos, $id_usuario)
     {
         global $conexion;
@@ -61,7 +85,6 @@ class TrasladoModelo
             $tipo_movilidad = 'NO_APLICA';
             $requiere_soporte_uti = 0;
 
-            // 1. Lógica diferenciada para Pacientes vs Logística
             if ($categoria === 'PACIENTE') {
                 $ci_paciente = $datos['ci_paciente'];
                 $tipo_movilidad = $datos['tipo_movilidad'];
@@ -77,11 +100,11 @@ class TrasladoModelo
                 $detalle_carga = $datos['detalle_carga'];
             }
 
-            // 2. Insertar SOLICITUD_TRASLADO
             $fecha_solicitud = $datos['fecha'] . ' ' . $datos['hora'] . ':00';
             $sqlSol = "INSERT INTO SOLICITUD_TRASLADO 
                    (categoria_traslado, ci_paciente, detalle_carga, tipo_movilidad, requiere_soporte_uti, id_origen, id_destino, id_canal, id_usuario_solicit, fecha_solicitud, motivo, estado_solicitud) 
-                   VALUES (?, ?, ?, ?, ?, ?, ?, 2, ?, ?, ?, 'ASIGNADA')";
+                   VALUES (?, ?, ?, ?, ?, ?, ?, 2, ?, ?, ?, 'PENDIENTE')";
+
             $stmtSol = $conexion->prepare($sqlSol);
             $stmtSol->execute([
                 $categoria,
@@ -95,46 +118,85 @@ class TrasladoModelo
                 $fecha_solicitud,
                 $datos['motivo']
             ]);
-            $id_solicitud = $conexion->lastInsertId();
 
-            // 3. Obtener o Crear la RUTA
+            $conexion->commit();
+            return ['status' => 'success', 'mensaje' => 'Solicitud de traslado registrada como PENDIENTE.'];
+        } catch (PDOException $e) {
+            $conexion->rollBack();
+            return ['status' => 'error', 'mensaje' => $e->getMessage()];
+        }
+    }
+
+    public static function asignarRecursos($datos, $id_usuario)
+    {
+        global $conexion;
+        try {
+            $conexion->beginTransaction();
+
+            $id_solicitud = $datos['id_solicitud'];
+            $id_vehiculo = $datos['vehiculo'];
+            $id_conductor = $datos['conductor'];
+            $id_enfermero = !empty($datos['enfermero']) ? $datos['enfermero'] : null;
+
+            // 1. Buscar origen y destino de la solicitud
+            $stmtSol = $conexion->prepare("SELECT id_origen, id_destino FROM SOLICITUD_TRASLADO WHERE id_solicitud = ?");
+            $stmtSol->execute([$id_solicitud]);
+            $solicitud = $stmtSol->fetch(PDO::FETCH_ASSOC);
+
+            // 2. Obtener o crear ruta
             $stmtRuta = $conexion->prepare("SELECT id_ruta FROM RUTA WHERE id_origen = ? AND id_destino = ?");
-            $stmtRuta->execute([$datos['origen'], $datos['destino']]);
+            $stmtRuta->execute([$solicitud['id_origen'], $solicitud['id_destino']]);
             $ruta = $stmtRuta->fetch(PDO::FETCH_ASSOC);
 
             if ($ruta) {
                 $id_ruta = $ruta['id_ruta'];
             } else {
                 $stmtInsRuta = $conexion->prepare("INSERT INTO RUTA (id_origen, id_destino, distancia_km) VALUES (?, ?, 5.00)");
-                $stmtInsRuta->execute([$datos['origen'], $datos['destino']]);
+                $stmtInsRuta->execute([$solicitud['id_origen'], $solicitud['id_destino']]);
                 $id_ruta = $conexion->lastInsertId();
             }
 
-            // 4. Insertar TRASLADO
+            // 3. Crear traslado
             $sqlTras = "INSERT INTO TRASLADO (id_solicitud, id_vehiculo, id_ruta) VALUES (?, ?, ?)";
             $stmtTras = $conexion->prepare($sqlTras);
-            $stmtTras->execute([$id_solicitud, $datos['vehiculo'], $id_ruta]);
+            $stmtTras->execute([$id_solicitud, $id_vehiculo, $id_ruta]);
             $id_traslado = $conexion->lastInsertId();
 
-            // 5. Asignar Personal
+            // 4. Asignar personal
             $stmtPers = $conexion->prepare("INSERT INTO PERSONAL_TRASLADO (id_traslado, id_personal, rol_en_traslado) VALUES (?, ?, 'CONDUCTOR')");
-            $stmtPers->execute([$id_traslado, $datos['conductor']]);
+            $stmtPers->execute([$id_traslado, $id_conductor]);
 
-            if (!empty($datos['enfermero'])) {
+            if ($id_enfermero) {
                 $stmtEnf = $conexion->prepare("INSERT INTO PERSONAL_TRASLADO (id_traslado, id_personal, rol_en_traslado) VALUES (?, ?, 'ENFERMERO')");
-                $stmtEnf->execute([$id_traslado, $datos['enfermero']]);
+                $stmtEnf->execute([$id_traslado, $id_enfermero]);
             }
 
-            // 6. Registrar en HISTORIAL_ESTADO
-            $stmtHist = $conexion->prepare("INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, id_usuario, observaciones) VALUES (?, 1, ?, 'Traslado asignado desde el Panel')");
+            // 5. Registrar Historial del traslado
+            $stmtHist = $conexion->prepare("INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, id_usuario, observaciones) VALUES (?, 1, ?, 'Recursos asignados operativamente')");
             $stmtHist->execute([$id_traslado, $id_usuario]);
 
+            // 6. ACTUALIZAR ESTADO DE LA SOLICITUD (Esto la elimina de la tabla inferior)
+            $stmtUpdateSol = $conexion->prepare("UPDATE SOLICITUD_TRASLADO SET estado_solicitud = 'ASIGNADA' WHERE id_solicitud = ?");
+            $stmtUpdateSol->execute([$id_solicitud]);
+
             $conexion->commit();
-            return ['status' => 'success', 'mensaje' => 'Traslado guardado correctamente'];
+            return ['status' => 'success', 'mensaje' => 'Recursos asignados y traslado confirmado.'];
         } catch (PDOException $e) {
             $conexion->rollBack();
-            error_log("Error al guardar traslado: " . $e->getMessage());
             return ['status' => 'error', 'mensaje' => $e->getMessage()];
+        }
+    }
+    public static function rechazarSolicitud($id_solicitud)
+    {
+        global $conexion;
+        try {
+            // Actualizamos el estado a RECHAZADA
+            $stmt = $conexion->prepare("UPDATE SOLICITUD_TRASLADO SET estado_solicitud = 'RECHAZADA' WHERE id_solicitud = ?");
+            $stmt->execute([$id_solicitud]);
+
+            return ['status' => 'success', 'mensaje' => 'Solicitud rechazada correctamente.'];
+        } catch (PDOException $e) {
+            return ['status' => 'error', 'mensaje' => 'Error al rechazar: ' . $e->getMessage()];
         }
     }
 }

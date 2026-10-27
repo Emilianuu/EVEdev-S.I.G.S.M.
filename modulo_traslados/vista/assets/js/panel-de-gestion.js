@@ -11,10 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const darkModeToggle = document.getElementById("cfg-darkmode");
 
   if (darkModeToggle) {
-    // Leer estado actual de la clave unificada "theme"
     darkModeToggle.checked = localStorage.getItem("theme") === "dark";
-
-    /* Evento para el cambio manual de Dark Mode */
     darkModeToggle.addEventListener("change", function () {
       const isDark = this.checked;
       if (isDark) {
@@ -26,12 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    /* Escuchar cambios desde otras ventanas en tiempo real */
     window.addEventListener("storage", (e) => {
       if (e.key === "theme") {
         const isDark = e.newValue === "dark";
-        darkModeToggle.checked = isDark; // Sincroniza el botón visualmente
-
+        darkModeToggle.checked = isDark;
         if (isDark) {
           document.documentElement.setAttribute("data-theme", "dark");
         } else {
@@ -45,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const navLinks = document.querySelectorAll(".nav-link-custom");
   const topbarTitle = document.getElementById("topbar-title");
 
-  // Mapeo de identificadores a títulos para el breadcrumb
   const sectionTitles = {
     dashboard: "Panel Principal",
     traslados: "Gestión de Traslados",
@@ -58,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
   navLinks.forEach((link) => {
     link.addEventListener("click", function (e) {
       e.preventDefault();
-
       // Remover active de todos los enlaces
       navLinks.forEach((l) => l.classList.remove("active"));
       this.classList.add("active");
@@ -75,12 +68,12 @@ document.addEventListener("DOMContentLoaded", () => {
         viewElement.classList.add("active");
       }
 
-      // --- ACTUALIZAR EL TÍTULO DEL TOPBAR ---
+      // Actualizar el título del topbar
       if (topbarTitle && sectionTitles[target]) {
         topbarTitle.textContent = sectionTitles[target];
       }
 
-      // Cerrar sidebar en dispositivos móviles
+      // Cerrar sidebar en móviles
       if (window.innerWidth <= 768) {
         document.getElementById("sidebar").classList.remove("open");
       }
@@ -91,11 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const tabPills = document.querySelectorAll(".tab-pill");
   tabPills.forEach((pill) => {
     pill.addEventListener("click", function () {
-      // Activar pill
       tabPills.forEach((p) => p.classList.remove("active"));
       this.classList.add("active");
 
-      // Mostrar panel
       const targetTab = this.getAttribute("data-tab");
       document
         .querySelectorAll(".tab-content-panel")
@@ -124,27 +115,25 @@ document.addEventListener("DOMContentLoaded", () => {
   if (mobileToggle && sidebar && main) {
     mobileToggle.addEventListener("click", () => {
       if (window.innerWidth <= 768) {
-        // En móvil: despliega o esconde el menú lateral
         sidebar.classList.toggle("open");
       } else {
-        // En escritorio: contrae el menú y ajusta el contenedor principal
         sidebar.classList.toggle("collapsed");
         main.classList.toggle("collapsed");
       }
     });
   }
+
   /* --- LÓGICA DEL FORMULARIO WIZARD --- */
   const formWizard = document.getElementById("formNuevoTraslado");
 
   if (formWizard) {
     let currentStep = 1;
-    const totalSteps = 4;
+    const totalSteps = 3;
 
     const panels = formWizard.querySelectorAll(".wizard-panel");
     const stepsIndicators = document.querySelectorAll(
       "#view-nuevo-traslado .wizard-step",
     );
-
     const btnPrev = document.getElementById("btnPrevStep");
     const btnNext = document.getElementById("btnNextStep");
     const btnSubmit = document.getElementById("btnSubmitForm");
@@ -176,67 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    function filtrarVehiculosCompatibles() {
-      const cat = document.getElementById("categoria_traslado")?.value;
-      const movilidad = document.getElementById("tipo_movilidad")
-        ? document.getElementById("tipo_movilidad").value
-        : "NO_APLICA";
-      const reqUti = document.getElementById("requiere_soporte_uti")
-        ? document.getElementById("requiere_soporte_uti").checked
-        : false;
-
-      const selectVehiculo = document.getElementById("vehiculo_select");
-      if (!selectVehiculo) return;
-
-      const opciones = selectVehiculo.querySelectorAll(
-        'option:not([value=""])',
-      );
-      let vehiculosValidos = 0;
-
-      opciones.forEach((opt) => {
-        let esCompatible = true;
-        if (cat === "PACIENTE") {
-          if (reqUti && opt.getAttribute("data-uti") == "0")
-            esCompatible = false;
-          if (
-            movilidad === "SILLA_RUEDAS" &&
-            opt.getAttribute("data-sr") == "0"
-          )
-            esCompatible = false;
-          if (movilidad === "CAMILLA" && opt.getAttribute("data-cam") == "0")
-            esCompatible = false;
-        } else if (cat === "MATERIAL_BIOLOGICO") {
-          if (opt.getAttribute("data-bio") == "0") esCompatible = false;
-        } else if (cat === "EQUIPAMIENTO" || cat === "INSUMOS") {
-          if (opt.getAttribute("data-ins") == "0") esCompatible = false;
-        }
-
-        if (esCompatible) {
-          opt.disabled = false;
-          opt.text = opt.text.replace(" (No compatible)", "");
-          vehiculosValidos++;
-        } else {
-          opt.disabled = true;
-          if (!opt.text.includes("(No compatible)"))
-            opt.text += " (No compatible)";
-        }
-      });
-
-      if (
-        selectVehiculo.selectedIndex > 0 &&
-        selectVehiculo.options[selectVehiculo.selectedIndex].disabled
-      ) {
-        selectVehiculo.value = "";
-      }
-
-      document
-        .getElementById("vehiculo_warning")
-        ?.classList.toggle("d-none", vehiculosValidos > 0);
-    }
-
-    // Función para actualizar la vista de los pasos
     function updateWizard() {
-      // Mostrar y ocultar paneles
       panels.forEach((panel) => {
         if (parseInt(panel.getAttribute("data-step")) === currentStep) {
           panel.classList.remove("d-none");
@@ -245,20 +174,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      if (currentStep === 3) filtrarVehiculosCompatibles();
-
-      // Actualizar bolitas de progreso superiores
       stepsIndicators.forEach((step, index) => {
-        if (index < currentStep) {
-          step.classList.add("active");
-        } else {
-          step.classList.remove("active");
-        }
+        if (index < currentStep) step.classList.add("active");
+        else step.classList.remove("active");
       });
 
-      // Ajustar botones inferiores
       btnPrev.disabled = currentStep === 1;
-
       if (currentStep === totalSteps) {
         btnNext.classList.add("d-none");
         btnSubmit.classList.remove("d-none");
@@ -268,61 +189,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Función para validar que los datos del paso actual estén completos
-    // Función para mostrar alertas elegantes en pantalla (reemplaza a los alert() del navegador)
     function mostrarAlerta(mensaje, tipo = "danger") {
       const container = document.getElementById("form-alert-container");
       if (!container) return;
-
       const icono =
         tipo === "success"
           ? "bi-check-circle-fill"
           : "bi-exclamation-triangle-fill";
-
-      container.innerHTML = `
-        <div class="alert alert-${tipo} alert-dismissible fade show d-flex align-items-center mt-4 mb-3" role="alert">
-          <i class="bi ${icono} me-2 fs-5"></i>
-          <div>${mensaje}</div>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-      `;
-
-      // Si es un éxito, la alerta desaparece sola después de 5 segundos
-      if (tipo === "success") {
+      container.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show d-flex align-items-center mt-4 mb-3" role="alert"><i class="bi ${icono} me-2 fs-5"></i><div>${mensaje}</div><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+      if (tipo === "success")
         setTimeout(() => {
           container.innerHTML = "";
         }, 5000);
-      }
     }
 
-    // Función de Validación Mejorada
-    // Función para mostrar alertas elegantes en pantalla (reemplaza a los alert() del navegador)
-    function mostrarAlerta(mensaje, tipo = "danger") {
-      const container = document.getElementById("form-alert-container");
-      if (!container) return;
-
-      const icono =
-        tipo === "success"
-          ? "bi-check-circle-fill"
-          : "bi-exclamation-triangle-fill";
-
-      container.innerHTML = `
-        <div class="alert alert-${tipo} alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
-          <i class="bi ${icono} me-2 fs-5"></i>
-          <div>${mensaje}</div>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-      `;
-
-      // Si es un éxito, la alerta desaparece sola después de 5 segundos
-      if (tipo === "success") {
-        setTimeout(() => {
-          container.innerHTML = "";
-        }, 5000);
-      }
-    }
-
-    // Función de Validación Mejorada
     function validateCurrentStep() {
       const currentPanel = formWizard.querySelector(
         `.wizard-panel[data-step="${currentStep}"]`,
@@ -332,7 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       let isValid = true;
 
-      // 1. Validación base de HTML5 (campos vacíos)
       inputs.forEach((input) => {
         if (!input.checkValidity() || input.value.trim() === "") {
           isValid = false;
@@ -342,63 +221,43 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      // 2. Validaciones Específicas por Paso
       if (currentStep === 2) {
-        const cat = document.getElementById("categoria_traslado")?.value;
-        if (cat === "PACIENTE") {
-          const ciInput = document.getElementById("ci_paciente");
-          if (ciInput && ciInput.value) {
-            // Limpia todo lo que no sea número y verifica que tenga al menos 7 u 8 dígitos
-            const ciLimpia = ciInput.value.replace(/[^0-9]/g, "");
-            if (ciLimpia.length < 7 || ciLimpia.length > 8) {
-              isValid = false;
-              ciInput.classList.add("is-invalid");
-              document.getElementById("feedback-ci").textContent =
-                "La cédula debe contener 7 u 8 números.";
-            } else {
-              ciInput.value = ciLimpia; // formatea el input para enviarlo limpio al servidor
-            }
+        const cat = selectCategoria?.value;
+        if (cat === "PACIENTE" && inputCi && inputCi.value) {
+          const ciLimpia = inputCi.value.replace(/[^0-9]/g, "");
+          if (ciLimpia.length < 7 || ciLimpia.length > 8) {
+            isValid = false;
+            inputCi.classList.add("is-invalid");
+            document.getElementById("feedback-ci").textContent =
+              "La cédula debe contener 7 u 8 números.";
+          } else {
+            inputCi.value = ciLimpia;
           }
         }
       }
 
-      if (currentStep === 4) {
+      if (currentStep === 3) {
         const fechaInput = currentPanel.querySelector('input[name="fecha"]');
         if (fechaInput && fechaInput.value) {
-          // Evitar que programen traslados en el pasado (ayer o antes)
-          const fechaSeleccionada = fechaInput.value;
-          const fechaHoy = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD local
-
-          if (fechaSeleccionada < fechaHoy) {
+          if (fechaInput.value < new Date().toISOString().split("T")[0]) {
             isValid = false;
             fechaInput.classList.add("is-invalid");
-            fechaInput.nextElementSibling.textContent =
-              "No puede programar un traslado en una fecha pasada.";
           }
         }
       }
 
-      // Si algo falló, mostramos un aviso rápido
-      if (!isValid) {
-        mostrarAlerta(
-          "Por favor, revise los campos marcados en rojo.",
-          "warning",
-        );
-      } else {
-        document.getElementById("form-alert-container").innerHTML = ""; // Limpiar alertas previas
-      }
+      if (!isValid)
+        mostrarAlerta("Revise los campos marcados en rojo.", "warning");
+      else document.getElementById("form-alert-container").innerHTML = "";
 
       return isValid;
     }
 
-    // Limpiar alertas rojas apenas el usuario empieza a corregir el campo
     formWizard.addEventListener("input", (e) => {
-      if (e.target.classList.contains("is-invalid")) {
+      if (e.target.classList.contains("is-invalid"))
         e.target.classList.remove("is-invalid");
-      }
     });
 
-    // Acción botón Siguiente
     btnNext.addEventListener("click", () => {
       if (validateCurrentStep()) {
         currentStep++;
@@ -406,21 +265,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Acción botón Anterior
     btnPrev.addEventListener("click", () => {
       currentStep--;
       updateWizard();
     });
 
-    // Acción botón Guardar (Submit final mejorado)
     formWizard.addEventListener("submit", (e) => {
       e.preventDefault();
-
       if (validateCurrentStep()) {
         const formData = new FormData(formWizard);
         formData.append("accion", "guardar");
 
-        const btnSubmit = document.getElementById("btnSubmitForm");
         const textoOriginal = btnSubmit.innerHTML;
         btnSubmit.innerHTML =
           '<span class="spinner-border spinner-border-sm me-2"></span> GUARDANDO...';
@@ -434,57 +289,224 @@ document.addEventListener("DOMContentLoaded", () => {
           .then((data) => {
             btnSubmit.innerHTML = textoOriginal;
             btnSubmit.disabled = false;
-
             if (data.status === "success") {
-              // ALERTA VISUAL DE ÉXITO (Sin popup del navegador)
-              mostrarAlerta(
-                "¡Traslado guardado y asignado exitosamente!",
-                "success",
-              );
-
+              mostrarAlerta("¡Solicitud registrada correctamente!", "success");
               formWizard.reset();
               currentStep = 1;
               updateWizard();
-
-              // Redirigir a la vista de tabla suavemente
               setTimeout(() => {
                 document.querySelector('[data-view="traslados"]').click();
-                cargarTraslados();
-              }, 1500); // Esperamos 1.5s para que vea el mensaje verde antes de cambiar de pantalla
+                cargarSolicitudesPendientes();
+              }, 1500);
             } else {
-              // ERROR DESDE EL SERVIDOR
-              mostrarAlerta("Error del servidor: " + data.mensaje, "danger");
+              mostrarAlerta(data.mensaje, "danger");
             }
           })
           .catch((err) => {
-            console.error(err);
-            mostrarAlerta("Error de conexión. Verifica la consola.", "danger");
+            mostrarAlerta("Error de conexión.", "danger");
             btnSubmit.innerHTML = textoOriginal;
             btnSubmit.disabled = false;
           });
       }
     });
   }
-  /* --- CARGA DINÁMICA DE TRASLADOS DESDE LA BD --- */
+
+  /* --- LOGICA DEL MODAL DE ASIGNACIÓN (APROBAR SOLICITUD) --- */
+  window.abrirModalAsignacion = function (
+    id_solicitud,
+    categoria,
+    movilidad,
+    req_uti,
+  ) {
+    document.getElementById("modal_id_solicitud").value = id_solicitud;
+    const selectVehiculo = document.getElementById("modal_vehiculo_select");
+    const opciones = selectVehiculo.querySelectorAll('option:not([value=""])');
+    let vehiculosValidos = 0;
+
+    opciones.forEach((opt) => {
+      let esCompatible = true;
+      if (categoria === "PACIENTE") {
+        if (req_uti === 1 && opt.getAttribute("data-uti") == "0")
+          esCompatible = false;
+        if (movilidad === "SILLA_RUEDAS" && opt.getAttribute("data-sr") == "0")
+          esCompatible = false;
+        if (movilidad === "CAMILLA" && opt.getAttribute("data-cam") == "0")
+          esCompatible = false;
+      } else if (
+        categoria === "MATERIAL_BIOLOGICO" &&
+        opt.getAttribute("data-bio") == "0"
+      ) {
+        esCompatible = false;
+      } else if (
+        (categoria === "EQUIPAMIENTO" || categoria === "INSUMOS") &&
+        opt.getAttribute("data-ins") == "0"
+      ) {
+        esCompatible = false;
+      }
+
+      if (esCompatible) {
+        opt.disabled = false;
+        opt.text = opt.text.replace(" (No compatible)", "");
+        vehiculosValidos++;
+      } else {
+        opt.disabled = true;
+        if (!opt.text.includes("(No compatible)"))
+          opt.text += " (No compatible)";
+      }
+    });
+
+    if (selectVehiculo.options[selectVehiculo.selectedIndex]?.disabled)
+      selectVehiculo.value = "";
+    document
+      .getElementById("modal_vehiculo_warning")
+      .classList.toggle("d-none", vehiculosValidos > 0);
+
+    const modalInstance = new bootstrap.Modal(
+      document.getElementById("modalAsignarRecursos"),
+    );
+    modalInstance.show();
+  };
+
+  const formAsignar = document.getElementById("formAsignarRecursos");
+  if (formAsignar) {
+    formAsignar.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const formData = new FormData(formAsignar);
+      formData.append("accion", "asignar");
+
+      const btnConf = document.getElementById("btnConfirmarAsignacion");
+      const textoOrig = btnConf.innerHTML;
+      btnConf.innerHTML =
+        '<span class="spinner-border spinner-border-sm"></span> Asignando...';
+      btnConf.disabled = true;
+
+      fetch("../controlador/traslado_controlador.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          btnConf.innerHTML = textoOrig;
+          btnConf.disabled = false;
+          if (d.status === "success") {
+            bootstrap.Modal.getInstance(
+              document.getElementById("modalAsignarRecursos"),
+            ).hide();
+            formAsignar.reset();
+            cargarTraslados();
+            cargarSolicitudesPendientes();
+          } else {
+            document.getElementById("modal-alert-container").innerHTML =
+              `<div class="alert alert-danger">${d.mensaje}</div>`;
+          }
+        })
+        .catch((err) => {
+          btnConf.innerHTML = textoOrig;
+          btnConf.disabled = false;
+        });
+    });
+  }
+
+  /* --- ALERTAS EN PANTALLA PARA SOLICITUDES --- */
+  function mostrarAlertaSolicitudes(mensaje, tipo = "success") {
+    const container = document.getElementById("alert-solicitudes-container");
+    if (!container) return;
+    const icono =
+      tipo === "success"
+        ? "bi-check-circle-fill"
+        : "bi-exclamation-triangle-fill";
+    container.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+                             <i class="bi ${icono} me-2 fs-5"></i><div>${mensaje}</div>
+                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                           </div>`;
+    setTimeout(() => {
+      container.innerHTML = "";
+    }, 5000);
+  }
+
+  /* --- RECHAZAR SOLICITUD (CON MODAL BOOTSTRAP) --- */
+  let solicitudARechazar = null;
+
+  window.rechazarSolicitud = function (id) {
+    solicitudARechazar = id;
+    document.getElementById("rechazo-id-text").textContent = "SOL-" + id;
+    const modalRechazo = new bootstrap.Modal(
+      document.getElementById("modalConfirmarRechazo"),
+    );
+    modalRechazo.show();
+  };
+
+  const btnConfirmarRechazo = document.getElementById("btnConfirmarRechazo");
+  if (btnConfirmarRechazo) {
+    btnConfirmarRechazo.addEventListener("click", function () {
+      if (!solicitudARechazar) return;
+
+      const btn = this;
+      const originalText = btn.innerHTML;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Rechazando...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append("accion", "rechazar");
+      formData.append("id_solicitud", solicitudARechazar);
+
+      fetch("../controlador/traslado_controlador.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalConfirmarRechazo"),
+          ).hide();
+
+          if (data.status === "success") {
+            mostrarAlertaSolicitudes(
+              "Solicitud SOL-" +
+                solicitudARechazar +
+                " rechazada correctamente.",
+              "success",
+            );
+            cargarSolicitudesPendientes();
+          } else {
+            mostrarAlertaSolicitudes("Error: " + data.mensaje, "danger");
+          }
+          solicitudARechazar = null;
+        })
+        .catch((err) => {
+          console.error(err);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalConfirmarRechazo"),
+          ).hide();
+          mostrarAlertaSolicitudes(
+            "Error de conexión al rechazar la solicitud.",
+            "danger",
+          );
+          solicitudARechazar = null;
+        });
+    });
+  }
+
+  /* --- CARGA DINÁMICA DE TABLAS --- */
   cargarTraslados();
+  cargarSolicitudesPendientes();
 
   function cargarTraslados() {
-    // Apuntamos al Controlador Maestro y le decimos qué acción queremos
     fetch("../controlador/traslado_controlador.php?accion=listar")
-      .then((respuesta) => {
-        if (!respuesta.ok)
-          throw new Error("Error en la respuesta del servidor");
-        return respuesta.json();
-      })
+      .then((respuesta) => respuesta.json())
       .then((datos) => {
         const tbody = document.getElementById("tabla-traslados-body");
         if (!tbody) return;
-
         tbody.innerHTML = "";
 
         if (datos.length === 0) {
           tbody.innerHTML =
-            '<tr><td colspan="10" class="text-center text-muted py-4">No hay traslados registrados.</td></tr>';
+            '<tr><td colspan="8" class="text-center text-muted py-4">No hay traslados activos registrados.</td></tr>';
           return;
         }
 
@@ -498,37 +520,57 @@ document.addEventListener("DOMContentLoaded", () => {
           else if (estadoMin.includes("completado"))
             claseEstado = "b-completado";
           else if (estadoMin.includes("asignado")) claseEstado = "b-programado";
-          else if (estadoMin.includes("cancelado")) claseEstado = "badge-red"; // Puedes definir esta clase en tu CSS
+          else if (estadoMin.includes("cancelado")) claseEstado = "bg-danger";
 
-          const tr = document.createElement("tr");
-
-          tr.innerHTML = `
-            <td><strong>AMB-${t.id_traslado || "N/A"}</strong></td>
-            <td>${t.fecha || ""} ${t.hora || ""}</td>
-            <td>${t.conductor || "-"}</td>
-            <td>${t.enfermero || "-"}</td>
-            <td>${t.paciente_elemento || "-"}</td>
-            <td><span class="badge-tipo-traslado">${t.tipo_traslado || "Paciente"}</span></td>
-            <td>${t.vehiculo || "-"}</td>
-            <td>${t.destino || "-"}</td>
-            <td>
-              <span class="badge-estado ${claseEstado}">${textoEstado.replace("_", " ")}</span>
-            </td>
-            <td>
-              <button class="btn-eye" title="Ver detalles">
-                <i class="bi bi-eye-fill"></i>
-              </button>
-            </td>
-          `;
-          tbody.appendChild(tr);
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>AMB-${t.id_traslado || "N/A"}</strong></td>
+              <td>${t.fecha} ${t.hora}</td>
+              <td>${t.vehiculo || "-"}</td>
+              <td>${t.conductor || "-"}</td>
+              <td>${t.paciente_elemento || "-"}</td>
+              <td>${t.destino || "-"}</td>
+              <td><span class="badge-estado ${claseEstado}">${textoEstado.replace("_", " ")}</span></td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary me-1" title="Modificar Traslado" onclick="modificarTraslado(${t.id_traslado})"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn btn-sm btn-outline-danger" title="Cancelar Traslado" onclick="cancelarTraslado(${t.id_traslado})"><i class="bi bi-x-circle"></i></button>
+              </td>
+            </tr>`;
         });
       })
-      .catch((error) => {
-        console.error("Error consultando BD:", error);
-        const tbody = document.getElementById("tabla-traslados-body");
-        if (tbody)
+      .catch(console.error);
+  }
+
+  function cargarSolicitudesPendientes() {
+    fetch("../controlador/traslado_controlador.php?accion=listar_pendientes")
+      .then((respuesta) => respuesta.json())
+      .then((datos) => {
+        const tbody = document.getElementById("tabla-solicitudes-body");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        if (datos.length === 0) {
           tbody.innerHTML =
-            '<tr><td colspan="10" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle"></i> Error al cargar los datos desde el servidor.</td></tr>';
-      });
+            '<tr><td colspan="7" class="text-center text-muted py-4">No hay solicitudes pendientes.</td></tr>';
+          return;
+        }
+
+        datos.forEach((s) => {
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>SOL-${s.id_solicitud}</strong></td>
+              <td>${s.fecha}</td>
+              <td><span class="badge-tipo-traslado">${s.categoria_traslado}</span></td>
+              <td>${s.paciente_elemento}</td>
+              <td>${s.destino}</td>
+              <td><small class="text-muted">${s.motivo}</small></td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-success me-1" title="Aprobar (Asignar Recursos)" onclick="abrirModalAsignacion(${s.id_solicitud}, '${s.categoria_traslado}', '${s.tipo_movilidad}', ${s.requiere_soporte_uti})"><i class="bi bi-check-lg"></i></button>
+                <button class="btn btn-sm btn-outline-danger" title="Rechazar" onclick="rechazarSolicitud(${s.id_solicitud})"><i class="bi bi-x-lg"></i></button>
+              </td>
+            </tr>`;
+        });
+      })
+      .catch(console.error);
   }
 });

@@ -22,13 +22,27 @@ if (isset($palabras[1])) $iniciales .= strtoupper(substr($palabras[1], 0, 1));
 // =======================================================================
 require_once $_SERVER['DOCUMENT_ROOT'] . '/sigsm/servicios_comunes/conexion_BD/conexion.php';
 
+// Arrays para los selects del formulario
 $vehiculosDisponibles = [];
 $conductoresDisponibles = [];
 $enfermerosDisponibles = [];
 $destinosDisponibles = [];
 
+// Arrays y contadores para la pestaña de Recursos (Valores por defecto)
+$todosVehiculos = [];
+$vehiculosTotales = 0;
+$vehiculosDispCount = 0;
+
+$todosConductores = [];
+$conductoresTotales = 0;
+$conductoresDispCount = 0;
+
+$todosEnfermeros = [];
+$enfermerosTotales = 0;
+$enfermerosDispCount = 0;
+
 try {
-  // 1. Vehículos (Solo los Disponibles)
+  // 1. Vehículos (Solo los Disponibles - Para el formulario)
   $sqlVehiculos = "SELECT v.id_vehiculo, v.matricula, v.marca, v.modelo, 
                             tv.nombre as tipo, tv.apto_silla_ruedas, tv.apto_camilla, 
                             tv.apto_uti, tv.apto_biologico, tv.apto_insumos 
@@ -37,11 +51,11 @@ try {
                      WHERE v.estado_disponibilidad = 'DISPONIBLE' AND v.activo = TRUE";
   $vehiculosDisponibles = $conexion->query($sqlVehiculos)->fetchAll(PDO::FETCH_ASSOC);
 
-  // 2. Conductores (Activos)
+  // 2. Conductores (Activos - Para el formulario)
   $sqlConductores = "SELECT id_personal, nombre, apellido FROM PERSONAL WHERE rol_personal = 'CONDUCTOR' AND activo = TRUE";
   $conductoresDisponibles = $conexion->query($sqlConductores)->fetchAll(PDO::FETCH_ASSOC);
 
-  // 3. Enfermeros (Activos)
+  // 3. Enfermeros (Activos - Para el formulario)
   $sqlEnfermeros = "SELECT id_personal, nombre, apellido FROM PERSONAL WHERE rol_personal = 'ENFERMERO' AND activo = TRUE";
   $enfermerosDisponibles = $conexion->query($sqlEnfermeros)->fetchAll(PDO::FETCH_ASSOC);
 
@@ -50,10 +64,10 @@ try {
   $destinosDisponibles = $conexion->query($sqlDestinos)->fetchAll(PDO::FETCH_ASSOC);
 
   // =========================================================
-  // DATOS PARA LA PESTAÑA "RECURSOS" (TODOS LOS REGISTROS)
+  // DATOS PARA LA PESTAÑA "RECURSOS" (ESTADÍSTICAS EN VIVO)
   // =========================================================
 
-  // VEHÍCULOS (Todos, con su estado y conductor si están en uso)
+  // VEHÍCULOS (Todos)
   $sqlTodosVehiculos = "SELECT v.id_vehiculo, v.matricula, tv.nombre as tipo, v.estado_disponibilidad,
                           (SELECT CONCAT(p.nombre, ' ', p.apellido) 
                            FROM PERSONAL p JOIN TRASLADO t ON t.id_vehiculo = v.id_vehiculo 
@@ -98,7 +112,6 @@ try {
 } catch (Exception $e) {
   error_log("Error cargando listas dinámicas: " . $e->getMessage());
 }
-
 ?>
 <!doctype html>
 <html lang="es">
@@ -109,19 +122,13 @@ try {
   <title>Hospital de Clínicas – Ambulancias y Traslados</title>
 
   <!-- Bootstrap 5.3 -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <!-- Bootstrap Icons -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Estilos propios -->
   <link rel="stylesheet" href="../vista/assets/css/panel-de-gestion.css" />
@@ -131,15 +138,8 @@ try {
   <!-- SIDEBAR -->
   <aside id="sidebar">
     <div class="sidebar-brand">
-      <img
-        src="../../servicios_comunes/vista_general/banner.jpg"
-        alt="Banner Hospital de Clínicas"
-        class="brand-img-normal" />
-
-      <img
-        src="../../servicios_comunes/vista_general/banner-reducido.jpg"
-        alt="Ícono Hospital de Clínicas"
-        class="brand-img-collapsed" />
+      <img src="../../servicios_comunes/vista_general/banner.jpg" alt="Banner Hospital de Clínicas" class="brand-img-normal" />
+      <img src="../../servicios_comunes/vista_general/banner-reducido.jpg" alt="Ícono Hospital de Clínicas" class="brand-img-collapsed" />
     </div>
 
     <div class="sidebar-section-label">Sistema de Gestión</div>
@@ -197,14 +197,12 @@ try {
         <span class="bc-current" id="topbar-title">Panel Principal</span>
       </div>
       <div class="topbar-actions ms-auto">
-        <button
-          class="btn btn-outline-secondary border-0"
-          id="btnLogout"
-          style="padding: 4px 12px; font-size: 0.82rem; font-weight: 600">
+        <button class="btn btn-outline-secondary border-0" id="btnLogout" style="padding: 4px 12px; font-size: 0.82rem; font-weight: 600">
           <i class="bi bi-box-arrow-left"></i> Volver al portal principal
         </button>
       </div>
     </div>
+
     <!-- DASHBOARD -->
     <section class="view active" id="view-dashboard">
       <div class="page-title">Panel Principal</div>
@@ -222,7 +220,7 @@ try {
         <div class="col-12 col-sm-6 col-xl-3">
           <div class="dash-card dc-green">
             <div>
-              <div class="dc-val">12/18</div>
+              <div class="dc-val"><?= $vehiculosDispCount ?>/<?= $vehiculosTotales ?></div>
               <div class="dc-label">Vehículos Disponibles</div>
             </div>
             <i class="bi bi-truck"></i>
@@ -231,7 +229,7 @@ try {
         <div class="col-12 col-sm-6 col-xl-3">
           <div class="dash-card dc-orange">
             <div>
-              <div class="dc-val">24</div>
+              <div class="dc-val"><?= ($conductoresTotales - $conductoresDispCount) + ($enfermerosTotales - $enfermerosDispCount) ?></div>
               <div class="dc-label">Personal en Servicio</div>
             </div>
             <i class="bi bi-person"></i>
@@ -250,7 +248,6 @@ try {
 
       <div class="section-card">
         <h5>Traslados Activos</h5>
-
         <div class="traslado-card">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <div>
@@ -260,9 +257,7 @@ try {
             <span class="badge-estado b-transito">En tránsito</span>
           </div>
           <div class="progress progress-sm">
-            <div
-              class="progress-bar progress-bar-primary"
-              style="width: 65%"></div>
+            <div class="progress-bar progress-bar-primary" style="width: 65%"></div>
           </div>
           <small class="text-muted text-xs">Progreso: 65%</small>
         </div>
@@ -276,9 +271,7 @@ try {
             <span class="badge-estado b-transito">En tránsito</span>
           </div>
           <div class="progress progress-sm">
-            <div
-              class="progress-bar progress-bar-primary"
-              style="width: 30%"></div>
+            <div class="progress-bar progress-bar-primary" style="width: 30%"></div>
           </div>
           <small class="text-muted text-xs">Progreso: 30%</small>
         </div>
@@ -292,9 +285,7 @@ try {
             <span class="badge-estado b-salida">Salida</span>
           </div>
           <div class="progress progress-sm">
-            <div
-              class="progress-bar progress-bar-amber"
-              style="width: 10%"></div>
+            <div class="progress-bar progress-bar-amber" style="width: 10%"></div>
           </div>
           <small class="text-muted text-xs">Progreso: 10%</small>
         </div>
@@ -303,42 +294,59 @@ try {
 
     <!-- TRASLADOS -->
     <section class="view" id="view-traslados">
-      <div class="page-title">Gestión de Traslados</div>
+      <div class="page-title mb-4">Gestión de Traslados y Solicitudes</div>
 
-      <div class="filter-bar">
-        <i class="bi bi-funnel filter-icon"></i>
-        <select>
-          <option>Todos</option>
-          <option>En tránsito</option>
-          <option>Completado</option>
-          <option>Programado</option>
-          <option>En preparación</option>
-        </select>
-        <input type="text" placeholder="Buscar por ID o paciente" />
-      </div>
-
-      <div class="section-card p-0 overflow-hidden">
+      <!-- SECCIÓN 1: TRASLADOS CONFIRMADOS -->
+      <h5 class="mb-3 fw-bold">Traslados Confirmados</h5>
+      <div class="section-card p-0 overflow-hidden mb-5">
         <div class="table-responsive">
           <table class="table table-custom mb-0">
             <thead>
               <tr>
                 <th>ID</th>
                 <th>Fecha/Hora</th>
-                <th>Conductor</th>
-                <th>Enfermero</th>
-                <th>Paciente/Elemento</th>
-                <th>Tipo</th>
                 <th>Vehículo</th>
+                <th>Conductor</th>
+                <th>Paciente/Carga</th>
                 <th>Destino</th>
                 <th>Estado</th>
-                <th>Acciones</th>
+                <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody id="tabla-traslados-body">
               <tr>
-                <td colspan="10" class="text-center text-muted py-4">
-                  <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                  Cargando información desde la base de datos...
+                <td colspan="8" class="text-center text-muted py-4">
+                  <div class="spinner-border spinner-border-sm me-2"></div> Cargando traslados...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: SOLICITUDES PENDIENTES -->
+      <h5 class="mb-3 fw-bold">Solicitudes Pendientes de Aprobación</h5>
+
+      <div id="alert-solicitudes-container"></div>
+
+      <div class="section-card p-0 overflow-hidden">
+        <div class="table-responsive">
+          <table class="table table-custom mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID Sol.</th>
+                <th>Fecha Creada</th>
+                <th>Categoría</th>
+                <th>Paciente / Carga</th>
+                <th>Destino</th>
+                <th>Motivo</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-solicitudes-body">
+              <tr>
+                <td colspan="7" class="text-center text-muted py-4">
+                  <div class="spinner-border spinner-border-sm me-2"></div> Cargando solicitudes...
                 </td>
               </tr>
             </tbody>
@@ -366,16 +374,10 @@ try {
           <div class="step-line"></div>
           <div class="wizard-step">
             <div class="step-num">3</div>
-            <span>Recursos</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="wizard-step">
-            <div class="step-num">4</div>
             <span>Ruta</span>
           </div>
         </div>
 
-        <!-- INICIO DEL FORMULARIO -->
         <form id="formNuevoTraslado" novalidate>
           <!-- PASO 1: TIPO DE TRASLADO -->
           <div class="wizard-panel" data-step="1">
@@ -392,15 +394,13 @@ try {
             </div>
             <div class="info-box mt-3">
               <i class="bi bi-info-circle-fill"></i>
-              La categoría determina si se requerirán datos clínicos o detalle de carga.
+              La solicitud se guardará como PENDIENTE para su posterior despacho.
             </div>
           </div>
 
           <!-- PASO 2: DATOS DEL TRASLADO -->
           <div class="wizard-panel d-none" data-step="2">
             <p class="wizard-subtitle">Información Específica</p>
-
-            <!-- Panel Dinámico: Paciente -->
             <div id="seccion_paciente" class="d-none">
               <div class="row g-3">
                 <div class="col-md-6">
@@ -419,180 +419,136 @@ try {
                 <div class="col-12 mt-2">
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="requiere_soporte_uti" id="requiere_soporte_uti" value="1">
-                    <label class="form-check-label text-danger fw-bold" for="requiere_soporte_uti">
-                      Requiere Soporte Vital / UTI
-                    </label>
+                    <label class="form-check-label text-danger fw-bold" for="requiere_soporte_uti">Requiere Soporte Vital / UTI</label>
                   </div>
                 </div>
               </div>
             </div>
-
-            <!-- Panel Dinámico: Logística -->
             <div id="seccion_logistica" class="d-none">
               <div class="col-12">
                 <label class="form-label form-label-custom">Detalle exacto de la carga <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="detalle_carga" id="detalle_carga" placeholder="Ej: 10 Tubos de sangre">
               </div>
             </div>
-
-            <!-- Motivo General -->
             <div class="col-12 mt-3">
               <label class="form-label form-label-custom">Motivo del Traslado <span class="text-danger">*</span></label>
               <textarea class="form-control" name="motivo" rows="2" placeholder="Detalles adicionales..." required></textarea>
             </div>
           </div>
 
-          <!-- PASO 3: ASIGNACIÓN DE RECURSOS -->
+          <!-- PASO 3: RUTA Y HORARIOS -->
           <div class="wizard-panel d-none" data-step="3">
-            <p class="wizard-subtitle">Asignación de Vehículo y Personal</p>
-            <div class="row g-3">
-
-              <!-- Vehículos Dinámicos -->
-              <div class="col-md-4">
-                <label class="form-label form-label-custom">Vehículo <span class="text-danger">*</span></label>
-                <select class="form-select" name="vehiculo" id="vehiculo_select" required>
-                  <option value="" selected disabled>Seleccionar...</option>
-                  <?php foreach ($vehiculosDisponibles as $v): ?>
-                    <option value="<?= $v['id_vehiculo'] ?>"
-                      data-sr="<?= $v['apto_silla_ruedas'] ?>"
-                      data-cam="<?= $v['apto_camilla'] ?>"
-                      data-uti="<?= $v['apto_uti'] ?>"
-                      data-bio="<?= $v['apto_biologico'] ?>"
-                      data-ins="<?= $v['apto_insumos'] ?>">
-                      <?= htmlspecialchars($v['tipo'] . ' - ' . $v['marca'] . ' ' . $v['modelo'] . ' (' . $v['matricula'] . ')') ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-                <div id="vehiculo_warning" class="text-danger mt-1 d-none" style="font-size: 0.85rem;">No hay vehículos que cumplan los requisitos de esta categoría.</div>
-              </div>
-
-              <!-- Conductores Dinámicos -->
-              <div class="col-md-4">
-                <label class="form-label form-label-custom">Conductor <span class="text-danger">*</span></label>
-                <select class="form-select" name="conductor" required>
-                  <option value="" selected disabled>Seleccionar...</option>
-                  <?php foreach ($conductoresDisponibles as $c): ?>
-                    <option value="<?= $c['id_personal'] ?>">
-                      <?= htmlspecialchars($c['nombre'] . ' ' . $c['apellido']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
-
-              <!-- Enfermeros Dinámicos -->
-              <div class="col-md-4">
-                <label class="form-label form-label-custom">Enfermero</label>
-                <select class="form-select" name="enfermero">
-                  <option value="" selected>Ninguno / No requiere</option>
-                  <?php foreach ($enfermerosDisponibles as $e): ?>
-                    <option value="<?= $e['id_personal'] ?>">
-                      <?= htmlspecialchars($e['nombre'] . ' ' . $e['apellido']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- PASO 4: RUTA Y HORARIOS -->
-          <div class="wizard-panel d-none" data-step="4">
             <p class="wizard-subtitle">Establecer Origen, Destino y Hora</p>
             <div class="row g-3">
-
-              <!-- Origen Fijo (Bloqueado visualmente, envía ID 1) -->
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Origen</label>
                 <input type="text" class="form-control text-muted bg-light" value="Hospital de Clínicas" readonly />
                 <input type="hidden" name="origen" value="1" />
               </div>
-
-              <!-- Destinos Dinámicos -->
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Destino <span class="text-danger">*</span></label>
                 <select class="form-select" name="destino" required>
                   <option value="" selected disabled>Seleccionar destino...</option>
                   <?php foreach ($destinosDisponibles as $d): ?>
-                    <option value="<?= $d['id_ubicacion'] ?>">
-                      <?= htmlspecialchars($d['nombre']) ?> (<?= htmlspecialchars($d['tipo_ubicacion']) ?>)
-                    </option>
+                    <option value="<?= $d['id_ubicacion'] ?>"><?= htmlspecialchars($d['nombre']) ?></option>
                   <?php endforeach; ?>
                 </select>
               </div>
-
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Fecha <span class="text-danger">*</span></label>
                 <input type="date" class="form-control" name="fecha" required />
-                <div class="invalid-feedback">Seleccione una fecha.</div>
               </div>
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Hora estimada <span class="text-danger">*</span></label>
                 <input type="time" class="form-control" name="hora" required />
-                <div class="invalid-feedback">Seleccione una hora.</div>
               </div>
             </div>
           </div>
 
-          <!-- CONTENEDOR DE ALERTAS INLINE -->
           <div id="form-alert-container"></div>
-
-          <!-- BOTONERA DE NAVEGACIÓN -->
-          <div
-            class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-            <button
-              type="button"
-              class="btn btn-outline-secondary btn-wizard-prev"
-              id="btnPrevStep"
-              disabled>
-              <i class="bi bi-chevron-left"></i> ANTERIOR
-            </button>
-
-            <button
-              type="button"
-              class="btn btn-primary btn-wizard-next"
-              id="btnNextStep">
-              SIGUIENTE <i class="bi bi-chevron-right"></i>
-            </button>
-
-            <!-- Botón final oculto por defecto -->
-            <button
-              type="submit"
-              class="btn btn-success d-none"
-              id="btnSubmitForm">
-              <i class="bi bi-floppy"></i> GUARDAR TRASLADO
-            </button>
+          <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+            <button type="button" class="btn btn-outline-secondary btn-wizard-prev" id="btnPrevStep" disabled><i class="bi bi-chevron-left"></i> ANTERIOR</button>
+            <button type="button" class="btn btn-primary btn-wizard-next" id="btnNextStep">SIGUIENTE <i class="bi bi-chevron-right"></i></button>
+            <button type="submit" class="btn btn-success d-none" id="btnSubmitForm"><i class="bi bi-floppy"></i> REGISTRAR SOLICITUD</button>
           </div>
         </form>
       </div>
     </section>
 
+    <!-- MODAL ASIGNAR RECURSOS (Agregar antes de cerrar el body) -->
+    <div class="modal fade" id="modalAsignarRecursos" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold text-primary"><i class="bi bi-truck me-2"></i>Despacho: Asignar Recursos</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <form id="formAsignarRecursos">
+            <div class="modal-body">
+              <input type="hidden" name="id_solicitud" id="modal_id_solicitud" />
+              <div id="modal-alert-container"></div>
+              <div class="row g-3">
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">Vehículo <span class="text-danger">*</span></label>
+                  <select class="form-select" name="vehiculo" id="modal_vehiculo_select" required>
+                    <option value="" selected disabled>Seleccionar vehículo idóneo...</option>
+                    <?php foreach ($vehiculosDisponibles as $v): ?>
+                      <option value="<?= $v['id_vehiculo'] ?>" data-sr="<?= $v['apto_silla_ruedas'] ?>" data-cam="<?= $v['apto_camilla'] ?>" data-uti="<?= $v['apto_uti'] ?>" data-bio="<?= $v['apto_biologico'] ?>" data-ins="<?= $v['apto_insumos'] ?>">
+                        <?= htmlspecialchars($v['tipo'] . ' - ' . $v['marca'] . ' ' . $v['modelo'] . ' (' . $v['matricula'] . ')') ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                  <div id="modal_vehiculo_warning" class="text-danger mt-1 d-none" style="font-size: 0.85rem;">No hay vehículos que cumplan los requisitos.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Conductor <span class="text-danger">*</span></label>
+                  <select class="form-select" name="conductor" required>
+                    <option value="" selected disabled>Seleccionar...</option>
+                    <?php foreach ($conductoresDisponibles as $c): ?>
+                      <option value="<?= $c['id_personal'] ?>"><?= htmlspecialchars($c['nombre'] . ' ' . $c['apellido']) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Enfermero</label>
+                  <select class="form-select" name="enfermero">
+                    <option value="" selected>Ninguno / No requiere</option>
+                    <?php foreach ($enfermerosDisponibles as $e): ?>
+                      <option value="<?= $e['id_personal'] ?>"><?= htmlspecialchars($e['nombre'] . ' ' . $e['apellido']) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-top-0 pt-0">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-success" id="btnConfirmarAsignacion"><i class="bi bi-check2-circle"></i> Confirmar Despacho</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- SEGUIMIENTO -->
     <section class="view" id="view-seguimiento">
       <div class="page-title">Seguimiento</div>
-
       <div class="row g-4">
         <div class="col-12 col-xl-8">
           <div class="section-card">
             <!-- Header -->
-            <div
-              class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
               <h5 class="mb-0 seguimiento-title">AMB-001</h5>
               <span class="badge-estado b-transito"><i class="bi bi-geo-alt-fill me-1"></i>En tránsito</span>
             </div>
-
             <!-- Info grid -->
             <div class="row g-3 mb-4">
               <div class="col-6">
                 <div class="info-label">Paciente</div>
-                <div class="info-value-bold">
-                  Juan Pérez (CI: 1.234.567-8)
-                </div>
+                <div class="info-value-bold">Juan Pérez (CI: 1.234.567-8)</div>
               </div>
               <div class="col-6">
                 <div class="info-label">Vehículo</div>
-                <div class="info-value-bold">
-                  Ambulancia 01 – Patente ABC 1234
-                </div>
+                <div class="info-value-bold">Ambulancia 01 – Patente ABC 1234</div>
               </div>
               <div class="col-6">
                 <div class="info-label">Conductor</div>
@@ -603,22 +559,18 @@ try {
                 <div class="info-value">Ana García</div>
               </div>
             </div>
-
             <!-- Progress bar ruta -->
             <div class="d-flex justify-content-between mb-1 ruta-label">
               <span>Hospital de Clínicas</span>
               <strong>Hospital Maciel</strong>
             </div>
             <div class="progress mb-1 progress-md">
-              <div
-                class="progress-bar progress-bar-primary"
-                style="width: 65%"></div>
+              <div class="progress-bar progress-bar-primary" style="width: 65%"></div>
             </div>
             <div class="d-flex justify-content-between ruta-time">
               <span>Salida: 08:30</span>
               <span>Llegada estimada: 09:15</span>
             </div>
-
             <!-- Map placeholder -->
             <div class="map-placeholder mt-4">
               <i class="bi bi-geo-alt-fill map-icon"></i>
@@ -631,23 +583,16 @@ try {
         <div class="col-12 col-xl-4">
           <div class="section-card">
             <h5>Línea de Tiempo</h5>
-
             <div class="timeline-item">
-              <div class="tl-dot done">
-                <i class="bi bi-check-lg timeline-icon-lg"></i>
-              </div>
+              <div class="tl-dot done"><i class="bi bi-check-lg timeline-icon-lg"></i></div>
               <div>
                 <div class="tl-time">08:15</div>
                 <div class="tl-title">Solicitud creada</div>
-                <div class="tl-sub">
-                  Solicitud generada por Dra. María Fernández
-                </div>
+                <div class="tl-sub">Solicitud generada por Dra. María Fernández</div>
               </div>
             </div>
             <div class="timeline-item">
-              <div class="tl-dot done">
-                <i class="bi bi-check-lg timeline-icon-lg"></i>
-              </div>
+              <div class="tl-dot done"><i class="bi bi-check-lg timeline-icon-lg"></i></div>
               <div>
                 <div class="tl-time">08:20</div>
                 <div class="tl-title">Personal asignado</div>
@@ -655,9 +600,7 @@ try {
               </div>
             </div>
             <div class="timeline-item">
-              <div class="tl-dot done">
-                <i class="bi bi-check-lg timeline-icon-lg"></i>
-              </div>
+              <div class="tl-dot done"><i class="bi bi-check-lg timeline-icon-lg"></i></div>
               <div>
                 <div class="tl-time">08:25</div>
                 <div class="tl-title">Vehículo preparado</div>
@@ -665,9 +608,7 @@ try {
               </div>
             </div>
             <div class="timeline-item">
-              <div class="tl-dot done">
-                <i class="bi bi-check-lg timeline-icon-lg"></i>
-              </div>
+              <div class="tl-dot done"><i class="bi bi-check-lg timeline-icon-lg"></i></div>
               <div>
                 <div class="tl-time">08:30</div>
                 <div class="tl-title">Salida del Hospital de Clínicas</div>
@@ -675,26 +616,18 @@ try {
               </div>
             </div>
             <div class="timeline-item">
-              <div class="tl-dot current">
-                <i class="bi bi-geo-alt-fill timeline-icon-sm"></i>
-              </div>
+              <div class="tl-dot current"><i class="bi bi-geo-alt-fill timeline-icon-sm"></i></div>
               <div>
                 <div class="tl-time">08:52</div>
-                <div class="tl-title active-step">
-                  En tránsito – Av. 18 de Julio
-                </div>
+                <div class="tl-title active-step">En tránsito – Av. 18 de Julio</div>
                 <div class="tl-sub">Ubicación actual del vehículo</div>
               </div>
             </div>
             <div class="timeline-item">
-              <div class="tl-dot pending">
-                <i class="bi bi-clock timeline-icon-sm"></i>
-              </div>
+              <div class="tl-dot pending"><i class="bi bi-clock timeline-icon-sm"></i></div>
               <div>
                 <div class="tl-time">09:15</div>
-                <div class="tl-title timeline-title-muted">
-                  Llegada estimada al Hospital Maciel
-                </div>
+                <div class="tl-title timeline-title-muted">Llegada estimada al Hospital Maciel</div>
               </div>
             </div>
           </div>
@@ -702,7 +635,6 @@ try {
       </div>
     </section>
 
-    <!-- RECURSOS -->
     <!-- RECURSOS -->
     <section class="view" id="view-recursos">
       <div class="page-title">Gestión de Recursos</div>
@@ -716,9 +648,7 @@ try {
               <div class="stat-label">Vehículos Totales</div>
               <div class="stat-sub">Disponibles</div>
             </div>
-            <div class="stat-icon-circle">
-              <i class="bi bi-truck-front-fill"></i>
-            </div>
+            <div class="stat-icon-circle"><i class="bi bi-truck-front-fill"></i></div>
           </div>
         </div>
         <div class="col-12 col-sm-4">
@@ -728,9 +658,7 @@ try {
               <div class="stat-label">Conductores</div>
               <div class="stat-sub">Disponibles</div>
             </div>
-            <div class="stat-icon-circle">
-              <i class="bi bi-person-fill"></i>
-            </div>
+            <div class="stat-icon-circle"><i class="bi bi-person-fill"></i></div>
           </div>
         </div>
         <div class="col-12 col-sm-4">
@@ -740,9 +668,7 @@ try {
               <div class="stat-label">Enfermeros</div>
               <div class="stat-sub">Disponibles</div>
             </div>
-            <div class="stat-icon-circle">
-              <i class="bi bi-plus-circle-fill"></i>
-            </div>
+            <div class="stat-icon-circle"><i class="bi bi-plus-circle-fill"></i></div>
           </div>
         </div>
       </div>
@@ -858,7 +784,6 @@ try {
     <!-- CONFIGURACIÓN -->
     <section class="view" id="view-configuracion">
       <div class="page-title">Configuración</div>
-
       <div class="row g-4">
         <div class="col-lg-6">
           <div class="section-card mb-4">
@@ -873,29 +798,15 @@ try {
             </div>
             <div class="mb-0">
               <label class="form-label fw-bold form-label-custom">Sector</label>
-              <input
-                class="form-control"
-                value="Mesa Central / Traslados"
-                disabled />
+              <input class="form-control" value="Mesa Central / Traslados" disabled />
             </div>
           </div>
-
           <div class="section-card">
             <h5><i class="bi bi-palette"></i> Apariencia</h5>
             <div class="form-check form-switch mb-0">
-              <input
-                class="form-check-input check-cursor-pointer"
-                type="checkbox"
-                id="cfg-darkmode" />
-              <label
-                class="form-check-label fw-bold form-check-label-title"
-                for="cfg-darkmode">
-                Modo Oscuro (Estilo EVE)
-              </label>
-              <p class="text-muted mt-1 form-check-description">
-                Cambia la interfaz a la paleta de colores oscuros con acentos
-                neón ideal para guardias nocturnas.
-              </p>
+              <input class="form-check-input check-cursor-pointer" type="checkbox" id="cfg-darkmode" />
+              <label class="form-check-label fw-bold form-check-label-title" for="cfg-darkmode">Modo Oscuro (Estilo EVE)</label>
+              <p class="text-muted mt-1 form-check-description">Cambia la interfaz a la paleta de colores oscuros con acentos neón ideal para guardias nocturnas.</p>
             </div>
           </div>
         </div>
@@ -904,42 +815,41 @@ try {
           <div class="section-card">
             <h5>Notificaciones y Alertas</h5>
             <div class="form-check form-switch mb-3">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                checked
-                id="cfg-t1" />
-              <label
-                class="form-check-label form-check-label-custom"
-                for="cfg-t1">
-                Notificar cuando un traslado cambie a "En tránsito"
-              </label>
+              <input class="form-check-input" type="checkbox" checked id="cfg-t1" />
+              <label class="form-check-label form-check-label-custom" for="cfg-t1">Notificar cuando un traslado cambie a "En tránsito"</label>
             </div>
             <div class="form-check form-switch mb-3">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                checked
-                id="cfg-t2" />
-              <label
-                class="form-check-label form-check-label-custom"
-                for="cfg-t2">
-                Avisar sobre ambulancias con mantenimiento vencido
-              </label>
+              <input class="form-check-input" type="checkbox" checked id="cfg-t2" />
+              <label class="form-check-label form-check-label-custom" for="cfg-t2">Avisar sobre ambulancias con mantenimiento vencido</label>
             </div>
             <div class="form-check form-switch mb-0">
               <input class="form-check-input" type="checkbox" id="cfg-t3" />
-              <label
-                class="form-check-label form-check-label-custom"
-                for="cfg-t3">
-                Resumen diario de flota por correo
-              </label>
+              <label class="form-check-label form-check-label-custom" for="cfg-t3">Resumen diario de flota por correo</label>
             </div>
           </div>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- MODAL CONFIRMAR RECHAZO -->
+  <div class="modal fade" id="modalConfirmarRechazo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Rechazo</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          ¿Está seguro que desea rechazar la solicitud <strong id="rechazo-id-text"></strong>? Esta acción cancelará el viaje y no se puede deshacer.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="btnConfirmarRechazo">Sí, rechazar solicitud</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
