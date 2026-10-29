@@ -80,7 +80,7 @@ INSERT INTO RESPUESTA_PREGUNTA (id_resp_encuesta, id_pregunta, id_opcion, texto_
 (2, 3, NULL, 'Más unidades disponibles en horario nocturno.');
 
 -- ---------------------------------------------------------------------
--- BLOQUE 3 — TRASLADOS
+-- BLOQUE 3 — TRASLADOS Y RECURSOS INICIALES
 -- ---------------------------------------------------------------------
 
 INSERT INTO CANAL_SOLICITUD (nombre) VALUES
@@ -106,7 +106,7 @@ INSERT INTO RUTA (id_origen, id_destino, descripcion, distancia_km) VALUES
 (4, 1, 'Domicilio Suárez -> Hospital de Clínicas',     7.10), -- ID 3
 (1, 5, 'Hospital de Clínicas -> Laboratorio Central',  2.10); -- ID 4
 
--- Solicitudes de Traslado (Pacientes y Materiales)
+-- Solicitudes de Traslado Iniciales
 INSERT INTO SOLICITUD_TRASLADO 
 (categoria_traslado, ci_paciente, detalle_carga, tipo_movilidad, requiere_soporte_uti, id_origen, id_destino, id_canal, id_usuario_solicit, fecha_solicitud, motivo, estado_solicitud) 
 VALUES
@@ -121,7 +121,7 @@ VALUES
 -- 5. Equipamiento Logístico (SIN CÉDULA)
 ('EQUIPAMIENTO', NULL, 'Ecógrafo Portátil Mindray', 'NO_APLICA', FALSE, 1, 2, 2, 2, '2026-07-24 11:00:00', 'Solicitud Policlínica', 'PENDIENTE');
 
--- Vehículos registrados
+-- Vehículos registrados iniciales
 INSERT INTO VEHICULO (matricula, marca, modelo, anho, id_tipo_vehiculo, activo, estado_disponibilidad) VALUES
 ('SBA1234', 'Mercedes-Benz', 'Sprinter', 2021, 2, TRUE, 'DISPONIBLE'),
 ('SBB5678', 'Fiat',          'Ducato',   2019, 1, TRUE, 'DISPONIBLE'),
@@ -129,6 +129,7 @@ INSERT INTO VEHICULO (matricula, marca, modelo, anho, id_tipo_vehiculo, activo, 
 ('LOG1234', 'Chevrolet',     'Onix',     2023, 4, TRUE, 'DISPONIBLE'),
 ('LOG5678', 'Peugeot',       'Partner',  2022, 5, TRUE, 'DISPONIBLE');
 
+-- Personal inicial
 INSERT INTO PERSONAL (ci, nombre, apellido, rol_personal, activo) VALUES
 ('42112233', 'Diego',   'Martínez', 'CONDUCTOR', TRUE),
 ('43223344', 'Sofía',   'Correa',   'ENFERMERO', TRUE),
@@ -159,8 +160,107 @@ INSERT INTO TRASLADO (id_solicitud, id_vehiculo, id_ruta, id_proveedor, hora_sal
 (4, 4, 4, NULL, '2026-07-23 10:10:00', NULL, NULL);
 
 INSERT INTO PERSONAL_TRASLADO (id_traslado, id_personal, rol_en_traslado) VALUES
-(2, 4, 'CONDUCTOR'); -- Solo chofer, no requiere enfermero
+(2, 4, 'CONDUCTOR'); 
 
 INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, fecha_hora, id_usuario, observaciones) VALUES
 (2, 1, '2026-07-23 10:05:00', 2, 'Asignado vehículo de logística'),
 (2, 2, '2026-07-23 10:10:00', 2, 'Chofer retiró la nevera térmica con muestras');
+
+
+-- =====================================================================
+-- BLOQUE 4 — EXPANSIÓN DE DATOS DE PRUEBA (MÁS VOLUMEN PARA EL SISTEMA)
+-- =====================================================================
+
+-- 1. Más Ubicaciones (Hospitales y Domicilios)
+INSERT INTO UBICACION (nombre, direccion, tipo_ubicacion) VALUES
+('Sanatorio Americano',          'Isabelino Bosch 2466, Montevideo', 'CLINICA'),   -- ID 6
+('Asociación Española',          'Bulevar Artigas 1465, Montevideo', 'HOSPITAL'),  -- ID 7
+('Policlínica Zonal',            'Av. Agraciada 3200, Montevideo',   'CLINICA'),   -- ID 8
+('Domicilio - Carlos Méndez',    'Cerro Largo 1200, Montevideo',     'DOMICILIO'), -- ID 9
+('Domicilio - Ana Laura',        'Bulevar España 2500, Montevideo',  'DOMICILIO'); -- ID 10
+
+-- 2. Más Rutas
+INSERT INTO RUTA (id_origen, id_destino, descripcion, distancia_km) VALUES
+(1, 6, 'Hospital de Clínicas -> Sanatorio Americano', 2.50), -- ID 5
+(1, 7, 'Hospital de Clínicas -> Asociación Española', 1.80), -- ID 6
+(9, 1, 'Domicilio Méndez -> Hospital de Clínicas',    4.30), -- ID 7
+(1, 8, 'Hospital de Clínicas -> Policlínica Zonal',   6.00); -- ID 8
+
+-- 3. Nuevos Pacientes y Cargas (Insumos)
+INSERT INTO PACIENTE (ci, nombre, apellido, fecha_nacimiento, email, telefono) VALUES
+('47651239',  'Carlos',  'Méndez',   '1955-08-12', NULL,                 '099554433'),
+('51234567',  'Ana',     'Laura',    '1988-12-01', 'ana.laura@mail.com', '091223344'),
+('38475612',  'Luis',    'García',   '1964-03-25', 'luisg@mail.com',     '095667788'),
+('OBJ-FAR01', '[INSUMO] Medicación Oncológica', 'Farmacia HC', '2026-01-01', NULL, NULL),
+('OBJ-OX01',  '[INSUMO] 5 Balas de Oxígeno', 'Mantenimiento', '2026-01-01', NULL, NULL);
+
+-- 4. Más Vehículos (Ambulancias y Logística)
+INSERT INTO VEHICULO (matricula, marca, modelo, anho, id_tipo_vehiculo, activo, estado_disponibilidad) VALUES
+('SBD3456', 'Ford',    'Transit',  2020, 2, TRUE, 'DISPONIBLE'),  -- ID 6 (UTI)
+('SBE7890', 'Hyundai', 'H1',       2021, 1, TRUE, 'EN_USO'),      -- ID 7 (Básica)
+('LOG9012', 'Citroën', 'Berlingo', 2023, 5, TRUE, 'DISPONIBLE');  -- ID 8 (Carga)
+
+-- 5. Más Personal (Conductores y Enfermeros)
+INSERT INTO PERSONAL (ci, nombre, apellido, rol_personal, activo) VALUES
+('46556677', 'Jorge',  'Pérez', 'CONDUCTOR', TRUE), -- ID 5
+('47667788', 'María',  'Gómez', 'ENFERMERO', TRUE), -- ID 6
+('48778899', 'Andrés', 'Silva', 'CONDUCTOR', TRUE), -- ID 7
+('49889900', 'Laura',  'Ríos',  'ENFERMERO', TRUE); -- ID 8
+
+-- =====================================================================
+-- 6. NUEVAS SOLICITUDES Y SUS TRASLADOS ASOCIADOS
+-- =====================================================================
+
+-- SOLICITUD 6: Traslado completado (Humano, Camilla)
+INSERT INTO SOLICITUD_TRASLADO (categoria_traslado, ci_paciente, detalle_carga, tipo_movilidad, requiere_soporte_uti, id_origen, id_destino, id_canal, id_usuario_solicit, fecha_solicitud, motivo, estado_solicitud) 
+VALUES ('PACIENTE', '47651239', NULL, 'CAMILLA', FALSE, 9, 1, 1, 3, DATE_SUB(NOW(), INTERVAL 2 DAY), 'Ingreso por urgencia', 'COMPLETADA');
+
+INSERT INTO TRASLADO (id_solicitud, id_vehiculo, id_ruta, hora_salida_real, hora_llegada_real, hora_retorno) 
+VALUES (6, 6, 7, DATE_SUB(NOW(), INTERVAL 47 HOUR), DATE_SUB(NOW(), INTERVAL 46 HOUR), DATE_SUB(NOW(), INTERVAL 45 HOUR));
+
+INSERT INTO PERSONAL_TRASLADO (id_traslado, id_personal, rol_en_traslado) VALUES (3, 5, 'CONDUCTOR'), (3, 6, 'ENFERMERO');
+
+INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, fecha_hora, id_usuario, observaciones) VALUES
+(3, 1, DATE_SUB(NOW(), INTERVAL 48 HOUR), 2, 'Despacho asignado'),
+(3, 2, DATE_SUB(NOW(), INTERVAL 47 HOUR), 2, 'Unidad en camino al domicilio'),
+(3, 3, DATE_SUB(NOW(), INTERVAL 46 HOUR), 2, 'Paciente ingresado a emergencia exitosamente');
+
+
+-- SOLICITUD 7: Traslado cancelado (Ambulatorio)
+INSERT INTO SOLICITUD_TRASLADO (categoria_traslado, ci_paciente, detalle_carga, tipo_movilidad, requiere_soporte_uti, id_origen, id_destino, id_canal, id_usuario_solicit, fecha_solicitud, motivo, estado_solicitud) 
+VALUES ('PACIENTE', '51234567', NULL, 'AMBULATORIO', FALSE, 1, 7, 2, 2, DATE_SUB(NOW(), INTERVAL 1 DAY), 'Consulta externa', 'CANCELADA');
+
+INSERT INTO TRASLADO (id_solicitud, id_vehiculo, id_ruta) VALUES (7, 2, 6);
+INSERT INTO PERSONAL_TRASLADO (id_traslado, id_personal, rol_en_traslado) VALUES (4, 7, 'CONDUCTOR');
+
+INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, fecha_hora, id_usuario, observaciones) VALUES
+(4, 1, DATE_SUB(NOW(), INTERVAL 23 HOUR), 2, 'Asignado, en espera de salida'),
+(4, 4, DATE_SUB(NOW(), INTERVAL 22 HOUR), 2, 'El paciente fue dado de alta previa al traslado, se cancela viaje.');
+
+
+-- SOLICITUD 8: Insumos (En camino / En tránsito ahora mismo)
+INSERT INTO SOLICITUD_TRASLADO (categoria_traslado, ci_paciente, detalle_carga, tipo_movilidad, requiere_soporte_uti, id_origen, id_destino, id_canal, id_usuario_solicit, fecha_solicitud, motivo, estado_solicitud) 
+VALUES ('INSUMOS', NULL, '5 Balas de Oxígeno completas', 'NO_APLICA', FALSE, 1, 8, 1, 2, NOW(), 'Reposición semanal', 'ASIGNADA');
+
+INSERT INTO TRASLADO (id_solicitud, id_vehiculo, id_ruta) VALUES (8, 8, 8);
+INSERT INTO PERSONAL_TRASLADO (id_traslado, id_personal, rol_en_traslado) VALUES (5, 7, 'CONDUCTOR');
+
+INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, fecha_hora, id_usuario, observaciones) VALUES
+(5, 1, DATE_SUB(NOW(), INTERVAL 30 MINUTE), 2, 'Logística asignada para cargar cilindros'),
+(5, 2, DATE_SUB(NOW(), INTERVAL 5 MINUTE), 2, 'Móvil LOG9012 cargado, en ruta hacia Policlínica Zonal');
+
+
+-- SOLICITUD 9: Paciente CTI (Asignado / En preparación en base)
+INSERT INTO SOLICITUD_TRASLADO (categoria_traslado, ci_paciente, detalle_carga, tipo_movilidad, requiere_soporte_uti, id_origen, id_destino, id_canal, id_usuario_solicit, fecha_solicitud, motivo, estado_solicitud) 
+VALUES ('PACIENTE', '38475612', NULL, 'CAMILLA', TRUE, 1, 6, 1, 4, NOW(), 'Estudio de alta complejidad (Resonancia)', 'ASIGNADA');
+
+INSERT INTO TRASLADO (id_solicitud, id_vehiculo, id_ruta) VALUES (9, 6, 5);
+INSERT INTO PERSONAL_TRASLADO (id_traslado, id_personal, rol_en_traslado) VALUES (6, 5, 'CONDUCTOR'), (6, 8, 'ENFERMERO');
+
+INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, fecha_hora, id_usuario, observaciones) VALUES
+(6, 1, NOW(), 4, 'Unidad de CTI asignada. Personal preparando respirador y bomba de infusión.');
+
+
+-- SOLICITUD 10: Pendiente (Carga Biológica)
+INSERT INTO SOLICITUD_TRASLADO (categoria_traslado, ci_paciente, detalle_carga, tipo_movilidad, requiere_soporte_uti, id_origen, id_destino, id_canal, id_usuario_solicit, fecha_solicitud, motivo, estado_solicitud) 
+VALUES ('MATERIAL_BIOLOGICO', NULL, 'Muestras de biopsia urgentes', 'NO_APLICA', FALSE, 1, 6, 2, 2, DATE_ADD(NOW(), INTERVAL 1 HOUR), 'Análisis anatomía patológica', 'PENDIENTE');
