@@ -101,6 +101,26 @@ class TrasladoModelo
             }
 
             $fecha_solicitud = $datos['fecha'] . ' ' . $datos['hora'] . ':00';
+
+            // --- NUEVA LÓGICA: GESTIÓN DE DESTINO (TEXTO LIBRE) ---
+            $nombre_destino = trim($datos['destino']);
+
+            // Verificamos si ese destino ya existe en la base de datos
+            $stmtDest = $conexion->prepare("SELECT id_ubicacion FROM UBICACION WHERE nombre = ?");
+            $stmtDest->execute([$nombre_destino]);
+            $ubi = $stmtDest->fetch(PDO::FETCH_ASSOC);
+
+            if ($ubi) {
+                // Si ya existe, usamos su ID
+                $id_destino = $ubi['id_ubicacion'];
+            } else {
+                // Si no existe, lo creamos al vuelo como ubicación 'EXTERNA'
+                $stmtInsUbi = $conexion->prepare("INSERT INTO UBICACION (nombre, tipo_ubicacion) VALUES (?, 'EXTERNA')");
+                $stmtInsUbi->execute([$nombre_destino]);
+                $id_destino = $conexion->lastInsertId();
+            }
+            // ------------------------------------------------------
+
             $sqlSol = "INSERT INTO SOLICITUD_TRASLADO 
                    (categoria_traslado, ci_paciente, detalle_carga, tipo_movilidad, requiere_soporte_uti, id_origen, id_destino, id_canal, id_usuario_solicit, fecha_solicitud, motivo, estado_solicitud) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, 2, ?, ?, ?, 'PENDIENTE')";
@@ -113,7 +133,7 @@ class TrasladoModelo
                 $tipo_movilidad,
                 $requiere_soporte_uti,
                 $datos['origen'],
-                $datos['destino'],
+                $id_destino,
                 $id_usuario,
                 $fecha_solicitud,
                 $datos['motivo']
@@ -387,6 +407,23 @@ class TrasladoModelo
             return ['status' => 'success', 'detalle' => $detalle, 'historial' => $historial];
         } catch (PDOException $e) {
             return ['status' => 'error', 'mensaje' => $e->getMessage()];
+        }
+    }
+    public static function actualizarEstado($datos, $id_usuario)
+    {
+        global $conexion;
+        try {
+            $id_traslado = $datos['id_traslado'];
+            $id_estado = $datos['id_estado'];
+            $observaciones = $datos['observaciones'];
+
+            // Insertamos la actualización en la línea de tiempo del traslado
+            $stmt = $conexion->prepare("INSERT INTO HISTORIAL_ESTADO (id_traslado, id_estado, id_usuario, observaciones) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$id_traslado, $id_estado, $id_usuario, $observaciones]);
+
+            return ['status' => 'success', 'mensaje' => 'Estado y observaciones actualizados correctamente.'];
+        } catch (PDOException $e) {
+            return ['status' => 'error', 'mensaje' => 'Error al actualizar el estado: ' . $e->getMessage()];
         }
     }
 }

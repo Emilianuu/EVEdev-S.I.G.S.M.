@@ -209,7 +209,7 @@ try {
 
       <div class="row g-3 mb-4">
         <div class="col-12 col-sm-6 col-xl-3">
-          <div class="dash-card dc-blue">
+          <div class="dash-card dc-blue" style="cursor: pointer;" onclick="document.querySelector('[data-view=\'traslados\']').click();">
             <div>
               <div class="dc-val" id="dash-traslados-activos"><span class="spinner-border spinner-border-sm"></span></div>
               <div class="dc-label">Traslados Activos</div>
@@ -218,7 +218,7 @@ try {
           </div>
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
-          <div class="dash-card dc-green">
+          <div class="dash-card dc-green" style="cursor: pointer;" onclick="document.querySelector('[data-view=\'recursos\']').click();">
             <div>
               <div class="dc-val"><?= $vehiculosDispCount ?>/<?= $vehiculosTotales ?></div>
               <div class="dc-label">Vehículos Disponibles</div>
@@ -227,7 +227,7 @@ try {
           </div>
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
-          <div class="dash-card dc-orange">
+          <div class="dash-card dc-orange" style="cursor: pointer;" onclick="document.querySelector('[data-view=\'recursos\']').click();">
             <div>
               <div class="dc-val"><?= ($conductoresTotales - $conductoresDispCount) + ($enfermerosTotales - $enfermerosDispCount) ?></div>
               <div class="dc-label">Personal en Servicio</div>
@@ -259,6 +259,30 @@ try {
     <!-- TRASLADOS -->
     <section class="view" id="view-traslados">
       <div class="page-title mb-4">Gestión de Traslados y Solicitudes</div>
+
+      <div class="section-card mb-5 py-3 px-4">
+        <div class="row align-items-center g-3">
+          <div class="col-md-3 text-muted fw-bold">
+            Filtros de búsqueda:
+          </div>
+          <div class="col-md-4">
+            <select id="filtro-estado" class="form-select border-primary">
+              <option value="">Todos los estados</option>
+              <option value="pendiente">Solo Solicitudes Pendientes</option>
+              <option value="asignado">Traslados Asignados (En base)</option>
+              <option value="camino">Traslados En Camino / Tránsito</option>
+              <option value="completado">Traslados Completados</option>
+              <option value="cancelado">Traslados Cancelados</option>
+            </select>
+          </div>
+          <div class="col-md-5">
+            <div class="input-group">
+              <span class="input-group-text border-primary bg-transparent text-primary"><i class="bi bi-search"></i></span>
+              <input type="text" id="filtro-texto" class="form-control border-primary" placeholder="Buscar paciente, ID, destino, vehículo...">
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- SECCIÓN 1: TRASLADOS CONFIRMADOS -->
       <h5 class="mb-3 fw-bold">Traslados Confirmados</h5>
@@ -408,28 +432,28 @@ try {
           <div class="wizard-panel d-none" data-step="3">
             <p class="wizard-subtitle">Establecer Origen, Destino y Hora</p>
             <div class="row g-3">
+
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Origen</label>
                 <input type="text" class="form-control text-muted bg-light" value="Hospital de Clínicas" readonly />
                 <input type="hidden" name="origen" value="1" />
               </div>
+
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Destino <span class="text-danger">*</span></label>
-                <select class="form-select" name="destino" required>
-                  <option value="" selected disabled>Seleccionar destino...</option>
-                  <?php foreach ($destinosDisponibles as $d): ?>
-                    <option value="<?= $d['id_ubicacion'] ?>"><?= htmlspecialchars($d['nombre']) ?></option>
-                  <?php endforeach; ?>
-                </select>
+                <input type="text" class="form-control" name="destino" placeholder="Ej: Sanatorio Americano, Domicilio..." required />
               </div>
+
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Fecha <span class="text-danger">*</span></label>
                 <input type="date" class="form-control" name="fecha" required />
               </div>
+
               <div class="col-md-6">
                 <label class="form-label form-label-custom">Hora estimada <span class="text-danger">*</span></label>
                 <input type="time" class="form-control" name="hora" required />
               </div>
+
             </div>
           </div>
 
@@ -501,61 +525,77 @@ try {
     <section class="view" id="view-seguimiento">
       <div class="page-title mb-4">Seguimiento de Traslado</div>
 
-      <!-- Estado vacío por defecto -->
-      <div id="seg-empty-state" class="text-center py-5 mt-5">
-        <i class="bi bi-geo-alt display-1 text-muted mb-3 opacity-50"></i>
-        <h4 class="text-muted">Seleccione un traslado</h4>
-        <p class="text-muted">Haga clic en el botón "Ver Seguimiento" en la tabla de traslados activos.</p>
-      </div>
+      <!-- NUEVO: CONTENEDOR DE ALERTAS DE SEGUIMIENTO -->
+      <div id="alert-seguimiento-container"></div>
 
-      <!-- Contenedor dinámico (oculto inicialmente) -->
-      <div id="seg-content-container" class="row g-4 d-none">
-        <div class="col-12 col-xl-8">
-          <div class="section-card">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <h5 class="mb-0 seguimiento-title" id="seg-titulo">AMB-###</h5>
-              <span id="seg-badge" class="badge-estado b-transito">Estado</span>
-            </div>
-
-            <div class="row g-3 mb-4">
-              <div class="col-6">
-                <div class="info-label">Paciente / Carga</div>
-                <div class="info-value-bold" id="seg-paciente">-</div>
+      <div class="section-card mb-4 py-3 px-4">
+        <div class="section-card mb-4 py-3 px-4">
+          <div class="row align-items-center g-3">
+            <div class="col-md-6 col-lg-5">
+              <label class="form-label fw-bold text-primary mb-1"><i class="bi bi-search me-1"></i> Buscar Traslado Manualmente</label>
+              <div class="input-group">
+                <span class="input-group-text border-primary bg-transparent text-primary fw-bold">AMB-</span>
+                <input type="number" id="input-buscar-seguimiento" class="form-control border-primary" placeholder="Ej: 3" min="1" oninput="this.value = Math.abs(this.value)">
+                <button class="btn btn-primary" type="button" id="btn-buscar-seguimiento">Rastrear</button>
               </div>
-              <div class="col-6">
-                <div class="info-label">Vehículo</div>
-                <div class="info-value-bold" id="seg-vehiculo">-</div>
-              </div>
-              <div class="col-6">
-                <div class="info-label">Conductor</div>
-                <div class="info-value" id="seg-conductor">-</div>
-              </div>
-              <div class="col-6">
-                <div class="info-label">Enfermero Responsable</div>
-                <div class="info-value" id="seg-enfermero">-</div>
-              </div>
-            </div>
-
-            <div class="d-flex justify-content-between mb-1 ruta-label">
-              <span id="seg-origen">Origen</span>
-              <strong id="seg-destino">Destino</strong>
-            </div>
-            <div class="progress mb-1 progress-md">
-              <div id="seg-progress-bar" class="progress-bar progress-bar-primary" style="width: 0%"></div>
             </div>
           </div>
         </div>
 
-        <!-- Línea de Tiempo Dinámica -->
-        <div class="col-12 col-xl-4">
-          <div class="section-card">
-            <h5>Línea de Tiempo</h5>
-            <div id="seg-timeline-container">
-              <!-- JS inyectará los pasos aquí -->
+        <!-- Estado vacío por defecto -->
+        <div id="seg-empty-state" class="text-center py-5 mt-5">
+          <i class="bi bi-geo-alt display-1 text-muted mb-3 opacity-50"></i>
+          <h4 class="text-muted">Seleccione un traslado</h4>
+          <p class="text-muted">Haga clic en el botón "Ver Seguimiento" en la tabla de traslados activos.</p>
+        </div>
+
+        <!-- Contenedor dinámico (oculto inicialmente) -->
+        <div id="seg-content-container" class="row g-4 d-none">
+          <div class="col-12 col-xl-8">
+            <div class="section-card">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0 seguimiento-title" id="seg-titulo">AMB-###</h5>
+                <span id="seg-badge" class="badge-estado b-transito">Estado</span>
+              </div>
+
+              <div class="row g-3 mb-4">
+                <div class="col-6">
+                  <div class="info-label">Paciente / Carga</div>
+                  <div class="info-value-bold" id="seg-paciente">-</div>
+                </div>
+                <div class="col-6">
+                  <div class="info-label">Vehículo</div>
+                  <div class="info-value-bold" id="seg-vehiculo">-</div>
+                </div>
+                <div class="col-6">
+                  <div class="info-label">Conductor</div>
+                  <div class="info-value" id="seg-conductor">-</div>
+                </div>
+                <div class="col-6">
+                  <div class="info-label">Enfermero Responsable</div>
+                  <div class="info-value" id="seg-enfermero">-</div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between mb-1 ruta-label">
+                <span id="seg-origen">Origen</span>
+                <strong id="seg-destino">Destino</strong>
+              </div>
+              <div class="progress mb-1 progress-md">
+                <div id="seg-progress-bar" class="progress-bar progress-bar-primary" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Línea de Tiempo Dinámica -->
+          <div class="col-12 col-xl-4">
+            <div class="section-card">
+              <h5>Línea de Tiempo</h5>
+              <div id="seg-timeline-container">
+              </div>
             </div>
           </div>
         </div>
-      </div>
     </section>
 
     <!-- RECURSOS -->
@@ -787,14 +827,6 @@ try {
             <input type="hidden" name="id_traslado" id="mod_id_traslado" />
             <div class="row g-3">
               <div class="col-md-12">
-                <label class="form-label fw-bold">Estado del Traslado <span class="text-danger">*</span></label>
-                <select class="form-select border-primary" name="estado" id="mod_estado" required>
-                  <option value="1">Asignado (Preparación)</option>
-                  <option value="2">En Camino / En Tránsito</option>
-                  <option value="3">Completado</option>
-                </select>
-              </div>
-              <div class="col-md-12">
                 <label class="form-label fw-bold">Vehículo <span class="text-danger">*</span></label>
                 <select class="form-select" name="vehiculo" id="mod_vehiculo" required>
                   <?php foreach ($todosVehiculos as $v): ?>
@@ -846,6 +878,40 @@ try {
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
           <button type="button" class="btn btn-danger" id="btnConfirmarCancelacion">Sí, cancelar traslado</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ACTUALIZAR ESTADO Y OBSERVACIONES -->
+  <div class="modal fade" id="modalActualizarEstado" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-success"><i class="bi bi-clock-history me-2"></i>Actualizar Estado AMB-<span id="lbl_estado_id"></span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form id="formActualizarEstado">
+          <div class="modal-body">
+            <input type="hidden" name="id_traslado" id="estado_id_traslado" />
+            <div class="mb-3">
+              <label class="form-label fw-bold">Nuevo Estado <span class="text-danger">*</span></label>
+              <select class="form-select border-success" name="id_estado" required>
+                <option value="" selected disabled>Seleccione fase del viaje...</option>
+                <option value="2">En Camino / En Tránsito</option>
+                <option value="3">Completado / Llegada a destino</option>
+              </select>
+            </div>
+            <div class="mb-0">
+              <label class="form-label fw-bold">Observaciones <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="observaciones" rows="3" placeholder="Ej: Chofer retiró la nevera térmica con muestras..." required></textarea>
+              <small class="text-muted">Este texto aparecerá debajo del estado en la Línea de Tiempo.</small>
+            </div>
+          </div>
+          <div class="modal-footer border-top-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-success" id="btnGuardarEstado"><i class="bi bi-send-check"></i> Registrar Avance</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

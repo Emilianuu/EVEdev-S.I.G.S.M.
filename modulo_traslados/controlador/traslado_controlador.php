@@ -128,6 +128,15 @@ switch ($accion) {
         }
         break;
 
+    case 'actualizar_estado':
+        $datos = $_POST;
+        $id_usuario = $_SESSION['id_usuario']; // El conductor/usuario logueado
+        $resultado = TrasladoModelo::actualizarEstado($datos, $id_usuario);
+
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($resultado);
+        exit;
+
     default:
         http_response_code(400);
         header('Content-Type: application/json; charset=utf-8');

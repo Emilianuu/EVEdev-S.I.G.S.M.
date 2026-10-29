@@ -238,10 +238,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (currentStep === 3) {
         const fechaInput = currentPanel.querySelector('input[name="fecha"]');
+        const horaInput = currentPanel.querySelector('input[name="hora"]');
+
         if (fechaInput && fechaInput.value) {
-          if (fechaInput.value < new Date().toISOString().split("T")[0]) {
+          const hoy = new Date();
+          // Obtener fecha local en formato YYYY-MM-DD
+          const fechaHoyStr =
+            hoy.getFullYear() +
+            "-" +
+            String(hoy.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(hoy.getDate()).padStart(2, "0");
+
+          if (fechaInput.value < fechaHoyStr) {
             isValid = false;
             fechaInput.classList.add("is-invalid");
+          } else if (
+            fechaInput.value === fechaHoyStr &&
+            horaInput &&
+            horaInput.value
+          ) {
+            // Si el traslado es hoy, validamos que la hora no haya pasado
+            const horaActualStr =
+              String(hoy.getHours()).padStart(2, "0") +
+              ":" +
+              String(hoy.getMinutes()).padStart(2, "0");
+            if (horaInput.value < horaActualStr) {
+              isValid = false;
+              horaInput.classList.add("is-invalid");
+            }
           }
         }
       }
@@ -395,6 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
             formAsignar.reset();
             cargarTraslados();
             cargarSolicitudesPendientes();
+            cargarDashboard();
           } else {
             document.getElementById("modal-alert-container").innerHTML =
               `<div class="alert alert-danger">${d.mensaje}</div>`;
@@ -509,6 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 5000);
   }
 
+  /* --- MODIFICAR TRASLADO --- */
   window.modificarTraslado = function (id) {
     // 1. Obtener datos actuales
     fetch(
@@ -519,7 +546,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data) {
           document.getElementById("mod_title_id").textContent = id;
           document.getElementById("mod_id_traslado").value = id;
-          document.getElementById("mod_estado").value = data.id_estado || "1";
+
+          // Solo cargamos los recursos (vehículo y personal)
           document.getElementById("mod_vehiculo").value =
             data.id_vehiculo || "";
           document.getElementById("mod_conductor").value =
@@ -702,7 +730,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <td>${t.destino || "-"}</td>
               <td><span class="badge-estado ${claseEstado}" style="${estiloNaranja}">${textoEstado.replace("_", " ")}</span></td>
               
-              <!-- 2. Botón desplegable de acciones -->
+              <!-- 2. Botón desplegable de acciones dinámico -->
               <td class="text-center">
                 <div class="dropdown">
                   <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -714,9 +742,19 @@ document.addEventListener("DOMContentLoaded", () => {
                         <i class="bi bi-geo-alt-fill me-2"></i> Ver Seguimiento
                       </a>
                     </li>
+                    
+                    ${
+                      !estadoMin.includes("cancelado") &&
+                      !estadoMin.includes("completado")
+                        ? `
+                    <li>
+                      <a class="dropdown-item text-success fw-bold" href="#" onclick="abrirModalEstado(${t.id_traslado}, '${textoEstado}'); return false;">
+                        <i class="bi bi-clock-history me-2"></i> Registrar Avance
+                      </a>
+                    </li>
                     <li>
                       <a class="dropdown-item text-primary" href="#" onclick="modificarTraslado(${t.id_traslado}); return false;">
-                        <i class="bi bi-pencil-square me-2"></i> Modificar estado
+                        <i class="bi bi-pencil-square me-2"></i> Modificar traslado
                       </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
@@ -725,11 +763,19 @@ document.addEventListener("DOMContentLoaded", () => {
                         <i class="bi bi-x-circle me-2"></i> Cancelar viaje
                       </a>
                     </li>
+                    `
+                        : `
+                    <li><hr class="dropdown-divider"></li>
+                    <li><span class="dropdown-item-text text-muted small"><i class="bi bi-lock-fill"></i> Viaje cerrado</span></li>
+                    `
+                    }
                   </ul>
                 </div>
               </td>
             </tr>`;
         });
+
+        if (typeof aplicarFiltros === "function") aplicarFiltros();
       })
       .catch(console.error);
   }
@@ -781,6 +827,8 @@ document.addEventListener("DOMContentLoaded", () => {
               </td>
             </tr>`;
         });
+
+        if (typeof aplicarFiltros === "function") aplicarFiltros();
       })
       .catch(console.error);
   }
@@ -817,6 +865,7 @@ document.addEventListener("DOMContentLoaded", () => {
           let textoProgreso = "1/3 - Recursos asignados (En Base)";
           let claseBadge = "b-prep";
           let barraClase = "progress-bar-primary";
+          let estiloNaranja = "";
 
           if (estadoMin.includes("asignado")) {
             porcentaje = 25;
@@ -836,7 +885,9 @@ document.addEventListener("DOMContentLoaded", () => {
           ) {
             porcentaje = 75;
             textoProgreso = "3/3 - En tránsito hacia destino";
-            claseBadge = "b-transito";
+            claseBadge = "";
+            estiloNaranja =
+              "background-color: #fd7e14; color: white; border: none;"; // Naranja Bootstrap
           } else if (estadoMin.includes("completado")) {
             porcentaje = 100;
             textoProgreso = "Llegada confirmada";
@@ -851,7 +902,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   <h6 class="mb-1">AMB-${t.id_traslado} – ${t.paciente_elemento}</h6>
                   <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>Destino: ${t.destino}</small>
                 </div>
-                <span class="badge-estado ${claseBadge}">${estadoTxt.replace("_", " ")}</span>
+                <span class="badge-estado ${claseBadge}" style="${estiloNaranja}">${estadoTxt.replace("_", " ")}</span>
               </div>
               <div class="progress mb-1 progress-sm">
                 <div class="progress-bar ${barraClase} progress-bar-striped progress-bar-animated" style="width: ${porcentaje}%"></div>
@@ -890,7 +941,31 @@ document.addEventListener("DOMContentLoaded", () => {
     )
       .then((res) => res.json())
       .then((data) => {
-        if (data.status !== "success") return;
+        // Manejo de error: Si el traslado no existe
+        if (data.status !== "success") {
+          // Volver a mostrar el estado inicial (ocultar el loader)
+          document.getElementById("seg-empty-state").classList.remove("d-none");
+          document
+            .getElementById("seg-content-container")
+            .classList.add("d-none");
+
+          // Mostrar alerta en pantalla
+          const alertCont = document.getElementById(
+            "alert-seguimiento-container",
+          );
+          if (alertCont) {
+            alertCont.innerHTML = `
+              <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div>${data.mensaje || "El traslado solicitado no existe."}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>`;
+            setTimeout(() => {
+              alertCont.innerHTML = "";
+            }, 5000);
+          }
+          return;
+        }
 
         const det = data.detalle;
         const hist = data.historial;
@@ -911,35 +986,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Determinar estado actual y barra
         let progreso = 25; // Base Asignado
-        let badgeClass = "b-prep";
+        let badgeClass = "b-programado"; // Azul por defecto para Asignado
         let estadoActual = "Asignado";
+        let estiloNaranja = ""; // Variable para forzar naranja
 
         if (hist.length > 0) {
           estadoActual = hist[hist.length - 1].estado;
           const estadoMin = estadoActual.toLowerCase();
+
           if (estadoMin.includes("camino") || estadoMin.includes("transito")) {
             progreso = 65;
-            badgeClass = "b-transito";
+            badgeClass = ""; // Quitamos clase para que no choque
+            estiloNaranja =
+              "background-color: #fd7e14; color: white; border: none;"; // Naranja
           } else if (estadoMin.includes("completado")) {
             progreso = 100;
             badgeClass = "b-completado";
           } else if (estadoMin.includes("cancelado")) {
             progreso = 100;
-            badgeClass = "bg-danger";
+            badgeClass = "bg-danger text-white border-0";
+          } else if (estadoMin.includes("asignado")) {
+            progreso = 25;
+            badgeClass = "b-programado"; // Azul
           }
         }
 
-        document.getElementById("seg-badge").className =
-          `badge-estado ${badgeClass}`;
-        document.getElementById("seg-badge").textContent = estadoActual.replace(
-          "_",
-          " ",
-        );
+        const badgeSeg = document.getElementById("seg-badge");
+        badgeSeg.className = `badge-estado ${badgeClass}`;
+        badgeSeg.style.cssText = estiloNaranja; // Aplica naranja si es en camino, o limpia estilos extra
+        badgeSeg.textContent = estadoActual.replace("_", " ");
 
         const bar = document.getElementById("seg-progress-bar");
         bar.style.width = progreso + "%";
         bar.className = `progress-bar ${progreso === 100 ? (estadoActual.includes("CANCELADO") ? "bg-danger" : "bg-success") : "progress-bar-primary"}`;
-
         // 3. Dibujar Línea de Tiempo
         let timelineHTML = "";
 
@@ -1019,5 +1098,181 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
       `;
+  }
+  /* --- BARRA DE FILTROS EN TIEMPO REAL --- */
+  const inputFiltroTexto = document.getElementById("filtro-texto");
+  const selectFiltroEstado = document.getElementById("filtro-estado");
+
+  window.aplicarFiltros = function () {
+    const texto = inputFiltroTexto ? inputFiltroTexto.value.toLowerCase() : "";
+    const estado = selectFiltroEstado
+      ? selectFiltroEstado.value.toLowerCase()
+      : "";
+
+    // 1. Filtrar tabla de Traslados Confirmados
+    const filasTraslados = document.querySelectorAll(
+      "#tabla-traslados-body tr",
+    );
+    filasTraslados.forEach((fila) => {
+      if (fila.cells.length === 1) return; // Ignora la fila de "Cargando..." o "Sin datos" si abarca toda la tabla
+
+      const textoFila = fila.textContent.toLowerCase();
+      const badge = fila.querySelector(".badge-estado");
+      const estadoFila = badge ? badge.textContent.toLowerCase() : "";
+
+      const coincideTexto = textoFila.includes(texto);
+      const coincideEstado = estado === "" || estadoFila.includes(estado);
+
+      // Si el usuario elige ver solo "pendientes", ocultamos todos los traslados confirmados
+      if (estado === "pendiente") {
+        fila.style.display = "none";
+      } else {
+        fila.style.display = coincideTexto && coincideEstado ? "" : "none";
+      }
+    });
+
+    // 2. Filtrar tabla de Solicitudes Pendientes
+    const filasSolicitudes = document.querySelectorAll(
+      "#tabla-solicitudes-body tr",
+    );
+    filasSolicitudes.forEach((fila) => {
+      if (fila.cells.length === 1) return; // Ignora la fila de "Cargando..."
+
+      const textoFila = fila.textContent.toLowerCase();
+      const coincideTexto = textoFila.includes(texto);
+
+      // Las solicitudes siempre son "pendientes". Si el usuario elige un estado distinto, se ocultan.
+      const coincideEstado = estado === "" || estado === "pendiente";
+
+      fila.style.display = coincideTexto && coincideEstado ? "" : "none";
+    });
+  };
+
+  if (inputFiltroTexto)
+    inputFiltroTexto.addEventListener("input", aplicarFiltros);
+  if (selectFiltroEstado)
+    selectFiltroEstado.addEventListener("change", aplicarFiltros);
+
+  /* --- BARRA DE BÚSQUEDA EN SEGUIMIENTO --- */
+  const inputBuscarSeg = document.getElementById("input-buscar-seguimiento");
+  const btnBuscarSeg = document.getElementById("btn-buscar-seguimiento");
+
+  function buscarTrasladoSeguimiento() {
+    if (!inputBuscarSeg) return;
+    const id = inputBuscarSeg.value.trim();
+
+    if (id === "") {
+      mostrarAlertaTrasladosTop(
+        "Por favor, ingrese el ID numérico del traslado.",
+        "warning",
+      );
+      return;
+    }
+
+    // Aprovechamos la función verSeguimiento que ya hace todo el trabajo
+    verSeguimiento(id);
+
+    // Limpiamos el input después de buscar
+    inputBuscarSeg.value = "";
+  }
+
+  if (btnBuscarSeg) {
+    btnBuscarSeg.addEventListener("click", buscarTrasladoSeguimiento);
+  }
+
+  if (inputBuscarSeg) {
+    inputBuscarSeg.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        buscarTrasladoSeguimiento();
+      }
+    });
+  }
+  /* --- ACTUALIZAR ESTADO Y OBSERVACIONES (MODAL) --- */
+  window.abrirModalEstado = function (id, estadoTxt) {
+    document.getElementById("lbl_estado_id").textContent = id;
+    document.getElementById("estado_id_traslado").value = id;
+    document.getElementById("formActualizarEstado").reset();
+
+    // Evaluar estado actual
+    const selectEstado = document.querySelector(
+      '#formActualizarEstado select[name="id_estado"]',
+    );
+    const estadoMin = (estadoTxt || "").toLowerCase();
+
+    Array.from(selectEstado.options).forEach((opt) => {
+      if (opt.value === "") return;
+      const val = parseInt(opt.value);
+
+      // RESTRICCIÓN: Si ya está en camino, desactivar opción "En camino" para obligar a elegir "Completado"
+      if (estadoMin.includes("camino") || estadoMin.includes("transito")) {
+        opt.disabled = val <= 2;
+      } else {
+        opt.disabled = false;
+      }
+    });
+
+    // Autoseleccionar la opción "Completado" si ya estaba "En camino"
+    if (estadoMin.includes("camino") || estadoMin.includes("transito")) {
+      selectEstado.value = "3";
+    }
+
+    const modalEst = new bootstrap.Modal(
+      document.getElementById("modalActualizarEstado"),
+    );
+    modalEst.show();
+  };
+
+  const formEstado = document.getElementById("formActualizarEstado");
+  if (formEstado) {
+    formEstado.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const btn = document.getElementById("btnGuardarEstado");
+      const textoOrig = btn.innerHTML;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Actualizando...';
+      btn.disabled = true;
+
+      const formData = new FormData(this);
+      formData.append("accion", "actualizar_estado");
+
+      fetch("../controlador/traslado_controlador.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          btn.innerHTML = textoOrig;
+          btn.disabled = false;
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalActualizarEstado"),
+          ).hide();
+
+          if (data.status === "success") {
+            mostrarAlertaTrasladosTop(
+              "Avance registrado en el traslado AMB-" +
+                formData.get("id_traslado") +
+                ".",
+              "success",
+            );
+            cargarTraslados(); // Refrescar la tabla
+            cargarDashboard(); // Refrescar los indicadores principales
+          } else {
+            mostrarAlertaTrasladosTop("Error: " + data.mensaje, "danger");
+          }
+        })
+        .catch((err) => {
+          btn.innerHTML = textoOrig;
+          btn.disabled = false;
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalActualizarEstado"),
+          ).hide();
+          mostrarAlertaTrasladosTop(
+            "Error de conexión al registrar el avance.",
+            "danger",
+          );
+        });
+    });
   }
 });
